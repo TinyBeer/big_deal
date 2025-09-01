@@ -2,30 +2,36 @@
 const jutils = require("./utils");
 
 /* config */
+// const objList = [
+//   { name: "雀神来也", dur_m: 60 },
+//   { name: "货柜趣消除", dur_m: 35 },
+//   { name: "趣味叠叠乐", dur_m: 15 },
+//   { name: "排队上车", dur_m: 15 },
+//   { name: "方块拼图", dur_m: 15 },
+//   { name: "养猪猪", dur_m: 10 },
+//   { name: "京豆捕鱼", dur_m: 8 },
+//   { name: "种菜领现金", dur_m: 0 },
+//   { name: "消灭小萌星", dur_m: 30 },
+//   { name: "麻将凑十", dur_m: 15 },
+//   { name: "解压硬币", dur_m: 15 },
+//   { name: "2048方块", dur_m: 60 },
+//   { name: "毛线大师", dur_m: 15 },
+//   { scroll: true },
+//   { name: "点点2048", dur_m: 15 },
+//   { name: "合成原始人", dur_m: 15 },
+//   { name: "无尽泡泡龙", dur_m: 15 },
+//   { name: "打螺丝王者", dur_m: 15 },
+//   { name: "数字喜加1", dur_m: 15 },
+//   { name: "纸牌接龙", dur_m: 15 },
+//   { name: "喵喵十消", dur_m: 15 },
+//   { name: "超级连连看", dur_m: 15 },
+//   // { name: "2048", dur_m: 0.1 },
+// ];
+
 const objList = [
-  { name: "雀神来也", dur_m: 60 },
-  { name: "货柜趣消除", dur_m: 35 },
-  { name: "趣味叠叠乐", dur_m: 15 },
-  { name: "排队上车", dur_m: 15 },
-  { name: "方块拼图", dur_m: 15 },
-  { name: "养猪猪", dur_m: 10 },
-  { name: "京豆捕鱼", dur_m: 8 },
-  { name: "种菜领现金", dur_m: 0 },
-  { name: "消灭小萌星", dur_m: 30 },
-  { name: "麻将凑十", dur_m: 15 },
-  { name: "解压硬币", dur_m: 15 },
-  { name: "2048方块", dur_m: 60 },
-  { name: "毛线大师", dur_m: 15 },
   { scroll: true },
-  { name: "点点2048", dur_m: 15 },
-  { name: "合成原始人", dur_m: 15 },
-  { name: "无尽泡泡龙", dur_m: 15 },
-  { name: "打螺丝王者", dur_m: 15 },
-  { name: "数字喜加1", dur_m: 15 },
-  { name: "纸牌接龙", dur_m: 15 },
-  { name: "喵喵十消", dur_m: 15 },
-  { name: "超级连连看", dur_m: 15 },
-  // { name: "2048", dur_m: 0.1 },
+  { name: "纸牌接龙", dur_m: 0.1 },
+  { name: "超级连连看", dur_m: 1 },
 ];
 
 function run() {
@@ -46,13 +52,15 @@ function run() {
 }
 
 function workWithName() {
+  let scorlled = false;
   for (let i = 0; i < objList.length; i++) {
     let e = objList[i];
     if (e.scroll) {
       scrollDown();
-      sleep(2000);
+      sleep(1000);
       scrollDown();
-      sleep(2000);
+      sleep(1000);
+      scorlled = true;
       continue;
     }
 
@@ -84,6 +92,8 @@ function workWithName() {
       back();
       back();
       sleep(2000);
+
+      open_box(scorlled);
     }
   }
 }
@@ -108,6 +118,48 @@ function enterInteractiveGames() {
     click(interactiveGame.center());
     sleep(5000);
   }
+}
+
+function open_box(scrolld) {
+  if (scrolld) {
+    scrollUp();
+    sleep(1000);
+    scrollUp();
+    sleep(1000);
+  }
+  let box = textContains("个盲盒待开").findOne(1000);
+  console.log(box.text());
+
+  if (!box) {
+    return true;
+  }
+
+  click(box.center());
+  sleep(2000);
+
+  while (true) {
+    let open = text("一键开启").findOne(1000);
+    if (!open) {
+      break;
+    }
+    click(open.center());
+    sleep(5000);
+
+    let pean = textContains("京豆+").findOne(3000);
+    if (!pean) {
+      return false;
+    }
+    click(450, 1500);
+    sleep(2000);
+  }
+
+  if (scrolld) {
+    scrollDown();
+    sleep(1000);
+    scrollDown();
+    sleep(1000);
+  }
+  return true;
 }
 
 //  导出函数（供其他脚本调用）
