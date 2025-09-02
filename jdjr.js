@@ -141,6 +141,13 @@ function enterInteractiveGames() {
     click(interactiveGame.center());
     sleep(5000);
   }
+
+  let pean = textContains("京豆+").findOne(3000);
+  if (pean) {
+    // first enter
+    click(400, 1300);
+    sleep(2000);
+  }
 }
 
 function open_box(scrolld) {
