@@ -21,7 +21,7 @@ const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
 // utils.preciseSleep(waitTime, true);
 
 jdjr.run();
-// jd.run();
+jd.run();
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");

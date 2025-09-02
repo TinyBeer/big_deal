@@ -29,9 +29,29 @@ const jutils = require("./utils");
 // ];
 
 const objList = [
+  { name: "雀神来也", dur_m: 0 },
+  { name: "货柜趣消除", dur_m: 1 },
+  { name: "趣味叠叠乐", dur_m: 0 },
+  { name: "排队上车", dur_m: 1 },
+  { name: "方块拼图", dur_m: 1 },
+  { name: "养猪猪", dur_m: 10 },
+  { name: "京豆捕鱼", dur_m: 8 },
+  { name: "种菜领现金", dur_m: 0 },
+  { name: "消灭小萌星", dur_m: 30 },
+  { name: "麻将凑十", dur_m: 15 },
+  { name: "解压硬币", dur_m: 15 },
+  { name: "2048方块", dur_m: 60 },
+  { name: "毛线大师", dur_m: 15 },
   { scroll: true },
-  { name: "纸牌接龙", dur_m: 0.1 },
-  { name: "超级连连看", dur_m: 1 },
+  { name: "点点2048", dur_m: 15 },
+  { name: "合成原始人", dur_m: 15 },
+  { name: "无尽泡泡龙", dur_m: 15 },
+  { name: "打螺丝王者", dur_m: 15 },
+  { name: "数字喜加1", dur_m: 15 },
+  { name: "纸牌接龙", dur_m: 15 },
+  { name: "喵喵十消", dur_m: 15 },
+  { name: "超级连连看", dur_m: 15 },
+  // { name: "2048", dur_m: 0.1 },
 ];
 
 function run() {
@@ -128,11 +148,10 @@ function open_box(scrolld) {
     sleep(1000);
   }
   let box = textContains("个盲盒待开").findOne(1000);
-  console.log(box.text());
-
   if (!box) {
     return true;
   }
+  console.log(box.text());
 
   click(box.center());
   sleep(2000);
