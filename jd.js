@@ -25,9 +25,73 @@ function run() {
   jinxi_direct();
   interactive_game_sign();
   interactive_game();
+  redeem_prize_tickets();
 }
 
 /* tasks */
+
+function redeem_prize_tickets() {
+  let backCnt = 0;
+  let enter = text("我的").findOne(1000);
+  if (!enter) {
+    return false;
+  }
+  click(enter.center());
+  shortWait();
+  backCnt++;
+
+  let gameEnter = text("互动游戏").findOne(1000);
+  if (!gameEnter) {
+    backN(backCnt);
+    return false;
+  }
+  click(gameEnter.center());
+  longWait();
+  backCnt++;
+
+  let redeemEnter = text("兑换").findOne(1000);
+  if (!redeemEnter) {
+    backN(backCnt);
+    return false;
+  }
+  click(redeemEnter.center());
+  backCnt++;
+  shortWait();
+
+  let fifteenTickets = text("15").findOne(1000);
+  if (!fifteenTickets) {
+    console.log("fifteen tickets not found");
+    backN(backCnt);
+    return false;
+  }
+  let tParent = fifteenTickets.parent();
+  if (!tParent || tParent.childCount() != 3) {
+    console.log("get wrong target");
+    backN(backCnt);
+    return false;
+  }
+  for (let i = 0; i < tParent.childCount(); i++) {
+    if (
+      tParent.children()[i].text() === "15" ||
+      tParent.children()[i].text() === "奖票"
+    ) {
+      continue;
+    }
+    click(tParent.children()[i].center());
+    shortWait();
+    var obj = text("确认兑换").findOne(1000);
+    if (!obj) {
+      console.log("sth wrong, break");
+      break;
+    }
+    var redeemBtn = text("确认兑换").findOne(1000);
+    click(redeemBtn.center());
+    shortWait();
+    break;
+  }
+
+  backN(backCnt);
+}
 
 function flash_sale() {
   let enter = text("秒杀").findOne(1000);
