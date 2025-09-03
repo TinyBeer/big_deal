@@ -9,6 +9,10 @@ function shortWait() {
   sleep(3000);
 }
 
+function mediumWait() {
+  sleep(5000);
+}
+
 function longWait() {
   sleep(8000);
 }
@@ -27,12 +31,92 @@ function run() {
   interactive_game();
   redeem_prize_tickets();
   dong_dong_farm();
+  global_shopping();
 }
 
 /* tasks */
 
+function global_shopping() {
+  let gs = homePageGetEnter("全球购");
+  if (!gs) {
+    console.log("missing 全球购 item, back");
+    swipe(ex, ey, sx, sy, 500);
+    shortWait();
+    return false;
+  }
+
+  click(gs.center());
+  shortWait();
+
+  let closeBtn = id("dolphin_float_close_btn").findOne(1000);
+  if (closeBtn) {
+    click(closeBtn.center());
+    shortWait();
+  }
+
+  let enter = id("bg").findOne(1000);
+  if (!enter) {
+    console.log("missing 做任务赚京豆 enter, skip");
+    back();
+    shortWait();
+    return false;
+  }
+  click(enter.center());
+  shortWait();
+
+  let sign = text("签到").findOne(1000);
+  if (sign) {
+    click(sign.center());
+    shortWait();
+  }
+
+  while (true) {
+    let explore = text("去浏览").findOne(1000);
+    if (!explore) {
+      break;
+    }
+    let parent = explore.parent();
+    for (let i = 0; i < parent.childCount(); i++) {
+      let child = parent.children()[i];
+      if (!child) {
+        continue;
+      }
+      let nums = extractNumbersWithDecimal(child.text());
+      if (nums && nums.length === 3) {
+        let num = nums[2] - nums[1];
+        if (child.text().includes("商品")) {
+          console.log(child.text());
+          click(explore.center());
+          mediumWait();
+          for (let i = 0; i < num; i++) {
+            let x = 270 + 540 * (i % 2);
+            let y = 550 + Math.floor(i / 2) * 700;
+            console.log("click", x, y);
+            click(x, y);
+            mediumWait();
+            back();
+            shortWait();
+          }
+          back();
+          shortWait();
+        } else {
+          console.log(child.text(), nums, "其他");
+          for (let i = 0; i < num; i++) {
+            click(explore.center());
+            shortWait();
+            back();
+            shortWait();
+          }
+        }
+      }
+    }
+  }
+  back();
+  shortWait();
+}
+
 function dong_dong_farm() {
-  let enter = text("东东农场").findOne(1000);
+  let enter = homePageGetEnter("东东农场");
   if (!enter) {
     console.log("missing 东东农场, skip");
     return false;
@@ -62,7 +146,7 @@ function redeem_prize_tickets() {
     return false;
   }
   click(gameEnter.center());
-  longWait();
+  mediumWait();
   backCnt++;
 
   let redeemEnter = text("兑换").findOne(1000);
@@ -110,7 +194,7 @@ function redeem_prize_tickets() {
 }
 
 function flash_sale() {
-  let enter = text("秒杀").findOne(1000);
+  let enter = homePageGetEnter("秒杀");
   if (!enter) {
     return false;
   }
@@ -124,7 +208,7 @@ function flash_sale() {
 }
 
 function luck_reward() {
-  let enter = text("秒杀").findOne(1000);
+  let enter = homePageGetEnter("秒杀");
   if (!enter) {
     return false;
   }
@@ -138,7 +222,7 @@ function luck_reward() {
 }
 
 function get_beans() {
-  let enter = text("种豆得豆").findOne(1000);
+  let enter = homePageGetEnter("种豆得豆");
   if (!enter) {
     return false;
   }
@@ -159,7 +243,7 @@ function get_beans() {
 }
 
 function jinxi_direct() {
-  let enter = text("京喜自营").findOne(1000);
+  let enter = homePageGetEnter("京喜自营");
   if (!enter) {
     return false;
   }
@@ -185,7 +269,7 @@ function jinxi_direct() {
 }
 
 function appliance_and_furniture() {
-  let enter = text("家电家居").findOne(1000);
+  let enter = homePageGetEnter("家电家居");
   if (!enter) {
     return false;
   }
@@ -253,7 +337,7 @@ function interactive_game() {
     return false;
   }
   click(moreEnter.center());
-  longWait();
+  mediumWait();
   backCnt++;
 
   let moreReward = text("玩游戏领京豆").findOne(1000);
@@ -262,10 +346,9 @@ function interactive_game() {
     return false;
   }
   click(910, 920);
-  shortWait();
+  longWait();
 
   for (var i = 0; i < gameTimeTaskNum; i++) {
-    sleep(1000);
     click(866, 1200);
     sleep(63000);
     back();
@@ -283,6 +366,54 @@ function backN(cnt) {
     back();
     shortWait();
   }
+}
+
+function homePageGetEnter(name) {
+  // swipe lefe
+  let y = 550;
+  let sx = 400;
+  let ex = 900;
+  let dur = 500;
+
+  swipe(sx, y, ex, y, dur);
+  shortWait();
+  let enter = text(name).findOne(1000);
+
+  if (enter && enter.center().x > 0 && enter.center().x < 1080) {
+    return enter;
+  }
+  swipe(ex, y, sx, y, dur);
+  shortWait();
+  return text(name).findOne(1000);
+}
+
+function extractNumbersWithDecimal(str) {
+  var numbers = [];
+  var currentNumber = "";
+  var hasDecimal = false; // 标记是否已经有小数点
+
+  for (var i = 0; i < str.length; i++) {
+    var char = str.charAt(i);
+    // 允许数字和一个小数点
+    if (!isNaN(char) && char !== " ") {
+      currentNumber += char;
+    } else if (char === "." && !hasDecimal) {
+      currentNumber += char;
+      hasDecimal = true;
+    } else {
+      if (currentNumber !== "") {
+        numbers.push(currentNumber);
+        currentNumber = "";
+        hasDecimal = false;
+      }
+    }
+  }
+
+  if (currentNumber !== "") {
+    numbers.push(currentNumber);
+  }
+
+  return numbers;
 }
 
 //  导出函数（供其他脚本调用）
