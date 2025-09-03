@@ -20,8 +20,8 @@ console.log("已开启屏幕常亮");
 const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
 // utils.preciseSleep(waitTime, true);
 
-jdjr.run();
 jd.run();
+jdjr.run();
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");

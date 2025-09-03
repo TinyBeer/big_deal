@@ -26,9 +26,25 @@ function run() {
   interactive_game_sign();
   interactive_game();
   redeem_prize_tickets();
+  dong_dong_farm();
 }
 
 /* tasks */
+
+function dong_dong_farm() {
+  let enter = text("东东农场").findOne(1000);
+  if (!enter) {
+    console.log("missing 东东农场, skip");
+    return false;
+  }
+  click(enter.center());
+  longWait();
+
+  //todo spinning wheel
+
+  back();
+  shortWait();
+}
 
 function redeem_prize_tickets() {
   let backCnt = 0;
