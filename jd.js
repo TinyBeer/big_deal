@@ -28,9 +28,10 @@ function run() {
   get_beans();
   jinxi_direct();
   interactive_game_sign();
-  interactive_game();
+  // interactive_game(); //todo optimize
   redeem_prize_tickets();
   dong_dong_farm();
+
   global_shopping();
   home_appliances_and_household_items();
 }
@@ -71,6 +72,7 @@ function home_appliances_and_household_items() {
     backN(backCnt);
     return false;
   }
+  // todo do not use act axis
   click(960, 1400);
   shortWait();
   backN(backCnt);
@@ -129,6 +131,7 @@ function global_shopping() {
           click(explore.center());
           mediumWait();
           for (let i = 0; i < num; i++) {
+            // todo do not use act axis
             let x = 270 + 540 * (i % 2);
             let y = 550 + Math.floor(i / 2) * 700;
             console.log("click", x, y);
@@ -240,13 +243,12 @@ function flash_sale() {
   }
   click(enter.center());
   shortWait();
-
   click(500, 620);
   shortWait();
   back();
   shortWait();
 }
-
+// todo fix
 function luck_reward() {
   let enter = homePageGetEnter("秒杀");
   if (!enter) {
@@ -296,8 +298,13 @@ function jinxi_direct() {
       // "领京豆 签到 大牌同厂 满1元5折 万人团 拼团价更低 零食代工厂 品质零食 地标美食 正宗好味"
       "领京豆"
     )
-    .findOne(6000)
-    .parent();
+    .findOne(6000);
+  if (!obj) {
+    console.log("missing claim button, back");
+    back();
+    shortWait();
+    return false;
+  }
   shortWait();
   if (obj) {
     click(400, 890);
@@ -395,7 +402,7 @@ function interactive_game() {
     back();
     sleep(4000);
     click(866, 1200);
-    sleep(2000);
+    sleep(4000);
   }
 
   backN(backCnt);
@@ -409,20 +416,21 @@ function backN(cnt) {
 }
 
 function homePageGetEnter(name) {
+  console.log("enter", name);
   // swipe lefe
   let y = 550;
   let sx = 400;
   let ex = 900;
   let dur = 500;
 
-  swipe(ex, y, sx, y, dur);
+  swipe(sx, y, ex, y, dur);
   shortWait();
   let enter = text(name).findOne(1000);
 
   if (enter && enter.center().x > 0 && enter.center().x < 1080) {
     return enter;
   }
-  swipe(sx, y, ex, y, dur);
+  swipe(ex, y, sx, y, dur);
   shortWait();
   return text(name).findOne(1000);
 }
