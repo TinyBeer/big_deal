@@ -1,11 +1,7 @@
 auto();
-
 const utils = require("./utils");
-const jd = require("./jd");
-const jdjr = require("./jdjr");
 const smzdm = require("./smzdm");
 const ctcp = require("./china_telecom_cloud_pan");
-const cm = require("./china_mobile");
 const sgo = require("./state_grid_online");
 
 const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
@@ -24,12 +20,9 @@ console.log("已开启屏幕常亮");
 const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
 // utils.preciseSleep(waitTime, true);
 
-// jdjr.run();
-// jd.run();
-smzdm.run();
-ctcp.run();
-cm.run();
-sgo.run();
+smzdm.sign();
+ctcp.sign();
+sgo.sign();
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");

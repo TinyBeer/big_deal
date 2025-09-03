@@ -1,4 +1,5 @@
-function run() {
+function sign() {
+  console.log("网上国网签到...");
   app.launchApp("网上国网");
   var signBtn = text("签到").findOne();
   sleep(4000);
@@ -9,5 +10,5 @@ function run() {
 }
 
 module.exports = {
-  run,
+  sign,
 };

@@ -1,5 +1,6 @@
-function run() {
-  app.launchApp("天翼云盘");
+function sign() {
+  console.log("天意云盘签到...");
+  console.log(app.launchApp("天翼云盘"));
   sleep(9000);
 
   if (id("ivCancel").exists()) {
@@ -32,5 +33,5 @@ function run() {
 }
 
 module.exports = {
-  run,
+  sign,
 };

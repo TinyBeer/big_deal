@@ -1,24 +1,36 @@
-function run() {
+function sign() {
+  console.log("什么值得买签到...");
+
   app.launchApp("什么值得买");
   sleep(8000);
 
   if (id("dialog_home_close").exists()) {
     id("dialog_home_close").findOne().click();
   }
-
-  id("iv_left").findOne().click();
   sleep(1000);
-  id("ll_login_sign").findOne().click();
 
-  sleep(3000);
-  if (id("iv_close").exists()) {
-    id("iv_close").findOne().click();
+  const signBtn = id("pag_left").findOne(1000);
+  if (!signBtn) {
+    console.log("not found sign button, skip");
+    return;
   }
+  click(signBtn.center());
   sleep(1000);
+
+  const closeBtn = id("iv_close").findOne(1000);
+  if (!closeBtn) {
+    console.log("smzdm sign failed!!!");
+    return;
+  }
+
+  click(closeBtn.center());
+  sleep(1000);
+
   back();
   back();
+  sleep(1000);
 }
 
 module.exports = {
-  run,
+  sign,
 };
