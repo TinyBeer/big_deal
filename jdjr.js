@@ -16,7 +16,8 @@ const objList = [
   { name: "麻将凑十", dur_m: 15 },
   { name: "解压硬币", dur_m: 15 },
   { name: "2048方块", dur_m: 60 },
-  { name: "毛线大师", dur_m: 15 },
+  { name: "毛线大师", dur_m: 15 }, //
+  { name: "无尽战歌", dur_m: 15 },
   // round two
   { name: "雀神来也", dur_m: 2 },
   { name: "货柜趣消除", dur_m: 2 },
@@ -30,7 +31,8 @@ const objList = [
   { name: "麻将凑十", dur_m: 2 },
   { name: "解压硬币", dur_m: 2 },
   { name: "2048方块", dur_m: 2 },
-  { name: "毛线大师", dur_m: 2 },
+  { name: "毛线大师", dur_m: 2 }, //
+  { name: "无尽战歌", dur_m: 15 },
   { name: "养猪猪", dur_m: 2 },
 
   { scroll: true },

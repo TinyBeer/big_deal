@@ -23,24 +23,64 @@ function run() {
   longWait();
 
   /* run task */
-  flash_sale();
-  luck_reward();
-  get_beans();
-  jinxi_direct();
-  interactive_game_sign();
-  interactive_game();
-  redeem_prize_tickets();
-  dong_dong_farm();
-  global_shopping();
+  // flash_sale();
+  // luck_reward();
+  // get_beans();
+  // jinxi_direct();
+  // interactive_game_sign();
+  // interactive_game();
+  // redeem_prize_tickets();
+  // dong_dong_farm();
+  // global_shopping();
+  home_appliances_and_household_items();
 }
 
 /* tasks */
 
+function home_appliances_and_household_items() {
+  let backCnt = 0;
+  let hh = homePageGetEnter("家电家居");
+  if (!hh) {
+    console.log("missing 家电家居 enter, skip");
+    shortWait();
+    return false;
+  }
+  click(hh.center());
+  mediumWait();
+  backCnt++;
+
+  let tmp = className("android.view.View")
+    .clickable(true)
+    .depth(22)
+    .findOne(1000);
+  if (!tmp || !tmp.parent()) {
+    console.log("missing 家电家居 float enter, back");
+    backN(backCnt);
+    shortWait();
+    return false;
+  }
+  let enter = tmp.parent();
+  click(enter.center());
+  longWait();
+  longWait();
+  backCnt++;
+
+  let claim = textContains("领奖励").findOne(1000);
+  if (!claim) {
+    console.log("missing claim btn, back");
+    backN(backCnt);
+    return false;
+  }
+  click(960, 1400);
+  shortWait();
+  backN(backCnt);
+  return true;
+}
+
 function global_shopping() {
   let gs = homePageGetEnter("全球购");
   if (!gs) {
-    console.log("missing 全球购 item, back");
-    swipe(ex, ey, sx, sy, 500);
+    console.log("missing 全球购 enter, skip");
     shortWait();
     return false;
   }
