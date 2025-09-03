@@ -3,4 +3,7 @@
 * [x] handle sign bug* 
 * [x] jd dong dong farm
 * [x] jd global shopping
-* [ ] jd Home Appliances & Household Items
+* [x] jd Home Appliances & Household Items
+* [ ] jd online doctor
+* [ ] jd home nurse
+* [ ] jd campus
