@@ -23,15 +23,15 @@ function run() {
   longWait();
 
   /* run task */
-  // flash_sale();
+  flash_sale();
   // luck_reward();
-  // get_beans();
-  // jinxi_direct();
-  // interactive_game_sign();
-  // interactive_game();
-  // redeem_prize_tickets();
-  // dong_dong_farm();
-  // global_shopping();
+  get_beans();
+  jinxi_direct();
+  interactive_game_sign();
+  interactive_game();
+  redeem_prize_tickets();
+  dong_dong_farm();
+  global_shopping();
   home_appliances_and_household_items();
 }
 
@@ -415,14 +415,14 @@ function homePageGetEnter(name) {
   let ex = 900;
   let dur = 500;
 
-  swipe(sx, y, ex, y, dur);
+  swipe(ex, y, sx, y, dur);
   shortWait();
   let enter = text(name).findOne(1000);
 
   if (enter && enter.center().x > 0 && enter.center().x < 1080) {
     return enter;
   }
-  swipe(ex, y, sx, y, dur);
+  swipe(sx, y, ex, y, dur);
   shortWait();
   return text(name).findOne(1000);
 }
