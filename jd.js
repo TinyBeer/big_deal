@@ -3,8 +3,6 @@
 
 /* conif data */
 
-const gameTimeTaskNum = 7;
-
 function shortWait() {
   sleep(3000);
 }
@@ -24,14 +22,13 @@ function run() {
 
   /* run task */
   flash_sale();
-  // luck_reward();
+  luck_reward();
   get_beans();
   jinxi_direct();
   interactive_game_sign();
-  // interactive_game(); //todo optimize
+  interactive_game(); //todo optimize
   redeem_prize_tickets();
   dong_dong_farm();
-
   global_shopping();
   home_appliances_and_household_items();
 }
@@ -392,17 +389,22 @@ function interactive_game() {
     backN(backCnt);
     return false;
   }
-  click(910, 920);
+  click(900, moreReward.center().y);
   longWait();
 
-  for (var i = 0; i < gameTimeTaskNum; i++) {
-    click(866, 1200);
+  while (true) {
+    let game = textContains("秒(0/1)").findOne(1000);
+    if (!game) {
+      break;
+    }
+    console.log(`find game[${game.text()}] play 60 sec...`);
+    click(866, game.center().y);
     sleep(63000);
     back();
     back();
     sleep(4000);
-    click(866, 1200);
-    sleep(4000);
+    click(866, game.center().y);
+    sleep(6000);
   }
 
   backN(backCnt);

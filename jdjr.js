@@ -16,7 +16,6 @@ const objList = [
   { name: "麻将凑十", dur_m: 15 },
   { name: "解压硬币", dur_m: 15 },
   { name: "2048方块", dur_m: 60 },
-  { name: "毛线大师", dur_m: 15 }, //
   { name: "无尽战歌", dur_m: 15 },
   // round two
   { name: "雀神来也", dur_m: 2 },
@@ -31,12 +30,12 @@ const objList = [
   { name: "麻将凑十", dur_m: 2 },
   { name: "解压硬币", dur_m: 2 },
   { name: "2048方块", dur_m: 2 },
-  { name: "毛线大师", dur_m: 2 }, //
   { name: "无尽战歌", dur_m: 15 },
   { name: "养猪猪", dur_m: 2 },
 
   { scroll: true },
   // round one
+  { name: "毛线大师", dur_m: 15 }, //
   { name: "点点2048", dur_m: 15 },
   { name: "合成原始人", dur_m: 15 },
   { name: "无尽泡泡龙", dur_m: 15 },
@@ -46,6 +45,7 @@ const objList = [
   { name: "喵喵十消", dur_m: 15 },
   { name: "超级连连看", dur_m: 15 },
   // round two
+  { name: "毛线大师", dur_m: 2 }, //
   { name: "点点2048", dur_m: 1 },
   { name: "合成原始人", dur_m: 1 },
   { name: "无尽泡泡龙", dur_m: 1 },
@@ -53,7 +53,7 @@ const objList = [
   { name: "数字喜加1", dur_m: 1 },
   { name: "纸牌接龙", dur_m: 1 },
   { name: "喵喵十消", dur_m: 1 },
-  { name: "超级连连看", dur_m: 1 },
+  // { name: "超级连连看", dur_m: 1 },
 ];
 
 function run() {
