@@ -26,7 +26,7 @@ function run() {
   // get_beans();
   // jinxi_direct();
   // interactive_game_sign();
-  interactive_game(); //todo optimize
+  // interactive_game(); //todo optimize
   // redeem_prize_tickets();
   // dong_dong_farm();
   // global_shopping();
@@ -46,6 +46,7 @@ function jd_campus() {
     shortWait();
     return false;
   }
+  click(jce.center());
   backCnt++;
   mediumWait();
 
@@ -62,6 +63,7 @@ function jd_campus() {
     shortWait();
     return false;
   }
+  backCnt++;
   click(133, enter.center().y);
   mediumWait();
 
@@ -73,7 +75,7 @@ function jd_campus() {
   }
   click(899, claim.center().y);
   shortWait();
-  back();
+  backN(backCnt);
   return true;
 }
 
