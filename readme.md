@@ -6,4 +6,5 @@
 * [x] jd Home Appliances & Household Items
 * [ ] jd online doctor
 * [ ] jd home nurse
-* [ ] jd campus
+* [x] jd campus
+* [ ] bline box
