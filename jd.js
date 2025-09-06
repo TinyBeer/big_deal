@@ -21,19 +21,61 @@ function run() {
   longWait();
 
   /* run task */
-  flash_sale();
-  luck_reward();
-  get_beans();
-  jinxi_direct();
-  interactive_game_sign();
+  // flash_sale();
+  // luck_reward();
+  // get_beans();
+  // jinxi_direct();
+  // interactive_game_sign();
   interactive_game(); //todo optimize
-  redeem_prize_tickets();
-  dong_dong_farm();
-  global_shopping();
-  home_appliances_and_household_items();
+  // redeem_prize_tickets();
+  // dong_dong_farm();
+  // global_shopping();
+  // home_appliances_and_household_items();
+  jd_campus();
 }
 
 /* tasks */
+
+function jd_campus() {
+  let backCnt = 0;
+  console.log("京东校园 task start...");
+
+  let jce = homePageGetEnter("京东校园");
+  if (!jce) {
+    console.log("missing 京东校园 enter, skip");
+    shortWait();
+    return false;
+  }
+  backCnt++;
+  mediumWait();
+
+  let obj = text("学生授权协议").findOne(1000);
+  if (obj) {
+    click(obj.center().x, obj.center().y - 100);
+    shortWait();
+  }
+
+  let enter = textContains("签到领豆").findOne(1000);
+  if (!enter) {
+    console.log("missing sign enter, skip");
+    backN(backCnt);
+    shortWait();
+    return false;
+  }
+  click(133, enter.center().y);
+  mediumWait();
+
+  let claim = text("今日签到").findOne(1000);
+  if (!claim) {
+    console.log("miss claim item, skip");
+    backN(backCnt);
+    return false;
+  }
+  click(899, claim.center().y);
+  shortWait();
+  back();
+  return true;
+}
 
 function home_appliances_and_household_items() {
   let backCnt = 0;
