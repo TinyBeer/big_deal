@@ -3,6 +3,10 @@
 
 /* conif data */
 
+function miniWait() {
+  sleep(500);
+}
+
 function shortWait() {
   sleep(3000);
 }
@@ -15,7 +19,7 @@ function longWait() {
   sleep(8000);
 }
 
-function run() {
+function run(screen) {
   /* launch app */
   app.launchApp("京东");
   longWait();
@@ -26,12 +30,12 @@ function run() {
   // get_beans();
   // jinxi_direct();
   // interactive_game_sign();
-  // interactive_game(); //todo optimize
+  interactive_game(screen); //todo optimize
   // redeem_prize_tickets();
   // dong_dong_farm();
   // global_shopping();
   // home_appliances_and_household_items();
-  jd_campus();
+  // jd_campus();
 }
 
 /* tasks */
@@ -397,7 +401,7 @@ function interactive_game_sign() {
   backN(backCnt);
 }
 
-function interactive_game() {
+function interactive_game(screen) {
   let backCnt = 0;
   let enter = text("我的").findOne(1000);
   if (!enter) {
@@ -428,30 +432,59 @@ function interactive_game() {
   mediumWait();
   backCnt++;
 
-  let moreReward = text("玩游戏领京豆").findOne(1000);
-  if (!moreReward) {
-    backN(backCnt);
-    return false;
-  }
-  click(900, moreReward.center().y);
-  longWait();
+  // let moreReward = text("玩游戏领京豆").findOne(1000);
+  // if (!moreReward) {
+  //   backN(backCnt);
+  //   return false;
+  // }
+  // click(900, moreReward.center().y);
+  // longWait();
 
   while (true) {
-    let game = textContains("秒(0/1)").findOne(1000);
-    if (!game) {
+    let games = textContains("秒(0/1)").find(1000);
+    if (!games || games.length === 0) {
       break;
     }
-    console.log(`find game[${game.text()}] play 60 sec...`);
-    click(866, game.center().y);
-    sleep(63000);
-    back();
-    back();
-    sleep(4000);
-    click(866, game.center().y);
-    sleep(6000);
+    for (let i = 0; i < games.length; i++) {
+      let game = games[i];
+      if (game.center().x < 0 || game.center().x > screen.width) {
+        continue;
+      }
+      console.log(`find game[${game.text()}] pos[${game.center()}] act`);
+      playGameTraverse(game.text(), game.parent(), 0);
+    }
+    miniWait();
   }
 
   backN(backCnt);
+}
+
+function playGameTraverse(name, view, depth) {
+  if (!view) return;
+  //   var indent = "  ".repeat(depth);
+  //   log(indent + "类名: " + view.getClassName());
+  //   log(indent + "ID: " + view.id());
+  //   log(indent + "文本: " + view.getText());
+  //   log(indent + "-------------------");
+  if (view.text() === "领奖励") {
+    console.log(name, "领奖励", view.center());
+    click(866, view.center().y);
+    shortWait();
+    return;
+  } else if (view.text() == "去完成") {
+    console.log(name, "去完成 60 s", view.center());
+    click(866, view.center().y);
+    sleep(63000);
+    back();
+    back();
+    shortWait();
+    return;
+  }
+  // 递归遍历子节点
+  var childCount = view.getChildCount();
+  for (var i = 0; i < childCount; i++) {
+    playGameTraverse(name, view.children()[i], depth + 1);
+  }
 }
 
 function backN(cnt) {
