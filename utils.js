@@ -1,5 +1,4 @@
 /* import */
-const jutils  = require("./utils");
 
 /**
  * 获取屏幕尺寸

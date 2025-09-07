@@ -1,6 +1,8 @@
+sign();
+
 function sign() {
   console.log("天意云盘签到...");
-  console.log(app.launchApp("天翼云盘"));
+  app.launchApp("天翼云盘");
   sleep(9000);
 
   if (id("ivCancel").exists()) {
@@ -31,7 +33,3 @@ function sign() {
   back();
   sleep(1000);
 }
-
-module.exports = {
-  sign,
-};

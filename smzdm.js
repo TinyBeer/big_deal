@@ -1,3 +1,5 @@
+sign();
+
 function sign() {
   console.log("什么值得买签到...");
 
@@ -20,6 +22,9 @@ function sign() {
   const closeBtn = id("iv_close").findOne(1000);
   if (!closeBtn) {
     console.log("smzdm sign failed!!!");
+    back();
+    back();
+    sleep(1000);
     return;
   }
 
@@ -30,7 +35,3 @@ function sign() {
   back();
   sleep(1000);
 }
-
-module.exports = {
-  sign,
-};

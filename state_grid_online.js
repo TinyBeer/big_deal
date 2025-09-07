@@ -1,3 +1,4 @@
+sign();
 function sign() {
   console.log("网上国网签到...");
   app.launchApp("网上国网");
@@ -8,7 +9,3 @@ function sign() {
   back();
   back();
 }
-
-module.exports = {
-  sign,
-};
