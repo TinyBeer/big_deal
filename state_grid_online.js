@@ -8,4 +8,8 @@ function sign() {
   sleep(8000);
   back();
   back();
+  sleep(2000);
+  back();
+  back();
+  sleep(5000);
 }

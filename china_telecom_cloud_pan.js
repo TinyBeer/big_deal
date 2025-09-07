@@ -31,5 +31,5 @@ function sign() {
   sleep(1000);
   back();
   back();
-  sleep(1000);
+  sleep(5000);
 }

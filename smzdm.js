@@ -14,24 +14,33 @@ function sign() {
   const signBtn = id("pag_left").findOne(1000);
   if (!signBtn) {
     console.log("not found sign button, skip");
+    back();
+    back();
+    sleep(5000);
     return;
   }
   click(signBtn.center());
-  sleep(1000);
+  sleep(3000);
 
   const closeBtn = id("iv_close").findOne(1000);
   if (!closeBtn) {
     console.log("smzdm sign failed!!!");
     back();
     back();
-    sleep(1000);
+    sleep(2000);
+    back();
+    back();
+    sleep(5000);
     return;
   }
 
   click(closeBtn.center());
-  sleep(1000);
+  sleep(2000);
 
   back();
   back();
-  sleep(1000);
+  sleep(2000);
+  back();
+  back();
+  sleep(5000);
 }
