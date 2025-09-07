@@ -25,20 +25,55 @@ function run(screen) {
   longWait();
 
   /* run task */
-  // flash_sale();
+  flash_sale();
   // luck_reward();
-  // get_beans();
-  // jinxi_direct();
-  // interactive_game_sign();
+  get_beans();
+  jinxi_direct();
+  interactive_game_sign();
   interactive_game(screen); //todo optimize
-  // redeem_prize_tickets();
-  // dong_dong_farm();
-  // global_shopping();
-  // home_appliances_and_household_items();
-  // jd_campus();
+  redeem_prize_tickets();
+  dong_dong_farm();
+  global_shopping();
+  home_appliances_and_household_items();
+  jd_campus();
+  online_doctor();
 }
 
 /* tasks */
+
+function online_doctor() {
+  let backCnt = 0;
+  console.log("在线医生 task start...");
+  let od = homePageGetEnter("在线医生");
+  if (!od) {
+    console.log("missing 在线医生 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(od.center());
+  backCnt++;
+  mediumWait();
+
+  let closeBtn = className("android.widget.ImageView").depth(10).findOne(1000);
+  if (closeBtn) {
+    click(closeBtn.center());
+    miniWait();
+  }
+  click(188, 396);
+  backCnt++;
+  mediumWait();
+
+  let claim = text("签到领京豆").findOne(1000);
+  if (!claim) {
+    console.log("missing claim btn, back");
+    backN(backCnt);
+    return false;
+  }
+  click(claim.center());
+  shortWait();
+  backN(backCnt);
+  return true;
+}
 
 function jd_campus() {
   let backCnt = 0;
@@ -429,7 +464,7 @@ function interactive_game(screen) {
     return false;
   }
   click(moreEnter.center());
-  mediumWait();
+  longWait();
   backCnt++;
 
   // let moreReward = text("玩游戏领京豆").findOne(1000);
