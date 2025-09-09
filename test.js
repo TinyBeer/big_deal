@@ -1,3 +1,7 @@
 auto();
+const utils = require("./utils");
+const screenSize = utils.getScreenSize();
 
-click(500, 1800);
+console.log(x, y);
+
+click(x, y);

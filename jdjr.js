@@ -3,15 +3,16 @@ const jutils = require("./utils");
 
 /* config */
 let nameList = [
-  "雀神来也",
-  "货柜趣消除",
-  "趣味叠叠乐",
-  "排队上车",
-  "方块拼图",
-  "消灭小萌星",
-  "麻将凑十",
-  "解压硬币",
-  "2048方块",
+  // "雀神来也",
+  // "货柜趣消除",
+  // "趣味叠叠乐",
+  // "排队上车",
+  // "方块拼图",
+  // "养猪猪",
+  // "消灭小萌星",
+  // "麻将凑十",
+  // "解压硬币",
+  // "2048方块",
   "无尽战歌",
 ];
 let gameTaskList = [];
@@ -72,7 +73,7 @@ let moreGameTaskList = [
   // { name: "超级连连看", dur_m: 1 },
 ];
 
-function run() {
+function run(screen) {
   // launch app
   app.launchApp("京东金融");
   sleep(5000);
@@ -86,7 +87,7 @@ function run() {
   gameTaskList = tasks.concat(moreGameTaskList);
   console.log(gameTaskList);
   // workWithPos();
-  workWithName(gameTaskList);
+  workWithName(screen, gameTaskList);
   // workWithName(hotGameTaskList);
 
   back();
@@ -95,7 +96,7 @@ function run() {
   sleep(2000);
 }
 
-function workWithName(objList) {
+function workWithName(screen, objList) {
   var scorlled = false;
   for (let i = 0; i < objList.length; i++) {
     let e = objList[i];
@@ -137,7 +138,7 @@ function workWithName(objList) {
       back();
       sleep(2000);
 
-      if (!open_box(scorlled)) {
+      if (!open_box(scorlled, screen)) {
         console.log("open box failed, break");
         break;
       }
@@ -174,7 +175,7 @@ function enterInteractiveGames() {
   }
 }
 
-function open_box(scrolld) {
+function open_box(scrolld, screen) {
   if (scrolld) {
     scrollUp();
     sleep(1000);
@@ -209,11 +210,11 @@ function open_box(scrolld) {
       return false;
     }
 
-    if (box.text() != "") {
+    if (box.text() !== "1个盲盒待开") {
       click(500, 1800);
       sleep(2000);
     } else {
-      click(450, 1500);
+      click(screenSize.width / 2, (screenSize.height * 2) / 3);
       sleep(2000);
     }
   }
@@ -236,7 +237,7 @@ function getGameTaskList(gameNameList) {
       continue;
     }
     click(game.center());
-    sleep(8000);
+    sleep(10000);
     let taskEnter = textContains("10元还款券").findOne(1000);
     if (!taskEnter) {
       continue;

@@ -43,7 +43,6 @@ function run(screen) {
 
 function online_doctor() {
   let backCnt = 0;
-  console.log("在线医生 task start...");
   let od = homePageGetEnter("在线医生");
   if (!od) {
     console.log("missing 在线医生 enter, back");
@@ -254,6 +253,7 @@ function dong_dong_farm() {
 }
 
 function redeem_prize_tickets() {
+  console.log("奖票兑换...");
   let backCnt = 0;
   let enter = text("我的").findOne(1000);
   if (!enter) {
@@ -408,6 +408,7 @@ function appliance_and_furniture() {
 }
 
 function interactive_game_sign() {
+  console.log("互动游戏签到...");
   let backCnt = 0;
   let enter = text("我的").findOne(1000);
   if (!enter) {
@@ -437,6 +438,8 @@ function interactive_game_sign() {
 }
 
 function interactive_game(screen) {
+  console.log("互动游戏...");
+
   let backCnt = 0;
   let enter = text("我的").findOne(1000);
   if (!enter) {
