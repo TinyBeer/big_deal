@@ -2,7 +2,18 @@
 const jutils = require("./utils");
 
 /* config */
-let nameList = ["雀神来也", "货柜趣消除", "趣味叠叠乐", "排队上车", "方块拼图"];
+let nameList = [
+  "雀神来也",
+  "货柜趣消除",
+  "趣味叠叠乐",
+  "排队上车",
+  "方块拼图",
+  "消灭小萌星",
+  "麻将凑十",
+  "解压硬币",
+  "2048方块",
+  "无尽战歌",
+];
 let gameTaskList = [];
 
 let hotGameTaskList = [
@@ -68,8 +79,8 @@ function run() {
 
   // enter interactive games
   enterInteractiveGames();
-  let gameNameList = getGameNameList("精品推荐", true);
-  nameList = nameList.concat(gameNameList);
+  // let gameNameList = getGameNameList("精品推荐", true);
+  // nameList = nameList.concat(gameNameList);
   console.log(nameList);
   let tasks = getGameTaskList(nameList);
   gameTaskList = tasks.concat(moreGameTaskList);
@@ -197,8 +208,14 @@ function open_box(scrolld) {
     if (!pean) {
       return false;
     }
-    click(450, 1500);
-    sleep(2000);
+
+    if (box.text() != "") {
+      click(500, 1800);
+      sleep(2000);
+    } else {
+      click(450, 1500);
+      sleep(2000);
+    }
   }
 
   if (scrolld) {
