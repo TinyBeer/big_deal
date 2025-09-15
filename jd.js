@@ -26,17 +26,19 @@ function run(screen) {
 
   /* run task */
   flash_sale();
-  // luck_reward();
+  luck_reward();
   get_beans();
   jinxi_direct();
   interactive_game_sign();
-  interactive_game(screen); //todo optimize
   redeem_prize_tickets();
   dong_dong_farm();
   global_shopping();
   home_appliances_and_household_items();
   jd_campus();
-  online_doctor();
+  // online_doctor();
+
+
+  interactive_game(screen); //todo optimize
 }
 
 /* tasks */

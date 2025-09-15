@@ -3,16 +3,16 @@ const jutils = require("./utils");
 
 /* config */
 let nameList = [
-  // "雀神来也",
-  // "货柜趣消除",
-  // "趣味叠叠乐",
-  // "排队上车",
-  // "方块拼图",
-  // "养猪猪",
-  // "消灭小萌星",
-  // "麻将凑十",
-  // "解压硬币",
-  // "2048方块",
+  "雀神来也",
+  "货柜趣消除",
+  "趣味叠叠乐",
+  "排队上车",
+  "方块拼图",
+  "养猪猪",
+  "消灭小萌星",
+  "麻将凑十",
+  "解压硬币",
+  "2048方块",
   "无尽战歌",
 ];
 let gameTaskList = [];
@@ -211,7 +211,7 @@ function open_box(scrolld, screen) {
     }
 
     if (box.text() !== "1个盲盒待开") {
-      click(500, 1800);
+      click((screenSize.width / 5) * 2, 1800);
       sleep(2000);
     } else {
       click(screenSize.width / 2, (screenSize.height * 2) / 3);
