@@ -35,10 +35,9 @@ function run(screen) {
   global_shopping();
   home_appliances_and_household_items();
   jd_campus();
-  // online_doctor();
+  online_doctor();
 
-
-  interactive_game(screen); //todo optimize
+  // interactive_game(screen); //todo optimize
 }
 
 /* tasks */
@@ -544,14 +543,27 @@ function homePageGetEnter(name) {
 
   swipe(sx, y, ex, y, dur);
   shortWait();
-  let enter = text(name).findOne(1000);
+  let enter = className("android.widget.TextView")
+    .text(name)
+    .depth(23)
+    .findOne(1000);
 
   if (enter && enter.center().x > 0 && enter.center().x < 1080) {
-    return enter;
+    if (
+      name !== "在线医生" ||
+      (name === "在线医生" && enter.parent().center().x < 1080)
+    ) {
+      return enter;
+    }
   }
   swipe(ex, y, sx, y, dur);
   shortWait();
-  return text(name).findOne(1000);
+  enter = className("android.widget.TextView")
+    .text(name)
+    .depth(23)
+    .findOne(1000);
+
+  return enter;
 }
 
 function extractNumbersWithDecimal(str) {
