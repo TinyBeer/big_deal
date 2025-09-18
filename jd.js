@@ -26,18 +26,19 @@ function run(screen) {
 
   /* run task */
   flash_sale();
-  luck_reward();
-  get_beans();
   jinxi_direct();
   interactive_game_sign();
   redeem_prize_tickets();
   dong_dong_farm();
   global_shopping();
+
+  //todo optimize
+  // luck_reward();
+  get_beans();
   home_appliances_and_household_items();
   jd_campus();
   online_doctor();
-
-  // interactive_game(screen); //todo optimize
+  interactive_game(screen);
 }
 
 /* tasks */
@@ -593,6 +594,19 @@ function extractNumbersWithDecimal(str) {
   }
 
   return numbers;
+}
+
+function switchTag(name) {
+  let tag = className("android.widget.TextView")
+    .depth(12)
+    .text(name)
+    .find(1000);
+  if (!tag) {
+    return false;
+  }
+
+  click(tag.center());
+  sleep(5000);
 }
 
 //  导出函数（供其他脚本调用）

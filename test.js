@@ -2,26 +2,62 @@ auto();
 const utils = require("./utils");
 const screenSize = utils.getScreenSize();
 
-// let obj = text("新品").findOne(1000);
-// click(obj.center());
-// sleep(2000);
+blind_box();
 
-// let newGoods = id("e_g").text("新奇集市").findOne(1000);
-// click(newGoods.center());
-// sleep(2000);
+function blind_box() {
+  console.log("抽盲盒");
 
-// let novelBlindBoxEntry = id("novelBlindBoxEntry").findOne(1000).parent();
-// click(novelBlindBoxEntry.center());
-// sleep(2000);
+  switchTag("新品");
 
-let comps = className("android.widget.TextView")
-  .text("在线医生")
-  .depth(23)
-  .find(1000);
+  let newGoodsShop = id("ea2").text("新奇集市").findOne(1000);
+  if (!newGoodsShop) {
+    console.log("missing 新奇集市 entry, skip");
+    switchTag("首页");
+    return false;
+  }
 
-comps = text("在线医生").find(1000);
-for (let index = 0; index < comps.length; index++) {
-  let comp = comps[index];
-  console.log(comp.center());
-  console.log(comp.parent().center());
+  click(newGoodsShop.center());
+  sleep(4000);
+
+  let entry = id("novelBlindBoxEntry").findOne(1000);
+  if (!entry) {
+    console.log("missing 盲盒 entry, skip");
+    switchTag("首页");
+    return;
+  }
+
+  let taskPage = null;
+  for (let i = 0; i < 2; i++) {
+    click(entry.center());
+    sleep(4000);
+    taskPage = className("android.view.View")
+      .textContains("抽盲盒机会")
+      .depth(29)
+      .findOne(1000);
+    if (taskPage) {
+      break;
+    }
+    click(1031, 1091);
+    sleep(1000);
+  }
+  if (!taskPage) {
+    console.log("missing taskpage skip");
+    switchTag("首页");
+    return false;
+  }
+
+  switchTag("首页");
+}
+
+function switchTag(name) {
+  let tag = className("android.widget.TextView")
+    .depth(12)
+    .text(name)
+    .findOne(1000);
+  if (!tag) {
+    return false;
+  }
+
+  click(tag.center());
+  sleep(5000);
 }
