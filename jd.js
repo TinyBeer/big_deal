@@ -96,9 +96,12 @@ function blind_box() {
         click(880, 1540);
         if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
           sleep(25000);
+        } else if (arr[0] === "逛逛权益中心") {
+          sleep(15000);
         } else {
-          sleep(6000);
+          sleep(1000);
         }
+        back();
         back();
         sleep(4000);
       } else if (arr[3] === "拆盲盒") {
@@ -122,6 +125,8 @@ function blind_box() {
   }
 
   click(1031, 1091);
+  sleep(1000);
+  back();
   sleep(1000);
   switchTag("首页");
 }
@@ -470,6 +475,13 @@ function jinxi_direct() {
     shortWait();
     return false;
   }
+  if (obj.text().includes("订阅提醒")) {
+    console.log("already claimed, back");
+    back();
+    shortWait();
+    return true;
+  }
+
   shortWait();
   if (obj) {
     click(400, 890);
@@ -683,7 +695,7 @@ function switchTag(name) {
   let tag = className("android.widget.TextView")
     .depth(12)
     .text(name)
-    .find(1000);
+    .findOne(1000);
   if (!tag) {
     return false;
   }

@@ -58,9 +58,12 @@ function blind_box() {
         click(880, 1540);
         if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
           sleep(25000);
+        } else if (arr[0] === "逛逛权益中心") {
+          sleep(15000);
         } else {
-          sleep(6000);
+          sleep(10000);
         }
+        back();
         back();
         sleep(4000);
       } else if (arr[3] === "拆盲盒") {
@@ -84,6 +87,8 @@ function blind_box() {
   }
 
   click(1031, 1091);
+  sleep(1000);
+  back();
   sleep(1000);
   switchTag("首页");
 }
