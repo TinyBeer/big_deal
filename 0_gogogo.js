@@ -2,6 +2,7 @@ auto();
 
 const utils = require("./utils");
 const jd = require("./jd");
+const jd_blindbox = require("./jd_blindbox");
 const jdjr = require("./jdjr");
 
 const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
@@ -9,17 +10,17 @@ const targetMinute = 5; // 目标分钟
 
 /* config */
 let nameList = [
-  // "雀神来也",
-  // "货柜趣消除",
-  // "趣味叠叠乐",
-  // "排队上车",
-  // "方块拼图",
-  // "养猪猪",
-  // "消灭小萌星",
-  // "麻将凑十",
-  // "解压硬币",
-  // "2048方块",
-  // "无尽战歌",
+  "雀神来也",
+  "货柜趣消除",
+  "趣味叠叠乐",
+  "排队上车",
+  "方块拼图",
+  "养猪猪",
+  "消灭小萌星",
+  "麻将凑十",
+  "解压硬币",
+  "2048方块",
+  "无尽战歌",
 ];
 
 let moreGameTaskList = [
@@ -32,7 +33,7 @@ let moreGameTaskList = [
   { name: "打螺丝王者", dur_m: 15 },
   { name: "数字喜加1", dur_m: 15 },
   { name: "纸牌接龙", dur_m: 15 },
-  // { name: "喵喵十消", dur_m: 15 },
+  { name: "喵喵十消", dur_m: 15 },
   // { name: "超级连连看", dur_m: 15 },
   // round two
   { name: "毛线大师", dur_m: 2 }, //
@@ -60,7 +61,8 @@ const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
 // utils.preciseSleep(waitTime, true);
 
 // jdjr.run(screenSize, nameList, moreGameTaskList);
-jd.run(screenSize);
+// jd.run(screenSize);
+jd_blindbox.run(screenSize);
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");
