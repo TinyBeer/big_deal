@@ -2,7 +2,7 @@ auto();
 
 const utils = require("./utils");
 const jd = require("./jd");
-const jd_blindbox = require("./jd_blindbox");
+const jd_manual = require("./jd_manual");
 const jdjr = require("./jdjr");
 
 const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
@@ -62,7 +62,7 @@ const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
 
 // jdjr.run(screenSize, nameList, moreGameTaskList);
 // jd.run(screenSize);
-jd_blindbox.run(screenSize);
+jd_manual.run(screenSize);
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");
