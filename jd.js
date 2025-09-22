@@ -31,6 +31,7 @@ function run(screen) {
   redeem_prize_tickets();
   dong_dong_farm();
   global_shopping();
+  daily_claim_pean();
 
   //todo optimize
   // luck_reward();
@@ -38,10 +39,45 @@ function run(screen) {
   home_appliances_and_household_items();
   jd_campus();
   online_doctor();
- 
 }
 
 /* tasks */
+
+function daily_claim_pean() {
+  let backCnt = 0;
+  let searchBar = desc("搜索栏").findOne(1000);
+  if (!searchBar) {
+    console.log("missing search bar, skip");
+    return false;
+  }
+  searchBar.click();
+  backCnt++;
+  sleep(500);
+  setText("天天领豆");
+  sleep(500);
+  backCnt++;
+
+  let searchBtn = text("搜索").findOne(1000);
+  if (!searchBtn) {
+    console.log("missing search button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  searchBtn.click();
+  sleep(10000);
+  backCnt++;
+
+  let signBtn = id("signBtn").findOne(1000);
+  if (!signBtn) {
+    console.log("missing sign bar, skip");
+    backN(backCnt);
+    return false;
+  }
+  signBtn.click();
+  backN(backCnt);
+  return true;
+}
 
 function online_doctor() {
   let backCnt = 0;

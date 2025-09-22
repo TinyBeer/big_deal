@@ -1,10 +1,54 @@
 auto();
 const utils = require("./utils");
 const screenSize = utils.getScreenSize();
+
+daily_claim_pean();
+
+function daily_claim_pean() {
+  let searchBar = desc("搜索栏").findOne(1000);
+  if (!searchBar) {
+    console.log("missing search bar, skip");
+    return false;
+  }
+  searchBar.click();
+  sleep(500);
+  setText("天天领豆");
+  sleep(500);
+
+  let searchBtn = text("搜索").findOne(1000);
+  if (!searchBtn) {
+    console.log("missing search button, skip");
+    back();
+    sleep(2000);
+    return false;
+  }
+
+  searchBtn.click();
+  sleep(10000);
+
+  let signBtn = id("signBtn").findOne(1000);
+  if (!signBtn) {
+    console.log("missing sign bar, skip");
+    back();
+    sleep(3000);
+    back();
+    sleep(2000);
+    back();
+    sleep(2000);
+    return false;
+  }
+  signBtn.click();
+  sleep(5000);
+  back();
+  sleep(1000);
+  back();
+  sleep(1000);
+}
+
 // let str =
 //   "逛逛中秋会场 逛逛中秋会场得抽盲盒机会 限1次(0/1) 去逛逛 种草新奇耳机 种草新奇耳机得抽盲盒机会 限3次(0/3) 去逛逛 种草迪士尼新奇月饼 种草迪士尼月饼得抽盲盒机会 限1次(0/1) 去逛逛 逛逛美心月饼 逛逛美心月饼得抽盲盒机会 限1次(0/1) 去逛逛";
 
-blind_box();
+// blind_box();
 
 function blind_box() {
   console.log("抽盲盒");
