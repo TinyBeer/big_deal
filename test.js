@@ -2,9 +2,41 @@ auto();
 const utils = require("./utils");
 const screenSize = utils.getScreenSize();
 
-daily_claim_pean();
+hardwar_city();
 
-function daily_claim_pean() {
+function hardwar_city() {
+  let backCnt = 0;
+  search("五金城", 8000);
+  backCnt += 3;
+
+  let entry = text("进入").findOne(1000);
+  if (!entry) {
+    console.log("missing entry, skip");
+    backCnt(backCnt);
+    return false;
+  }
+
+  click(entry.center());
+  backCnt++;
+  sleep(8000);
+
+  click(944, 2288);
+  backCnt++;
+  sleep(8000);
+
+  let claim = text("今日已签到").findOne(1000);
+  if (!claim) {
+    console.log("already claimed, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  // todo claim
+  backN(backCnt);
+  return true;
+}
+
+function search(content, waitTime) {
   let searchBar = desc("搜索栏").findOne(1000);
   if (!searchBar) {
     console.log("missing search bar, skip");
@@ -12,7 +44,7 @@ function daily_claim_pean() {
   }
   searchBar.click();
   sleep(500);
-  setText("天天领豆");
+  setText(content);
   sleep(500);
 
   let searchBtn = text("搜索").findOne(1000);
@@ -24,25 +56,7 @@ function daily_claim_pean() {
   }
 
   searchBtn.click();
-  sleep(10000);
-
-  let signBtn = id("signBtn").findOne(1000);
-  if (!signBtn) {
-    console.log("missing sign bar, skip");
-    back();
-    sleep(3000);
-    back();
-    sleep(2000);
-    back();
-    sleep(2000);
-    return false;
-  }
-  signBtn.click();
-  sleep(5000);
-  back();
-  sleep(1000);
-  back();
-  sleep(1000);
+  sleep(waitTime);
 }
 
 // let str =
@@ -148,4 +162,14 @@ function switchTag(name) {
 
   click(tag.center());
   sleep(5000);
+}
+
+function backN(cnt) {
+  for (let i = 0; i < cnt; i++) {
+    back();
+    shortWait();
+  }
+}
+function shortWait() {
+  sleep(3000);
 }
