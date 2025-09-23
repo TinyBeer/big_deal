@@ -17,6 +17,14 @@ function longWait() {
   sleep(8000);
 }
 
+/* back */
+function backN(cnt) {
+  for (let i = 0; i < cnt; i++) {
+    back();
+    shortWait();
+  }
+}
+
 /**
  * 获取屏幕尺寸
  */

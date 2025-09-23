@@ -583,6 +583,29 @@ function extractNumbersWithDecimal(str) {
   return numbers;
 }
 
+function search(content, waitTime) {
+  let searchBar = desc("搜索栏").findOne(1000);
+  if (!searchBar) {
+    console.log("missing search bar, skip");
+    return false;
+  }
+  searchBar.click();
+  sleep(500);
+  setText(content);
+  sleep(500);
+
+  let searchBtn = text("搜索").findOne(1000);
+  if (!searchBtn) {
+    console.log("missing search button, skip");
+    back();
+    sleep(2000);
+    return false;
+  }
+
+  searchBtn.click();
+  sleep(waitTime);
+}
+
 // function switchTag(name) {
 //   let tag = className("android.widget.TextView")
 //     .depth(12)
