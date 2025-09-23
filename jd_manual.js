@@ -1,28 +1,10 @@
 /* import */
-// const utils = require("./utils");
-
-/* conif data */
-
-function miniWait() {
-  sleep(500);
-}
-
-function shortWait() {
-  sleep(3000);
-}
-
-function mediumWait() {
-  sleep(5000);
-}
-
-function longWait() {
-  sleep(8000);
-}
+const utils = require("./utils");
 
 function run(screen) {
   /* launch app */
   app.launchApp("京东");
-  longWait();
+  utils.longWait();
 
   interactive_game(screen);
   /* run task */
@@ -33,7 +15,6 @@ function run(screen) {
 
 /* tasks */
 
-
 function interactive_game(screen) {
   console.log("互动游戏...");
 
@@ -43,7 +24,7 @@ function interactive_game(screen) {
     return false;
   }
   click(enter.center());
-  shortWait();
+  utils.shortWait();
   backCnt++;
 
   let gameEnter = text("互动游戏").findOne(1000);
@@ -52,11 +33,11 @@ function interactive_game(screen) {
     return false;
   }
   click(gameEnter.center());
-  longWait();
+  utils.longWait();
   backCnt++;
 
   scrollDown();
-  shortWait();
+  utils.shortWait();
 
   let moreEnter = text("玩更多").findOne(1000);
   if (!moreEnter) {
@@ -64,7 +45,7 @@ function interactive_game(screen) {
     return false;
   }
   click(moreEnter.center());
-  longWait();
+  utils.longWait();
   backCnt++;
 
   // let moreReward = text("玩游戏领京豆").findOne(1000);
@@ -73,7 +54,7 @@ function interactive_game(screen) {
   //   return false;
   // }
   // click(900, moreReward.center().y);
-  // longWait();
+  // utils.longWait();
 
   while (true) {
     let games = textContains("秒(0/1)").find(1000);
@@ -88,13 +69,11 @@ function interactive_game(screen) {
       console.log(`find game[${game.text()}] pos[${game.center()}] act`);
       playGameTraverse(game.text(), game.parent(), 0);
     }
-    miniWait();
+    utils.miniWait();
   }
 
   backN(backCnt);
 }
-
-
 
 function playGameTraverse(name, view, depth) {
   if (!view) return;
@@ -106,7 +85,7 @@ function playGameTraverse(name, view, depth) {
   if (view.text() === "领奖励") {
     console.log(name, "领奖励", view.center());
     click(866, view.center().y);
-    shortWait();
+    utils.shortWait();
     return;
   } else if (view.text() == "去完成") {
     console.log(name, "去完成 60 s", view.center());
@@ -114,7 +93,7 @@ function playGameTraverse(name, view, depth) {
     sleep(63000);
     back();
     back();
-    shortWait();
+    utils.shortWait();
     return;
   }
   // 递归遍历子节点
@@ -123,7 +102,6 @@ function playGameTraverse(name, view, depth) {
     playGameTraverse(name, view.children()[i], depth + 1);
   }
 }
-
 
 function blind_box() {
   console.log("抽盲盒");
@@ -183,7 +161,7 @@ function blind_box() {
           sleep(10000);
         }
         if (arr[0] === "逛逛买药频道") {
-          back();
+          click(540, 1897.5);
           sleep(1000);
         }
         back();
@@ -232,7 +210,7 @@ function switchTag(name) {
 function backN(cnt) {
   for (let i = 0; i < cnt; i++) {
     back();
-    shortWait();
+    utils.shortWait();
   }
 }
 

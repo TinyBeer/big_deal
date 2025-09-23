@@ -2,7 +2,118 @@ auto();
 const utils = require("./utils");
 const screenSize = utils.getScreenSize();
 
-hardwar_city();
+let taskNameList = [
+  "去抽话费礼包",
+  "去QQ阅读看庆余年",
+  // "去哈啰签到领出行优惠",
+  // "去百度地图领现金",
+  // "去点淘APP赚零花钱",
+  // "去酷狗免费听歌",
+  // "逛频道抢50元补贴券包",
+  // "浏览外卖频道页",
+  // "逛看病买药,领京豆",
+];
+
+daily_earn_pean();
+
+function daily_earn_pean() {
+  let backCnt = 0;
+  // let searchBar = id("com.jd.jrapp:id/con_top_search").findOne(1000);
+  // if (!searchBar) {
+  //   console.log("missing search bar, skip");
+  //   return false;
+  // }
+  // searchBar.click();
+  // backCnt += 2;
+  // sleep(500);
+  // setText("天天赚京豆");
+  // sleep(500);
+
+  // let searchBtn = text("搜索").findOne();
+  // if (!searchBtn) {
+  //   console.log("missing search button, skip");
+  //   backN(backCnt);
+  //   return false;
+  // }
+  // searchBtn.click();
+  // backCnt++;
+  // sleep(3000);
+
+  // let entry = text("天天赚京豆").depth(21).findOne(1000);
+  // if (!entry) {
+  //   console.log("missing entry, skip");
+  //   backN(backCnt);
+  //   return false;
+  // }
+  // click(entry.center());
+  // sleep(8000);
+
+  for (let i = 0; i < taskNameList.length; i++) {
+    let name = taskNameList[i];
+    console.log("do task:", name);
+    do_task(name);
+    sleep(5000);
+  }
+}
+
+function do_task(name) {
+  let obj = text(name).findOne(1000);
+  let gotoBtn = find_goto_button(obj.parent());
+  if (
+    !gotoBtn ||
+    gotoBtn.center().y < 0 ||
+    gotoBtn.center().y > screenSize.height
+  ) {
+    console.log("button out of screan, skip");
+    return false;
+  }
+  click(gotoBtn);
+  sleep(25000);
+  back();
+  sleep(2000);
+  back();
+  back();
+  sleep(2000);
+  back();
+  sleep(2000);
+  back();
+  sleep(2000);
+}
+
+function find_goto_button(parent) {
+  if (!parent) {
+    return;
+  }
+  for (let idx = 0; idx < parent.children().length; idx++) {
+    let child = parent.children()[idx];
+    if (child.text() === "去完成" || child.text() == "继续完成") {
+      return child;
+    }
+    if (child.childCount != 0) {
+      let ch = find_goto_button(child);
+      if (ch) {
+        return ch;
+      }
+    }
+  }
+  return;
+}
+
+function show_child_text(parent) {
+  if (!parent) {
+    return;
+  }
+  for (let idx = 0; idx < parent.children().length; idx++) {
+    let child = parent.children()[idx];
+    console.log(idx, child.text());
+
+    if (child.childCount != 0) {
+      show_child_text(child);
+    }
+  }
+}
+
+// hardwar_city();
 
 function hardwar_city() {
   let backCnt = 0;
@@ -24,14 +135,13 @@ function hardwar_city() {
   backCnt++;
   sleep(8000);
 
-  let claim = text("今日已签到").findOne(1000);
+  let claim = text("签到领取京豆").findOne(1000);
   if (!claim) {
     console.log("already claimed, skip");
     backN(backCnt);
     return false;
   }
 
-  // todo claim
   backN(backCnt);
   return true;
 }

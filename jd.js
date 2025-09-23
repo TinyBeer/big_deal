@@ -32,6 +32,7 @@ function run(screen) {
   dong_dong_farm();
   global_shopping();
   daily_claim_pean();
+  hardwar_city();
 
   //todo optimize
   // luck_reward();
@@ -42,6 +43,37 @@ function run(screen) {
 }
 
 /* tasks */
+
+function hardwar_city() {
+  let backCnt = 0;
+  search("五金城", 8000);
+  backCnt += 3;
+
+  let entry = text("进入").findOne(1000);
+  if (!entry) {
+    console.log("missing entry, skip");
+    backCnt(backCnt);
+    return false;
+  }
+
+  click(entry.center());
+  backCnt++;
+  sleep(8000);
+
+  click(944, 2288);
+  backCnt++;
+  sleep(8000);
+
+  let claim = text("签到领取京豆").findOne(1000);
+  if (!claim) {
+    console.log("already claimed, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  backN(backCnt);
+  return true;
+}
 
 function daily_claim_pean() {
   let backCnt = 0;

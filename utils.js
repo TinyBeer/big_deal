@@ -1,5 +1,22 @@
 /* import */
 
+/* delay */
+function miniWait() {
+  sleep(500);
+}
+
+function shortWait() {
+  sleep(3000);
+}
+
+function mediumWait() {
+  sleep(5000);
+}
+
+function longWait() {
+  sleep(8000);
+}
+
 /**
  * 获取屏幕尺寸
  */
@@ -84,4 +101,8 @@ module.exports = {
   getTimeToTarget,
   preciseSleep,
   getScreenSize,
+  miniWait,
+  shortWait,
+  mediumWait,
+  longWait,
 };
