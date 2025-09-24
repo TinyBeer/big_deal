@@ -1,5 +1,5 @@
 /* import */
-const jutils = require("./utils");
+const utils = require("./utils");
 
 let gameTaskList = [];
 
@@ -63,7 +63,7 @@ function workWithName(screen, objList) {
 
       console.log(`act play [${e.name}] ${t / 60 / 1000}min`);
       click(obj.center());
-      jutils.preciseSleep(t, false);
+      utils.preciseSleep(t, false);
       back();
       back();
       sleep(2000);

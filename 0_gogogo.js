@@ -1,6 +1,6 @@
 auto();
 
-const utils = require("./utils");
+const ut = require("./utils");
 const jd = require("./jd");
 const jd_manual = require("./jd_manual");
 const jdjr = require("./jdjr");
@@ -47,7 +47,7 @@ let moreGameTaskList = [
   // { name: "超级连连看", dur_m: 1 },
 ];
 
-const screenSize = utils.getScreenSize();
+const screenSize = ut.getScreenSize();
 console.log(
   "屏幕宽度: " + screenSize.width + "px, 屏幕高度: " + screenSize.height + "px"
 );
@@ -57,12 +57,12 @@ device.keepScreenOn();
 console.log("已开启屏幕常亮");
 
 /* waiting until specific time */
-const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
-// utils.preciseSleep(waitTime, true);
+const waitTime = ut.getTimeToTarget(targetHour, targetMinute);
+// ut.preciseSleep(waitTime, true);
 
-// jdjr.run(screenSize, nameList, moreGameTaskList);
+jdjr.run(screenSize, nameList, moreGameTaskList);
 jd.run(screenSize);
-// jd_manual.run(screenSize);
+jd_manual.run(screenSize);
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");
