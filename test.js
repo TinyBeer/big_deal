@@ -2,6 +2,9 @@ auto();
 const utils = require("./utils");
 const screenSize = utils.getScreenSize();
 
+let obj = text("签到领京豆").findOne(1000);
+console.log(obj);
+
 let taskNameList = [
   "去抽话费礼包",
   "去QQ阅读看庆余年",
@@ -14,7 +17,7 @@ let taskNameList = [
   // "逛看病买药,领京豆",
 ];
 
-daily_earn_pean();
+// daily_earn_pean();
 
 function daily_earn_pean() {
   let backCnt = 0;

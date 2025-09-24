@@ -61,8 +61,8 @@ const waitTime = utils.getTimeToTarget(targetHour, targetMinute);
 // utils.preciseSleep(waitTime, true);
 
 // jdjr.run(screenSize, nameList, moreGameTaskList);
-// jd.run(screenSize);
-jd_manual.run(screenSize);
+jd.run(screenSize);
+// jd_manual.run(screenSize);
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");

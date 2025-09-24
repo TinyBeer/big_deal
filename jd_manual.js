@@ -1,10 +1,10 @@
 /* import */
-const utils = require("./utils");
+const mutils = require("./utils");
 
 function run(screen) {
   /* launch app */
   app.launchApp("京东");
-  utils.longWait();
+  mutils.longWait();
 
   interactive_game(screen);
   /* run task */
@@ -24,7 +24,7 @@ function interactive_game(screen) {
     return false;
   }
   click(enter.center());
-  utils.shortWait();
+  mutils.shortWait();
   backCnt++;
 
   let gameEnter = text("互动游戏").findOne(1000);
@@ -33,11 +33,11 @@ function interactive_game(screen) {
     return false;
   }
   click(gameEnter.center());
-  utils.longWait();
+  mutils.longWait();
   backCnt++;
 
   scrollDown();
-  utils.shortWait();
+  mutils.shortWait();
 
   let moreEnter = text("玩更多").findOne(1000);
   if (!moreEnter) {
@@ -45,7 +45,7 @@ function interactive_game(screen) {
     return false;
   }
   click(moreEnter.center());
-  utils.longWait();
+  mutils.longWait();
   backCnt++;
 
   // let moreReward = text("玩游戏领京豆").findOne(1000);
@@ -54,7 +54,7 @@ function interactive_game(screen) {
   //   return false;
   // }
   // click(900, moreReward.center().y);
-  // utils.longWait();
+  // mutils.longWait();
 
   while (true) {
     let games = textContains("秒(0/1)").find(1000);
@@ -69,7 +69,7 @@ function interactive_game(screen) {
       console.log(`find game[${game.text()}] pos[${game.center()}] act`);
       playGameTraverse(game.text(), game.parent(), 0);
     }
-    utils.miniWait();
+    mutils.miniWait();
   }
 
   backN(backCnt);
@@ -85,7 +85,7 @@ function playGameTraverse(name, view, depth) {
   if (view.text() === "领奖励") {
     console.log(name, "领奖励", view.center());
     click(866, view.center().y);
-    utils.shortWait();
+    mutils.shortWait();
     return;
   } else if (view.text() == "去完成") {
     console.log(name, "去完成 60 s", view.center());
@@ -93,7 +93,7 @@ function playGameTraverse(name, view, depth) {
     sleep(63000);
     back();
     back();
-    utils.shortWait();
+    mutils.shortWait();
     return;
   }
   // 递归遍历子节点
@@ -210,7 +210,7 @@ function switchTag(name) {
 function backN(cnt) {
   for (let i = 0; i < cnt; i++) {
     back();
-    utils.shortWait();
+    mutils.shortWait();
   }
 }
 

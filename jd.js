@@ -35,7 +35,7 @@ function run(screen) {
   hardwar_city();
 
   //todo optimize
-  // luck_reward();
+  luck_reward();
   get_beans();
   home_appliances_and_household_items();
   jd_campus();
@@ -45,6 +45,7 @@ function run(screen) {
 /* tasks */
 
 function hardwar_city() {
+  console.log("五金城");
   let backCnt = 0;
   search("五金城", 8000);
   backCnt += 3;
@@ -64,18 +65,22 @@ function hardwar_city() {
   backCnt++;
   sleep(8000);
 
-  let claim = text("签到领取京豆").findOne(1000);
-  if (!claim) {
+  let claimBtn = text("签到领京豆").findOne(1000);
+  if (!claimBtn) {
     console.log("already claimed, skip");
     backN(backCnt);
     return false;
   }
+
+  click(claimBtn.center());
+  shortWait();
 
   backN(backCnt);
   return true;
 }
 
 function daily_claim_pean() {
+  console.log("天天领豆");
   let backCnt = 0;
   let searchBar = desc("搜索栏").findOne(1000);
   if (!searchBar) {
@@ -392,13 +397,21 @@ function flash_sale() {
     return false;
   }
   click(enter.center());
-  shortWait();
-  click(500, 620);
+  mediumWait();
+
+  let claimBtn = text("签到领豆").findOne(1000);
+  if (!claimBtn) {
+    console.log("missing claim button, skip");
+    back();
+    shortWait();
+    return false;
+  }
+  click(claimBtn.center());
   shortWait();
   back();
   shortWait();
 }
-// todo fix
+
 function luck_reward() {
   let enter = homePageGetEnter("秒杀");
   if (!enter) {
@@ -407,7 +420,14 @@ function luck_reward() {
   click(enter.center());
   shortWait();
 
-  click(900, 620);
+  let claimBtn = text("点击领取").findOne(1000);
+  if (!claimBtn) {
+    console.log("missing claim button, skip");
+    back();
+    shortWait();
+    return false;
+  }
+  click(claimBtn.center());
   shortWait();
   back();
   shortWait();
