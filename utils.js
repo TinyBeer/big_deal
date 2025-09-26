@@ -113,4 +113,5 @@ module.exports = {
   shortWait,
   mediumWait,
   longWait,
+  backN,
 };

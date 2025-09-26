@@ -57,7 +57,7 @@ function interactive_game(screen) {
   // utils.longWait();
 
   while (true) {
-    let games = textContains("秒(0/1)").find(1000);
+    let games = textContains("秒(0/1)").find(200);
     if (!games || games.length === 0) {
       break;
     }

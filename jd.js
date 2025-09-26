@@ -37,7 +37,7 @@ function hardwar_city() {
   let entry = text("进入").findOne(1000);
   if (!entry) {
     console.log("missing entry, skip");
-    backCnt(backCnt);
+    backN(backCnt);
     return false;
   }
 
@@ -195,7 +195,7 @@ function home_appliances_and_household_items() {
   if (!tmp || !tmp.parent()) {
     console.log("missing 家电家居 float enter, back");
     backN(backCnt);
-    shortWait();
+    utils.shortWait();
     return false;
   }
   let enter = tmp.parent();
@@ -466,9 +466,9 @@ function jinxi_direct() {
     return true;
   }
 
-  shortWait();
+  utils.shortWait();
   if (obj) {
-    click(400, 890);
+    click(400, obj.center().y);
     utils.shortWait();
   }
 

@@ -2,8 +2,10 @@ auto();
 const utils = require("./utils");
 const screenSize = utils.getScreenSize();
 
-let obj = text("签到领京豆").findOne(1000);
+let obj = text("去点淘APP赚零花钱").findOne(1000);
 console.log(obj);
+
+const closeButtonNameList = ["立即领取", "再领5京豆"];
 
 let taskNameList = [
   "去抽话费礼包",
@@ -20,43 +22,47 @@ let taskNameList = [
 // daily_earn_pean();
 
 function daily_earn_pean() {
-  let backCnt = 0;
-  // let searchBar = id("com.jd.jrapp:id/con_top_search").findOne(1000);
-  // if (!searchBar) {
-  //   console.log("missing search bar, skip");
-  //   return false;
-  // }
-  // searchBar.click();
-  // backCnt += 2;
-  // sleep(500);
-  // setText("天天赚京豆");
-  // sleep(500);
-
-  // let searchBtn = text("搜索").findOne();
-  // if (!searchBtn) {
-  //   console.log("missing search button, skip");
-  //   backN(backCnt);
-  //   return false;
-  // }
-  // searchBtn.click();
-  // backCnt++;
-  // sleep(3000);
-
-  // let entry = text("天天赚京豆").depth(21).findOne(1000);
-  // if (!entry) {
-  //   console.log("missing entry, skip");
-  //   backN(backCnt);
-  //   return false;
-  // }
-  // click(entry.center());
-  // sleep(8000);
+  enter_daily_earn_pean();
 
   for (let i = 0; i < taskNameList.length; i++) {
+    tryClosePopup();
     let name = taskNameList[i];
     console.log("do task:", name);
     do_task(name);
     sleep(5000);
   }
+}
+
+function enter_daily_earn_pean() {
+  let searchBar = id("com.jd.jrapp:id/con_top_search").findOne(1000);
+  if (!searchBar) {
+    console.log("missing search bar, skip");
+    return false;
+  }
+  searchBar.click();
+  backCnt += 2;
+  sleep(500);
+  setText("天天赚京豆");
+  sleep(500);
+
+  let searchBtn = text("搜索").findOne();
+  if (!searchBtn) {
+    console.log("missing search button, skip");
+    backN(backCnt);
+    return false;
+  }
+  searchBtn.click();
+  backCnt++;
+  sleep(3000);
+
+  let entry = text("天天赚京豆").depth(21).findOne(1000);
+  if (!entry) {
+    console.log("missing entry, skip");
+    backN(backCnt);
+    return false;
+  }
+  click(entry.center());
+  sleep(8000);
 }
 
 function do_task(name) {
@@ -100,6 +106,17 @@ function find_goto_button(parent) {
     }
   }
   return;
+}
+
+function tryClosePopup() {
+  for (let index = 0; index < closeButtonNameList.length; index++) {
+    let name = closeButtonNameList[index];
+    let obj = text(name).findOne(1000);
+    if (obj) {
+      click(obj.center().x, obj.center().y + 250);
+      sleep(1000);
+    }
+  }
 }
 
 function show_child_text(parent) {
