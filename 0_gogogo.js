@@ -33,7 +33,8 @@ let moreGameTaskList = [
   { name: "打螺丝王者", dur_m: 15 },
   { name: "数字喜加1", dur_m: 15 },
   { name: "纸牌接龙", dur_m: 15 },
-  { name: "喵喵十消", dur_m: 15 },
+  { name: "战争之王", dur_m: 15 },
+  // { name: "喵喵十消", dur_m: 15 },
   // { name: "超级连连看", dur_m: 15 },
   // round two
   { name: "毛线大师", dur_m: 2 }, //
@@ -43,7 +44,8 @@ let moreGameTaskList = [
   { name: "打螺丝王者", dur_m: 1 },
   { name: "数字喜加1", dur_m: 1 },
   { name: "纸牌接龙", dur_m: 1 },
-  { name: "喵喵十消", dur_m: 1 },
+  { name: "战争之王", dur_m: 1 },
+  // { name: "喵喵十消", dur_m: 1 },
   // { name: "超级连连看", dur_m: 1 },
 ];
 
