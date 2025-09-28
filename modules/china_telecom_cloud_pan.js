@@ -1,6 +1,4 @@
-sign();
-
-function sign() {
+function run() {
   console.log("天意云盘签到...");
   app.launchApp("天翼云盘");
   sleep(9000);
@@ -33,3 +31,7 @@ function sign() {
   back();
   sleep(5000);
 }
+
+module.exports = {
+  run,
+};

@@ -1,6 +1,4 @@
-sign();
-
-function sign() {
+function run() {
   console.log("什么值得买签到...");
 
   app.launchApp("什么值得买");
@@ -44,3 +42,7 @@ function sign() {
   back();
   sleep(5000);
 }
+
+module.exports = {
+  run,
+};
