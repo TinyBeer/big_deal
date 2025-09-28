@@ -11,6 +11,9 @@ function run(screen) {
   blind_box();
   blind_box();
   blind_box();
+
+  back();
+  backN(1);
 }
 
 /* tasks */
@@ -90,7 +93,7 @@ function playGameTraverse(name, view, depth) {
   } else if (view.text() == "去完成") {
     console.log(name, "去完成 60 s", view.center());
     click(866, view.center().y);
-    sleep(63000);
+    sleep(65000);
     back();
     back();
     utils.shortWait();
@@ -153,7 +156,9 @@ function blind_box() {
       if (arr[3] === "去逛逛") {
         console.log("goto ");
         click(880, 1540);
-        if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
+        if (arr[0] === "逛逛精选新奇好物 ") {
+          sleep(30000);
+        } else if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
           sleep(25000);
         } else if (arr[0] === "逛逛权益中心") {
           sleep(15000);

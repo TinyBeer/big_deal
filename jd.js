@@ -13,7 +13,6 @@ function run(screen) {
   jinxi_direct();
   interactive_game_sign();
   redeem_prize_tickets();
-  dong_dong_farm();
   global_shopping();
   daily_claim_pean();
   hardwar_city();
@@ -24,6 +23,10 @@ function run(screen) {
   home_appliances_and_household_items();
   jd_campus();
   online_doctor();
+  dong_dong_farm();
+
+  back();
+  utils.backN(1);
 }
 
 /* tasks */
@@ -95,7 +98,10 @@ function daily_claim_pean() {
     backN(backCnt);
     return false;
   }
-  signBtn.click();
+
+  click(signBtn.center());
+  utils.shortWait();
+
   backN(backCnt);
   return true;
 }
@@ -185,7 +191,7 @@ function home_appliances_and_household_items() {
     return false;
   }
   click(hh.center());
-  utils.mediumWait();
+  utils.longWait();
   backCnt++;
 
   let tmp = className("android.view.View")
@@ -211,7 +217,7 @@ function home_appliances_and_household_items() {
     return false;
   }
   // todo do not use act axis
-  click(960, 1400);
+  click(935, 1590);
   utils.shortWait();
   backN(backCnt);
   return true;

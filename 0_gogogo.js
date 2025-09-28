@@ -4,7 +4,7 @@ const ut = require("./utils");
 const jd = require("./jd");
 const jd_manual = require("./jd_manual");
 const jdjr = require("./jdjr");
-// const jdjr_ep = require("./jdjr_earn_pea")
+const jdjr_ep = require("./jdjr_earn_pea");
 
 const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
 const targetMinute = 5; // 目标分钟
@@ -66,7 +66,7 @@ const waitTime = ut.getTimeToTarget(targetHour, targetMinute);
 jdjr.run(screenSize, nameList, moreGameTaskList);
 jd.run(screenSize);
 jd_manual.run(screenSize);
-// jdjr_ep.run(screenSize);
+jdjr_ep.run(screenSize);
 
 device.cancelKeepingAwake();
 console.log("已关闭屏幕常亮");

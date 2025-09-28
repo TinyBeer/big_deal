@@ -3,9 +3,10 @@ const utils = require("./utils");
 
 const closeButtonNameList = ["立即领取", "再领\\d+京豆"];
 
-run();
+let sc = null;
 
 function run(screen) {
+  sc = screen;
   /* launch app */
   app.launchApp("京东金融");
   utils.longWait();
@@ -13,6 +14,7 @@ function run(screen) {
     console.log("进入 天天赚京豆 失败");
     return false;
   }
+
   goto_selectedgoods();
   goto_headlinefast();
   goto_headlineapp();
@@ -28,8 +30,11 @@ function run(screen) {
   goto_seeadoctor();
   goto_flash();
   goto_jmt();
-  
+
   back_from_daily_earn_pean();
+
+  back();
+  utils.backN(1);
 }
 
 function goto_jmt() {
@@ -63,7 +68,7 @@ function goto_flash() {
 
   utils.backN(2);
   back();
-  utils.backN(2);
+  utils.backN(1);
 
   try_close_popup();
 }
@@ -131,7 +136,9 @@ function goto_baidumap() {
   utils.longWait();
   utils.longWait();
 
-  utils.backN(2);
+  utils.backN(3);
+  back();
+  utils.backN(3);
 
   try_close_popup();
 }
@@ -151,7 +158,7 @@ function goto_baidufast() {
 
   utils.backN(3);
   back();
-  utils.backN(2);
+  utils.backN(3);
 
   try_close_popup();
 }
@@ -195,7 +202,7 @@ function goto_chinamobile() {
   utils.longWait();
   utils.longWait();
 
-  utils.backN(2);
+  utils.backN(3);
   back();
   utils.backN(2);
 
@@ -240,6 +247,7 @@ function goto_headlineapp() {
   utils.longWait();
   utils.longWait();
 
+  utils.backN(2);
   back();
   utils.backN(2);
 
@@ -278,7 +286,7 @@ function goto_headlinefast() {
 
   utils.backN(2);
   back();
-  utils.backN(2);
+  utils.backN(1);
 
   try_close_popup();
 }
@@ -410,7 +418,17 @@ function find_entry(name) {
     return;
   }
   let parent = obj.parent();
-  return find_goto_button(parent);
+  let entry = find_goto_button(parent);
+  if (
+    entry &&
+    (entry.center().x < 0 ||
+      entry.center().x > sc.width ||
+      entry.center().y < 0 ||
+      entry.center().y > sc.height)
+  ) {
+    return;
+  }
+  return entry;
 }
 
 function find_goto_button(parent) {
@@ -429,7 +447,7 @@ function find_goto_button(parent) {
   return;
 }
 
-// // 导出函数（供其他脚本调用）
-// module.exports = {
-//   run,
-// };
+// 导出函数（供其他脚本调用）
+module.exports = {
+  run,
+};

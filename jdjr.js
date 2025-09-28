@@ -20,10 +20,7 @@ function run(screen, nameList, moreGameTaskList) {
   workWithName(screen, gameTaskList);
   // workWithName(hotGameTaskList);
 
-  back();
-  sleep(2000);
-  back();
-  sleep(2000);
+  utils.backN(2);
 }
 
 function workWithName(screen, objList) {
@@ -222,7 +219,11 @@ function getGameTaskList(gameNameList) {
       continue;
     }
     click(game.center());
-    sleep(10000);
+    if (name === "无尽战歌") {
+      utils.shortWait();
+    } else {
+      utils.longWait();
+    }
     let taskEnter = textContains("10元还款券").findOne(1000);
     if (!taskEnter) {
       continue;
