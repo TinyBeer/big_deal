@@ -10,17 +10,17 @@ function run(screen, nameList, moreGameTaskList) {
 
   // enter interactive games
   enterInteractiveGames();
-  // let gameNameList = getGameNameList("精品推荐", true);
-  // nameList = nameList.concat(gameNameList);
   console.log(nameList);
   let tasks = getGameTaskList(nameList);
   gameTaskList = tasks.concat(moreGameTaskList);
   console.log(gameTaskList);
-  // workWithPos();
+
   workWithName(screen, gameTaskList);
   // workWithName(hotGameTaskList);
 
   utils.backN(2);
+  back();
+  utils.backN(1);
 }
 
 function workWithName(screen, objList) {
@@ -214,40 +214,47 @@ function getGameTaskList(gameNameList) {
   let taskList = [];
   for (let i = 0; i < gameNameList.length; i++) {
     let name = gameNameList[i];
-    let game = text(name).findOne(500);
-    if (!game) {
-      continue;
+    let tasks = getGameTaskListByName(name);
+    if (!tasks) {
+      tasks = getGameTaskListByName(name);
     }
-    click(game.center());
-    if (name === "无尽战歌") {
-      utils.shortWait();
-    } else {
-      utils.longWait();
-    }
-    let taskEnter = textContains("10元还款券").findOne(1000);
-    if (!taskEnter) {
-      continue;
-    }
-    click(taskEnter.center());
-    sleep(2000);
-    let mins = getGameMins();
-    for (let j = 0; j < mins.length; j++) {
-      let min = mins[j];
-      if (j == 0) {
-        taskList.push({
-          name: name,
-          dur_m: min,
-        });
-      } else {
-        taskList.push({
-          name: name,
-          dur_m: min - mins[j - 1] + 1,
-        });
-      }
-    }
-    back();
-    sleep(1000);
+    taskList = taskList.concat(tasks);
   }
+  return taskList;
+}
+
+function getGameTaskListByName(name) {
+  let taskList = [];
+  let game = text(name).findOne(500);
+  if (!game) {
+    return;
+  }
+  click(game.center());
+  utils.longWait();
+
+  let taskEnter = textContains("10元还款券").findOne(1000);
+  if (!taskEnter) {
+    return;
+  }
+  click(taskEnter.center());
+  sleep(2000);
+  let mins = getGameMins();
+  for (let j = 0; j < mins.length; j++) {
+    let min = mins[j];
+    if (j == 0) {
+      taskList.push({
+        name: name,
+        dur_m: min,
+      });
+    } else {
+      taskList.push({
+        name: name,
+        dur_m: min - mins[j - 1] + 1,
+      });
+    }
+  }
+  back();
+  sleep(1000);
   return taskList;
 }
 

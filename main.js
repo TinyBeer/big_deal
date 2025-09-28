@@ -11,6 +11,7 @@ ui.layout(
     <button id="jd" text="京东" />
     <button id="jdm" text="京东 手动" />
     <button id="ddep" text="天天赚京豆" />
+    <button id="test" text="test" />
     <button id="exit" text="退出" />
   </vertical>
 );
