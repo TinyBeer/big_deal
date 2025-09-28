@@ -95,9 +95,15 @@ ui.jdjr.click(() => {
 
 ui.jd.click(() => {
   threads.start(() => {
+    const ut = require("./modules/utils");
+    const screenSize = ut.getScreenSize();
+    const jd = require("./modules/jd");
+
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
+
+    jd.run(screenSize);
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -122,17 +128,19 @@ ui.jdm.click(() => {
 });
 
 ui.ddep.click(() => {
-  const jdjr_ep = require("./modules/jdjr_earn_pea");
-  const ut = require("./modules/utils");
-  const screenSize = ut.getScreenSize();
-  /* keep screen on */
-  device.keepScreenOn();
-  console.log("已开启屏幕常亮");
+  threads.start(() => {
+    const jdjr_ep = require("./modules/jdjr_earn_pea");
+    const ut = require("./modules/utils");
+    const screenSize = ut.getScreenSize();
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
 
-  jdjr_ep.run(screenSize);
+    jdjr_ep.run(screenSize);
 
-  device.cancelKeepingAwake();
-  console.log("已关闭屏幕常亮");
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
 });
 
 ui.exit.click(() => {
