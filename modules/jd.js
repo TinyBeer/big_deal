@@ -9,21 +9,21 @@ function run(screen) {
   utils.longWait();
 
   /* run task */
-  flash_sale();
-  jinxi_direct();
-  interactive_game_sign();
-  redeem_prize_tickets();
-  global_shopping();
-  daily_claim_pean();
-  hardwar_city();
+  // flash_sale();
+  // jinxi_direct();
+  // interactive_game_sign();
+  // redeem_prize_tickets();
+  // global_shopping();
+  // daily_claim_pean();
+  // hardwar_city();
 
-  //todo optimize
-  luck_reward();
-  get_beans();
-  home_appliances_and_household_items();
+  // //todo optimize
+  // luck_reward();
+  // get_beans();
+  // home_appliances_and_household_items();
   jd_campus();
-  online_doctor();
-  dong_dong_farm();
+  // online_doctor();
+  // dong_dong_farm();
 
   back();
   utils.backN(1);
@@ -168,7 +168,7 @@ function jd_campus() {
   }
   backCnt++;
   click(133, enter.center().y);
-  utils.mediumWait();
+  utils.longWait();
 
   let claim = text("今日签到").findOne(1000);
   if (!claim) {
