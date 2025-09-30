@@ -83,6 +83,12 @@ function enterInteractiveGames() {
     // home page
     click(900, 2250);
     sleep(2000);
+
+    let update = text("立即查看").findOne(1000);
+    if (update) {
+      utils.backN(1);
+    }
+
     let enter = text("互动游戏").findOne(1000);
     if (!enter) {
       return false;

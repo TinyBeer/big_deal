@@ -9,21 +9,21 @@ function run(screen) {
   utils.longWait();
 
   /* run task */
-  // flash_sale();
-  // jinxi_direct();
-  // interactive_game_sign();
-  // redeem_prize_tickets();
+  flash_sale();
+  jinxi_direct();
+  interactive_game_sign();
+  redeem_prize_tickets();
   global_shopping();
-  // daily_claim_pean();
-  // hardwar_city();
-  // jd_campus();
+  daily_claim_pean();
+  hardwar_city();
+  jd_campus();
 
-  // //todo optimize
-  // luck_reward();
-  // get_beans();
-  // home_appliances_and_household_items();
-  // online_doctor();
-  // dong_dong_farm();
+  //todo optimize
+  luck_reward();
+  get_beans();
+  home_appliances_and_household_items();
+  online_doctor();
+  dong_dong_farm();
 
   back();
   utils.backN(1);

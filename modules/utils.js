@@ -25,6 +25,18 @@ function backN(cnt) {
   }
 }
 
+function isInScreen(screen, point) {
+  if (
+    point.x > 0 &&
+    point.x < screen.width &&
+    point.y > 0 &&
+    point.y < screen.height
+  ) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * 获取屏幕尺寸
  */

@@ -18,6 +18,52 @@ function run(screen) {
 
 /* tasks */
 
+function jd_star(screen) {
+  /* launch app */
+  app.launchApp("京东");
+  utils.longWait();
+
+  console.log("超级明星...");
+
+  switchTag("新品");
+
+  let superStar = id("ea2").text("超级明星").findOne(1000);
+  if (!superStar) {
+    console.log("missing 超级明星 entry, skip");
+    switchTag("首页");
+    return false;
+  }
+
+  click(superStar.center());
+  utils.longWait();
+  
+  let loopCnt = 2;
+  for (let i = 0; i < loopCnt; i++) {
+    jd_star_scroll(true);
+  }
+
+  for (let i = 0; i < loopCnt; i++) {
+    jd_star_scroll(true);
+  }
+
+  switchTag("首页");
+
+  back();
+  backN(1);
+}
+
+function jd_star_scroll(up) {
+  let x = 500;
+  let sy = 2000;
+  let ey = 1000;
+  let dur = 500;
+  if (up) {
+    swipe(x, sy, x, ey, dur);
+  } else {
+    swipe(x, ey, x, sy, dur);
+  }
+}
+
 function interactive_game(screen) {
   console.log("互动游戏...");
 
@@ -119,7 +165,7 @@ function blind_box() {
   }
 
   click(newGoodsShop.center());
-  sleep(4000);
+  utils.mediumWait();
 
   let entry = id("novelBlindBoxEntry").findOne(1000);
   if (!entry) {
@@ -222,4 +268,5 @@ function backN(cnt) {
 //  导出函数（供其他脚本调用）
 module.exports = {
   run,
+  jd_star,
 };

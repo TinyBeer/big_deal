@@ -144,6 +144,23 @@ ui.ddep.click(() => {
   });
 });
 
+ui.test.click(() => {
+  threads.start(() => {
+    const ut = require("./modules/utils");
+    const screenSize = ut.getScreenSize();
+
+    const jd_manual = require("./modules/jd_manual");
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jd_manual.jd_star(screenSize);
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
 ui.exit.click(() => {
   exit();
 });
