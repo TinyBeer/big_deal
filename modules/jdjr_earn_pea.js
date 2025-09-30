@@ -18,6 +18,7 @@ function run(screen) {
   goto_selectedgoods();
   goto_headlinefast();
   goto_headlineapp();
+  goto_sevencat();
   goto_qqreading();
   goto_chinamobile();
   goto_monkeyexpolorer();
@@ -37,6 +38,24 @@ function run(screen) {
   utils.backN(1);
 }
 
+function goto_sevencat() {
+  let name = "去七猫小说领金币";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+  utils.longWait();
+
+  utils.backN(2);
+  back();
+  utils.backN(2);
+
+  try_close_popup();
+}
 function goto_jmt() {
   let name = "逛京民通，领京豆";
   console.log(name, "...");
@@ -90,7 +109,7 @@ function goto_ucfast() {
   utils.backN(3);
   back();
   back();
-  utils.miniWait();
+  utils.shortWait();
   let ex = text("退出").findOne(1000);
   if (ex) {
     click(ex.center());
@@ -138,7 +157,7 @@ function goto_baidumap() {
 
   utils.backN(3);
   back();
-  utils.backN(3);
+  utils.backN(2);
 
   try_close_popup();
 }
@@ -158,7 +177,7 @@ function goto_baidufast() {
 
   utils.backN(3);
   back();
-  utils.backN(3);
+  utils.backN(2);
 
   try_close_popup();
 }
@@ -223,12 +242,17 @@ function goto_qqreading() {
   utils.longWait();
 
   utils.backN(3);
-
-  let ex = text("退出").findOne(1000);
-  if (ex) {
-    click(ex.center());
-    utils.shortWait();
+  for (let i = 0; i < 4; i++) {
+    back();
+    utils.backN(1);
+    let ex = text("退出").findOne(1000);
+    if (ex) {
+      click(ex.center());
+      utils.shortWait();
+      break;
+    }
   }
+
   utils.backN(1);
 
   try_close_popup();
@@ -286,7 +310,7 @@ function goto_headlinefast() {
 
   utils.backN(2);
   back();
-  utils.backN(1);
+  utils.backN(2);
 
   try_close_popup();
 }
@@ -345,6 +369,7 @@ function goto_diantao() {
     return false;
   }
   click(entry.center());
+  utils.longWait();
   utils.longWait();
   utils.longWait();
 
