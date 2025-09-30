@@ -58,7 +58,8 @@ ui.jdjr.click(() => {
     let moreGameTaskList = [
       { scroll: true },
       // // round one
-      { name: "毛线大师", dur_m: 15 }, //
+      { name: "百炼飞仙", dur_m: 15 }, 
+      { name: "毛线大师", dur_m: 15 }, 
       { name: "点点2048", dur_m: 15 },
       { name: "合成原始人", dur_m: 15 },
       { name: "无尽泡泡龙", dur_m: 15 },
@@ -69,7 +70,8 @@ ui.jdjr.click(() => {
       // { name: "喵喵十消", dur_m: 15 },
       // { name: "超级连连看", dur_m: 15 },
       // round two
-      { name: "毛线大师", dur_m: 2 }, //
+      { name: "百炼飞仙", dur_m: 2 }, 
+      { name: "毛线大师", dur_m: 2 }, 
       { name: "点点2048", dur_m: 1 },
       { name: "合成原始人", dur_m: 1 },
       { name: "无尽泡泡龙", dur_m: 1 },
