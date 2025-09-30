@@ -13,15 +13,15 @@ function run(screen) {
   // jinxi_direct();
   // interactive_game_sign();
   // redeem_prize_tickets();
-  // global_shopping();
+  global_shopping();
   // daily_claim_pean();
   // hardwar_city();
+  // jd_campus();
 
   // //todo optimize
   // luck_reward();
   // get_beans();
   // home_appliances_and_household_items();
-  jd_campus();
   // online_doctor();
   // dong_dong_farm();
 
@@ -224,6 +224,7 @@ function home_appliances_and_household_items() {
 }
 
 function global_shopping() {
+  let backCnt = 0;
   let gs = homePageGetEnter("全球购");
   if (!gs) {
     console.log("missing 全球购 enter, skip");
@@ -232,74 +233,92 @@ function global_shopping() {
   }
 
   click(gs.center());
-  utils.shortWait();
+  backCnt++;
+  utils.longWait();
 
   let closeBtn = id("dolphin_float_close_btn").findOne(1000);
   if (closeBtn) {
     click(closeBtn.center());
     utils.shortWait();
   }
-
-  let enter = id("bg").findOne(1000);
+  let enter = className("android.view.View")
+    .depth(18)
+    .indexInParent(1)
+    .childCount(1)
+    .findOne(1000);
+  // let enter = id("bg").findOne(1000);
   if (!enter) {
     console.log("missing 做任务赚京豆 enter, skip");
     back();
     utils.shortWait();
     return false;
   }
+  
   click(enter.center());
-  utils.shortWait();
+  utils.longWait();
+  backCnt++;
 
-  let sign = text("签到").findOne(1000);
-  if (sign) {
-    click(sign.center());
-    utils.shortWait();
+  let claim = text("今日签到").findOne(1000);
+  if (!claim) {
+    console.log("miss claim item, skip");
+    backN(backCnt);
+    return false;
   }
-
-  while (true) {
-    let explore = text("去浏览").findOne(1000);
-    if (!explore) {
-      break;
-    }
-    let parent = explore.parent();
-    for (let i = 0; i < parent.childCount(); i++) {
-      let child = parent.children()[i];
-      if (!child) {
-        continue;
-      }
-      let nums = extractNumbersWithDecimal(child.text());
-      if (nums && nums.length === 3) {
-        let num = nums[2] - nums[1];
-        if (child.text().includes("商品")) {
-          console.log(child.text());
-          click(explore.center());
-          utils.mediumWait();
-          for (let i = 0; i < num; i++) {
-            // todo do not use act axis
-            let x = 270 + 540 * (i % 2);
-            let y = 550 + Math.floor(i / 2) * 700;
-            console.log("click", x, y);
-            click(x, y);
-            utils.mediumWait();
-            back();
-            utils.shortWait();
-          }
-          back();
-          utils.shortWait();
-        } else {
-          console.log(child.text(), nums, "其他");
-          for (let i = 0; i < num; i++) {
-            click(explore.center());
-            utils.shortWait();
-            back();
-            utils.shortWait();
-          }
-        }
-      }
-    }
-  }
-  back();
+  click(899, claim.center().y);
   utils.shortWait();
+  backN(backCnt);
+  return true;
+
+  // let sign = text("签到").findOne(1000);
+  // if (sign) {
+  //   click(sign.center());
+  //   utils.shortWait();
+  // }
+
+  // while (true) {
+  //   let explore = text("去浏览").findOne(1000);
+  //   if (!explore) {
+  //     break;
+  //   }
+  //   let parent = explore.parent();
+  //   for (let i = 0; i < parent.childCount(); i++) {
+  //     let child = parent.children()[i];
+  //     if (!child) {
+  //       continue;
+  //     }
+  //     let nums = extractNumbersWithDecimal(child.text());
+  //     if (nums && nums.length === 3) {
+  //       let num = nums[2] - nums[1];
+  //       if (child.text().includes("商品")) {
+  //         console.log(child.text());
+  //         click(explore.center());
+  //         utils.mediumWait();
+  //         for (let i = 0; i < num; i++) {
+  //           // todo do not use act axis
+  //           let x = 270 + 540 * (i % 2);
+  //           let y = 550 + Math.floor(i / 2) * 700;
+  //           console.log("click", x, y);
+  //           click(x, y);
+  //           utils.mediumWait();
+  //           back();
+  //           utils.shortWait();
+  //         }
+  //         back();
+  //         utils.shortWait();
+  //       } else {
+  //         console.log(child.text(), nums, "其他");
+  //         for (let i = 0; i < num; i++) {
+  //           click(explore.center());
+  //           utils.shortWait();
+  //           back();
+  //           utils.shortWait();
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  // back();
+  // utils.shortWait();
 }
 
 function dong_dong_farm() {
