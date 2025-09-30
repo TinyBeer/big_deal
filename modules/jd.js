@@ -123,7 +123,8 @@ function online_doctor() {
     click(closeBtn.center());
     utils.miniWait();
   }
-  click(188, 396);
+
+  click(174, 430);
   backCnt++;
   utils.mediumWait();
 
@@ -243,7 +244,7 @@ function global_shopping() {
   }
   let enter = className("android.view.View")
     .depth(18)
-    .indexInParent(1)
+    .indexInParent(2)
     .childCount(1)
     .findOne(1000);
   // let enter = id("bg").findOne(1000);
@@ -253,7 +254,7 @@ function global_shopping() {
     utils.shortWait();
     return false;
   }
-  
+
   click(enter.center());
   utils.longWait();
   backCnt++;
