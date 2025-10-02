@@ -18,23 +18,14 @@ function longWait() {
 }
 
 /* back */
-function backN(cnt) {
+function backN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
+    if (untilFunc && untilFunc()) {
+      break;
+    }
     back();
     shortWait();
   }
-}
-
-function isInScreen(screen, point) {
-  if (
-    point.x > 0 &&
-    point.x < screen.width &&
-    point.y > 0 &&
-    point.y < screen.height
-  ) {
-    return true;
-  }
-  return false;
 }
 
 /**

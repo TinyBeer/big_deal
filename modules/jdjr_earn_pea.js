@@ -433,8 +433,10 @@ function try_close_popup() {
     if (obj) {
       click(obj.center().x, obj.center().y + 250);
       sleep(1000);
+      return true;
     }
   }
+  return false;
 }
 
 function find_entry(name) {
