@@ -18,12 +18,12 @@ function run(screen) {
   hardwar_city();
   jd_campus();
   big_brand();
-  
   //todo optimize
   luck_reward();
   // get_beans();
   home_appliances_and_household_items();
   online_doctor();
+  mother_baby();
   dong_dong_farm();
   home_nurse();
   global_shopping();
@@ -33,6 +33,37 @@ function run(screen) {
 }
 
 /* tasks */
+
+function mother_baby() {
+  let backCnt = 0;
+  let bb = homePageGetEnter("母婴馆");
+  if (!bb) {
+    console.log("missing 母婴馆 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(bb.center());
+  utils.mediumWait();
+  backCnt++;
+
+  for (let i = 0; i < 4; i++) {
+    scrollDown();
+    utils.shortWait();
+  }
+  utils.longWait();
+
+  let obj = text("今日签到").findOne(1000);
+  if (!obj) {
+    console.log("missing claim button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(888, obj.center().y);
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
 
 function big_brand() {
   let backCnt = 0;
@@ -721,7 +752,7 @@ function homePageGetEnter(name) {
     .depth(23)
     .findOne(1000);
 
-  if (enter && enter.center().x > 0 && enter.center().x < 1080) {
+  if (enter && enter.center().x > 0 && enter.center().x < 1045) {
     if (
       name !== "在线医生" ||
       (name === "在线医生" && enter.parent().center().x < 1080)

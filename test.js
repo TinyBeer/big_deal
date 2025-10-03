@@ -1,10 +1,8 @@
-let obj = text("连签奖励").findOne(1000);
-if (!obj){
-    console.log("missing claim button, skip");
-    
-    
-}
-
+let enter = className("android.widget.TextView")
+  .text("母婴馆")
+  .depth(23)
+  .findOne(1000);
+console.log(enter);
 
 // let loopCnt = 2;
 // for (let i = 0; i < loopCnt; i++) {
