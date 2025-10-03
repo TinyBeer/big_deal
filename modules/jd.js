@@ -9,6 +9,7 @@ function run(screen) {
   utils.longWait();
 
   /* run task */
+  ecard();
   flash_sale();
   jinxi_direct();
   interactive_game_sign();
@@ -20,16 +21,100 @@ function run(screen) {
 
   //todo optimize
   luck_reward();
-  get_beans();
+  // get_beans();
   home_appliances_and_household_items();
   online_doctor();
   dong_dong_farm();
+  home_nurse();
 
   back();
   utils.backN(1);
 }
 
 /* tasks */
+
+function home_nurse() {
+  let backCnt = 0;
+  let od = homePageGetEnter("护士到家");
+  if (!od) {
+    console.log("missing 在线医生 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(od.center());
+  backCnt++;
+  utils.mediumWait();
+
+  utils.backN(1);
+  click(od.center());
+  backCnt++;
+  utils.mediumWait();
+
+  click(198, 493);
+  backCnt++;
+  utils.mediumWait();
+
+  let claim = text("签到领京豆").findOne(1000);
+  if (!claim) {
+    console.log("missing claim btn, back");
+    backN(backCnt);
+    return false;
+  }
+  click(claim.center());
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
+
+function ecard() {
+  utils.longWait();
+  console.log("京东E卡 ...");
+
+  let backCnt = 0;
+
+  let mine = text("我的").findOne(1000);
+  if (!mine) {
+    console.log("missing 我的, skip");
+    return false;
+  }
+  click(mine.center());
+  utils.shortWait();
+  backCnt++;
+
+  let entry = text("京东E卡").findOne(1000);
+  if (!entry) {
+    console.log("missing entry, skip");
+    utils.backN(backCnt);
+    return false;
+  }
+  click(entry.center());
+  utils.mediumWait();
+  backCnt++;
+
+  let obj = textMatches("天天抢\\d+京豆").findOne(1000);
+  if (!obj) {
+    console.log("missing claim button, skip");
+    utils.backN(backCnt);
+    return false;
+  }
+  let par = obj.parent();
+  for (let idx = 0; idx < par.childCount(); idx++) {
+    let child = par.children()[idx];
+    if (child.text() === "已领取") {
+      console.log("already calimed, back");
+      utils.backN(backCnt);
+      return false;
+    } else if (child.text() === "去领取") {
+      click(child.center());
+      sleep(2000);
+      utils.backN(backCnt);
+      return true;
+    }
+  }
+  console.log("missing claim button, skip");
+  utils.backN(backCnt);
+  return false;
+}
 
 function hardwar_city() {
   console.log("五金城");
@@ -483,12 +568,29 @@ function jinxi_direct() {
     console.log("missing claim button, back");
     back();
     utils.shortWait();
+
+    let ex = text("退出").findOne(1000);
+    if (ex) {
+      click(ex.center());
+      sleep(1000);
+      back();
+      utils.shortWait();
+    }
+
     return false;
   }
   if (obj.text().includes("订阅提醒")) {
     console.log("already claimed, back");
     back();
     utils.shortWait();
+
+    let ex = text("退出").findOne(1000);
+    if (ex) {
+      click(ex.center());
+      sleep(1000);
+      back();
+      utils.shortWait();
+    }
     return true;
   }
 
@@ -500,6 +602,13 @@ function jinxi_direct() {
 
   back();
   utils.shortWait();
+  let ex = text("退出").findOne(1000);
+  if (ex) {
+    click(ex.center());
+    sleep(1000);
+    back();
+    utils.shortWait();
+  }
 }
 
 function appliance_and_furniture() {

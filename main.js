@@ -43,41 +43,41 @@ ui.jdjr.click(() => {
     const targetMinute = 5; // 目标分钟
     /* config */
     let nameList = [
-      "雀神来也",
-      "货柜趣消除",
-      "趣味叠叠乐",
-      "排队上车",
-      "方块拼图",
-      "养猪猪",
-      "消灭小萌星",
-      "麻将凑十",
-      "解压硬币",
-      "2048方块",
-      "无尽战歌",
+      // "雀神来也",
+      // "货柜趣消除",
+      // "趣味叠叠乐",
+      // "排队上车",
+      // "方块拼图",
+      // "养猪猪",
+      // "消灭小萌星",
+      // "麻将凑十",
+      // "解压硬币",
+      // "2048方块",
+      // "无尽战歌",
     ];
     let moreGameTaskList = [
       { scroll: true },
       // // round one
-      { name: "百炼飞仙", dur_m: 15 }, 
-      { name: "毛线大师", dur_m: 15 }, 
+      { name: "百炼飞仙", dur_m: 15 },
+      { name: "毛线大师", dur_m: 15 },
       { name: "点点2048", dur_m: 15 },
       { name: "合成原始人", dur_m: 15 },
       { name: "无尽泡泡龙", dur_m: 15 },
       { name: "打螺丝王者", dur_m: 15 },
       { name: "数字喜加1", dur_m: 15 },
-      { name: "纸牌接龙", dur_m: 15 },
+      // { name: "纸牌接龙", dur_m: 15 },
       { name: "战争之王", dur_m: 15 },
       // { name: "喵喵十消", dur_m: 15 },
       // { name: "超级连连看", dur_m: 15 },
       // round two
-      { name: "百炼飞仙", dur_m: 2 }, 
-      { name: "毛线大师", dur_m: 2 }, 
+      { name: "百炼飞仙", dur_m: 2 },
+      { name: "毛线大师", dur_m: 2 },
       { name: "点点2048", dur_m: 1 },
       { name: "合成原始人", dur_m: 1 },
       { name: "无尽泡泡龙", dur_m: 1 },
       { name: "打螺丝王者", dur_m: 1 },
       { name: "数字喜加1", dur_m: 1 },
-      { name: "纸牌接龙", dur_m: 1 },
+      // { name: "纸牌接龙", dur_m: 1 },
       { name: "战争之王", dur_m: 1 },
       // { name: "喵喵十消", dur_m: 1 },
       // { name: "超级连连看", dur_m: 1 },
@@ -148,18 +148,7 @@ ui.ddep.click(() => {
 
 ui.test.click(() => {
   threads.start(() => {
-    const ut = require("./modules/utils");
-    const screenSize = ut.getScreenSize();
-
-    const jd_manual = require("./modules/jd_manual");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jd_manual.jd_star(screenSize);
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
+    console.log("test");
   });
 });
 

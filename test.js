@@ -1,9 +1,4 @@
-let enter = className("android.widget.ImageView")
-  .depth(20)
-  .indexInParent(0)
-  .findOne();
 
-console.log(enter);
 
 // let loopCnt = 2;
 // for (let i = 0; i < loopCnt; i++) {
