@@ -18,6 +18,7 @@ function run(screen) {
   hardwar_city();
   jd_campus();
   big_brand();
+  clothe_makup();
   //todo optimize
   luck_reward();
   // get_beans();
@@ -33,6 +34,51 @@ function run(screen) {
 }
 
 /* tasks */
+
+function clothe_makup() {
+  let backCnt = 0;
+  let bb = homePageGetEnter("服饰美妆");
+  if (!bb) {
+    console.log("missing 服饰美妆 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(bb.center());
+  utils.mediumWait();
+  backCnt++;
+
+  let list = text("image").depth(24).indexInParent(0).find(1000);
+  let signBtn = null;
+  for (let idx = 0; idx < list.length; idx++) {
+    let element = list[idx];
+    if (element.center().x < 100) {
+      signBtn = element;
+      break;
+    }
+  }
+  if (!signBtn) {
+    console.log("missing sign entry, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(signBtn.center());
+  utils.longWait();
+  utils.mediumWait();
+  backCnt++;
+
+  let obj = text("待领取").findOne(1000);
+  if (!obj) {
+    console.log("missing claim button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(888, obj.center().y);
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
 
 function mother_baby() {
   let backCnt = 0;
