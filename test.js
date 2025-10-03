@@ -1,3 +1,11 @@
+let obj = text("连签奖励").findOne(1000);
+if (!obj){
+    console.log("missing claim button, skip");
+    
+    
+}
+
+
 // let loopCnt = 2;
 // for (let i = 0; i < loopCnt; i++) {
 //   jd_star_scroll(true);

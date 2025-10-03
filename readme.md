@@ -7,6 +7,6 @@
 - [x] jd Home Appliances & Household Items
 - [x] jd online doctor
 - [x] jd campus
-- [ ] bline box
+- [x] bline box
 
 - jd home nurse: minus coordinate

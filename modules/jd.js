@@ -17,7 +17,8 @@ function run(screen) {
   daily_claim_pean();
   hardwar_city();
   jd_campus();
-
+  big_brand();
+  
   //todo optimize
   luck_reward();
   // get_beans();
@@ -32,6 +33,51 @@ function run(screen) {
 }
 
 /* tasks */
+
+function big_brand() {
+  let backCnt = 0;
+  let bb = homePageGetEnter("大牌奥莱");
+  if (!bb) {
+    console.log("missing 大牌奥莱 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(bb.center());
+  utils.mediumWait();
+  backCnt++;
+
+  let list = text("image").depth(24).indexInParent(0).find(1000);
+  let signBtn = null;
+  for (let idx = 0; idx < list.length; idx++) {
+    let element = list[idx];
+    if (element.center().x < 100) {
+      signBtn = element;
+      break;
+    }
+  }
+  if (!signBtn) {
+    console.log("missing sign entry, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(signBtn.center());
+  utils.longWait();
+  utils.mediumWait();
+  backCnt++;
+
+  let obj = text("连签奖励").findOne(1000);
+  if (!obj) {
+    console.log("missing claim button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(888, 767);
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
 
 function home_nurse() {
   let backCnt = 0;
