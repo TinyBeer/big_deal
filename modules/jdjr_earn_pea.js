@@ -31,11 +31,101 @@ function run(screen) {
   goto_seeadoctor();
   goto_flash();
   goto_jmt();
+  goto_takeawayticket();
+  goto_dailysubsidary();
+  goto_whateveryonebuying();
+  goto_qualitylife();
+  goto_daydaylowprice();
+  goto_dailysubsidarygood();
 
   back_from_daily_earn_pean();
 
   back();
   utils.backN(1);
+}
+
+function goto_dailysubsidarygood() {
+  let name = "逛每日补贴好物";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+
+  utils.backN(3, try_close_popup);
+}
+
+function goto_daydaylowprice() {
+  let name = "天天低价新发现";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+
+  utils.backN(3, try_close_popup);
+}
+
+function goto_qualitylife() {
+  let name = "花小钱享品质生活";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+
+  utils.backN(3, try_close_popup);
+}
+
+function goto_whateveryonebuying() {
+  let name = "逛逛大家都在买什么";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+
+  utils.backN(3, try_close_popup);
+}
+
+function goto_dailysubsidary() {
+  let name = "每日补贴限时抢！";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+
+  utils.backN(3, try_close_popup);
+}
+
+function goto_takeawayticket() {
+  let name = "去领取一张10元外卖券";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+
+  utils.backN(3, try_close_popup);
 }
 
 function goto_sevencat() {
@@ -52,7 +142,7 @@ function goto_sevencat() {
 
   utils.backN(2);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }
@@ -136,7 +226,7 @@ function goto_mantisshrimp() {
 
   utils.backN(2);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }
@@ -155,9 +245,13 @@ function goto_baidumap() {
   utils.longWait();
   utils.longWait();
 
-  utils.backN(3);
-  back();
-  utils.backN(2);
+  let closeBtn = text("关闭").findOne(1000);
+  if (closeBtn) {
+    click(closeBtn.center());
+    utils.miniWait();
+  }
+
+  utils.backN(3, try_close_popup);
 
   try_close_popup();
 }
@@ -177,7 +271,20 @@ function goto_baidufast() {
 
   utils.backN(3);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
+
+  let closeBtn = desc("关闭").findOne(1000);
+  if (closeBtn) {
+    click(closeBtn.center());
+    utils.miniWait();
+  }
+
+  let quitBtn = text("残忍离开").findOne(1000);
+  if (quitBtn) {
+    click(quitBtn.center());
+    utils.shortWait();
+    utils.backN(2, try_close_popup);
+  }
 
   try_close_popup();
 }
@@ -203,7 +310,7 @@ function goto_monkeyexpolorer() {
 
   utils.backN(2);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }
@@ -223,7 +330,7 @@ function goto_chinamobile() {
 
   utils.backN(3);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }
@@ -273,7 +380,7 @@ function goto_headlineapp() {
 
   utils.backN(2);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }
@@ -308,9 +415,9 @@ function goto_headlinefast() {
     utils.miniWait();
   }
 
-  utils.backN(2);
+  utils.backN(3);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }
@@ -326,7 +433,7 @@ function goto_selectedgoods() {
   }
   click(entry.center());
   utils.longWait();
-  utils.backN(1);
+  utils.backN(1, try_close_popup);
   try_close_popup();
 }
 
@@ -375,7 +482,7 @@ function goto_diantao() {
 
   utils.backN(3);
   back();
-  utils.backN(2);
+  utils.backN(2, try_close_popup);
 
   try_close_popup();
 }

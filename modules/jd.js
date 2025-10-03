@@ -14,7 +14,6 @@ function run(screen) {
   jinxi_direct();
   interactive_game_sign();
   redeem_prize_tickets();
-  global_shopping();
   daily_claim_pean();
   hardwar_city();
   jd_campus();
@@ -26,6 +25,7 @@ function run(screen) {
   online_doctor();
   dong_dong_farm();
   home_nurse();
+  global_shopping();
 
   back();
   utils.backN(1);

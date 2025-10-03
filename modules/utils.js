@@ -20,11 +20,11 @@ function longWait() {
 /* back */
 function backN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
+    back();
+    shortWait();
     if (untilFunc && untilFunc()) {
       break;
     }
-    back();
-    shortWait();
   }
 }
 
