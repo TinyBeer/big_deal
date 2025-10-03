@@ -1,6 +1,3 @@
-let obj = textContains("天天低价新发现").findOne(1000);
-console.log(obj);
-
 // let loopCnt = 2;
 // for (let i = 0; i < loopCnt; i++) {
 //   jd_star_scroll(true);

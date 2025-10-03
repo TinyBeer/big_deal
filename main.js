@@ -11,6 +11,7 @@ ui.layout(
     <button id="jd" text="京东" />
     <button id="jdm" text="京东 手动" />
     <button id="ddep" text="天天赚京豆" />
+    <button id="jdjrm" text="京东金融 手动" />
     <button id="test" text="test" />
     <button id="exit" text="退出" />
   </vertical>
@@ -43,17 +44,17 @@ ui.jdjr.click(() => {
     const targetMinute = 5; // 目标分钟
     /* config */
     let nameList = [
-      // "雀神来也",
-      // "货柜趣消除",
-      // "趣味叠叠乐",
-      // "排队上车",
-      // "方块拼图",
-      // "养猪猪",
-      // "消灭小萌星",
-      // "麻将凑十",
-      // "解压硬币",
-      // "2048方块",
-      // "无尽战歌",
+      "雀神来也",
+      "货柜趣消除",
+      "趣味叠叠乐",
+      "排队上车",
+      "方块拼图",
+      "养猪猪",
+      "消灭小萌星",
+      "麻将凑十",
+      "解压硬币",
+      "2048方块",
+      "无尽战歌",
     ];
     let moreGameTaskList = [
       { scroll: true },
@@ -140,6 +141,22 @@ ui.ddep.click(() => {
     console.log("已开启屏幕常亮");
 
     jdjr_ep.run(screenSize);
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.jdjrm.click(() => {
+  threads.start(() => {
+    const jdjrm = require("./modules/jdjr_manual");
+    const ut = require("./modules/utils");
+    const screenSize = ut.getScreenSize();
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jdjrm.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
