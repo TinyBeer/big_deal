@@ -9,13 +9,13 @@ function run(screen) {
   utils.longWait();
 
   /* run task */
-  ecard();
   flash_sale();
   jinxi_direct();
   interactive_game_sign();
   redeem_prize_tickets();
   daily_claim_pean();
   hardwar_city();
+  ecard();
   jd_campus();
   big_brand();
   clothe_makup();
@@ -160,7 +160,7 @@ function home_nurse() {
   let backCnt = 0;
   let od = homePageGetEnter("护士到家");
   if (!od) {
-    console.log("missing 在线医生 enter, back");
+    console.log("missing 护士到家 enter, back");
     backN(backCnt);
     return false;
   }
@@ -170,7 +170,6 @@ function home_nurse() {
 
   utils.backN(1);
   click(od.center());
-  backCnt++;
   utils.mediumWait();
 
   click(198, 493);
@@ -190,24 +189,15 @@ function home_nurse() {
 }
 
 function ecard() {
-  utils.longWait();
   console.log("京东E卡 ...");
-
   let backCnt = 0;
+  search("京东礼品卡", 8000);
+  backCnt += 3;
 
-  let mine = text("我的").findOne(1000);
-  if (!mine) {
-    console.log("missing 我的, skip");
-    return false;
-  }
-  click(mine.center());
-  utils.shortWait();
-  backCnt++;
-
-  let entry = text("京东E卡").findOne(1000);
+  let entry = text("持卡特权").findOne(1000);
   if (!entry) {
     console.log("missing entry, skip");
-    utils.backN(backCnt);
+    backN(backCnt);
     return false;
   }
   click(entry.center());
@@ -452,7 +442,7 @@ function global_shopping() {
   }
   let enter = className("android.view.View")
     .depth(18)
-    .indexInParent(2)
+    .indexInParent(1)
     .childCount(1)
     .findOne(1000);
   // let enter = id("bg").findOne(1000);

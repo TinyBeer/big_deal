@@ -1,8 +1,9 @@
-let enter = className("android.widget.TextView")
-  .text("母婴馆")
-  .depth(23)
+let entry = className("android.view.View")
+  .depth(18)
+  .indexInParent(1)
+  .childCount(1)
   .findOne(1000);
-console.log(enter);
+console.log(entry);
 
 // let loopCnt = 2;
 // for (let i = 0; i < loopCnt; i++) {
