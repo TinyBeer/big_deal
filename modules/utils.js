@@ -106,6 +106,22 @@ function displayRemainTime(waitTime) {
   // console.log(`下次执行时间：${new Date(Date.now() + waitTime).toLocaleString()}`);
 }
 
+/* 区域判断 */
+
+/**
+ * 判断点是否在区域内部
+ * @param {object} point -  point: {x,y}
+ * @param {Array<int>} bounds - bounds:[x1,y1,x2,y2]
+ */
+function isPointInBounds(point, bounds) {
+  return (
+    point.x > bounds[0] &&
+    point.x < bounds[2] &&
+    point.y > bounds[1] &&
+    point.y < bounds[3]
+  );
+}
+
 // 导出函数（供其他脚本调用）
 module.exports = {
   displayRemainTime,
@@ -117,4 +133,5 @@ module.exports = {
   mediumWait,
   longWait,
   backN,
+  isPointInBounds,
 };

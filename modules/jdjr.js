@@ -163,59 +163,6 @@ function open_box(scrolld, screen) {
   return true;
 }
 
-// function open_box(scrolld, screen) {
-//   if (scrolld) {
-//     scrollUp();
-//     sleep(1000);
-//     scrollUp();
-//     sleep(1000);
-//   }
-//   let box = textContains("个盲盒待开").findOne(1000);
-//   if (!box) {
-//     if (scrolld) {
-//       scrollDown();
-//       sleep(1000);
-//       scrollDown();
-//       sleep(1000);
-//     }
-//     return true;
-//   }
-//   console.log(box.text());
-
-//   click(box.center());
-//   sleep(2000);
-
-//   while (true) {
-//     let open = text("一键开启").findOne(1000);
-//     if (!open) {
-//       break;
-//     }
-//     click(open.center());
-//     sleep(5000);
-
-//     let pean = textContains("京豆+").findOne(3000);
-//     if (!pean) {
-//       return false;
-//     }
-
-//     if (box.text() === "1个盲盒待开") {
-//       click(screenSize.width / 2, (screenSize.height * 2) / 3);
-//       sleep(2000);
-//     } else {
-//       click(screenSize.width / 2, (screenSize.height * 3) / 4);
-//       sleep(2000);
-//     }
-//   }
-
-//   if (scrolld) {
-//     scrollDown();
-//     sleep(1000);
-//     scrollDown();
-//     sleep(1000);
-//   }
-//   return true;
-// }
-
 function getGameTaskList(gameNameList) {
   let taskList = [];
   for (let i = 0; i < gameNameList.length; i++) {

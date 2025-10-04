@@ -1,9 +1,27 @@
-let entry = className("android.view.View")
-  .depth(18)
-  .indexInParent(1)
-  .childCount(1)
-  .findOne(1000);
-console.log(entry);
+// let obj = textContains("去浏览").findOne(1000);
+// console.log(obj);
+
+console.log(ocr.detect([0,1140,1080,1180]));
+
+// let list = text("去抽奖").find(1000);
+// for (let idx = 0; idx < list.length; idx++) {
+//   let element = list[idx];
+//   if (isPointInBounds(element.center(), [0, 456, 1080, 2218])) {
+//     click(element.center());
+//     sleep(3000);
+//     click(1031, 886);
+//     sleep(1000);
+//   }
+// }
+
+// function isPointInBounds(point, bounds) {
+//   return (
+//     point.x > bounds[0] &&
+//     point.x < bounds[2] &&
+//     point.y > bounds[1] &&
+//     point.y < bounds[3]
+//   );
+// }
 
 // let loopCnt = 2;
 // for (let i = 0; i < loopCnt; i++) {

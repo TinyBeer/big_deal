@@ -6,11 +6,12 @@ function run(screen) {
   app.launchApp("京东");
   utils.longWait();
 
-  interactive_game(screen);
-  /* run task */
-  blind_box();
-  blind_box();
-  blind_box();
+  // interactive_game(screen);
+  // /* run task */
+  // blind_box();
+  // blind_box();
+  // blind_box();
+  jd_star(screen);
 
   back();
   backN(1);
@@ -36,14 +37,19 @@ function jd_star(screen) {
 
   click(superStar.center());
   utils.longWait();
-  
-  let loopCnt = 2;
+
+  let loopCnt = 3;
   for (let i = 0; i < loopCnt; i++) {
     jd_star_scroll(true);
+    let drawBtnList = getDrawButtons();
+    for (let idx = 0; idx < drawBtnList.length; idx++) {
+      let btn = drawBtnList[idx];
+      click(btn.center());
+    }
   }
 
   for (let i = 0; i < loopCnt; i++) {
-    jd_star_scroll(true);
+    jd_star_scroll(false);
   }
 
   switchTag("首页");
@@ -62,6 +68,19 @@ function jd_star_scroll(up) {
   } else {
     swipe(x, ey, x, sy, dur);
   }
+  utils.miniWait();
+}
+
+function getDrawButtons() {
+  let btns = [];
+  let list = text("去抽奖").find(1000);
+  for (let idx = 0; idx < list.length; idx++) {
+    let element = list[idx];
+    if (utils.isPointInBounds(element.center(), [0, 456, 1080, 2218])) {
+      btns.push(element);
+    }
+  }
+  return btns;
 }
 
 function interactive_game(screen) {

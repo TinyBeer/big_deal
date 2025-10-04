@@ -1,5 +1,6 @@
 # TODO
 
+- [ ] super star： lack of media privilege
 - [x] jdjr Redeem Prize Tickets
 - [x] handle sign bug\*
 - [x] jd dong dong farm
@@ -8,5 +9,3 @@
 - [x] jd online doctor
 - [x] jd campus
 - [x] bline box
-
-- jd home nurse: minus coordinate
