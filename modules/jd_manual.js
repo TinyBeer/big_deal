@@ -6,12 +6,11 @@ function run(screen) {
   app.launchApp("京东");
   utils.longWait();
 
-  // interactive_game(screen);
-  // /* run task */
-  // blind_box();
-  // blind_box();
-  // blind_box();
-  jd_star(screen);
+  interactive_game(screen);
+  /* run task */
+  blind_box();
+  blind_box();
+  blind_box();
 
   back();
   backN(1);

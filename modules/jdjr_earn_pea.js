@@ -175,9 +175,7 @@ function goto_flash() {
   click(entry.center());
   utils.longWait();
 
-  utils.backN(2);
-  back();
-  utils.backN(1);
+  utils.backN(3, try_close_popup);
 
   try_close_popup();
 }
@@ -243,8 +241,9 @@ function goto_baidumap() {
   click(entry.center());
   utils.longWait();
   utils.longWait();
+  utils.backN(1);
   utils.longWait();
-
+  utils.longWait();
   let closeBtn = text("关闭").findOne(1000);
   if (closeBtn) {
     click(closeBtn.center());
@@ -378,7 +377,7 @@ function goto_headlineapp() {
   utils.longWait();
   utils.longWait();
 
-  utils.backN(2);
+  utils.backN(3);
   back();
   utils.backN(2, try_close_popup);
 

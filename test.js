@@ -1,6 +1,5 @@
-click(300, 300);
-sleep(15000);
-
+let obj = textContains("去看看").findOne(1000);
+console.log(obj);
 
 // console.log(ocr.detect([0,1140,1080,1180]));
 
