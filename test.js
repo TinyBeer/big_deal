@@ -1,7 +1,8 @@
-// let obj = textContains("去浏览").findOne(1000);
-// console.log(obj);
+click(300, 300);
+sleep(15000);
 
-console.log(ocr.detect([0,1140,1080,1180]));
+
+// console.log(ocr.detect([0,1140,1080,1180]));
 
 // let list = text("去抽奖").find(1000);
 // for (let idx = 0; idx < list.length; idx++) {

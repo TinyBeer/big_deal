@@ -12,6 +12,7 @@ ui.layout(
     <button id="jdm" text="京东 手动" />
     <button id="ddep" text="天天赚京豆" />
     <button id="jdjrm" text="京东金融 手动" />
+    <button id="panda" text="熊猫乐园" />
     <button id="test" text="test" />
     <button id="exit" text="退出" />
   </vertical>
@@ -157,6 +158,21 @@ ui.jdjrm.click(() => {
     console.log("已开启屏幕常亮");
 
     jdjrm.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.panda.click(() => {
+  threads.start(() => {
+    const panda = require("./modules/china_mobile");
+    const ut = require("./modules/utils");
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    panda.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
