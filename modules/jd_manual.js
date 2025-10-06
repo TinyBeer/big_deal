@@ -12,13 +12,59 @@ function run(screen) {
   blind_box();
   blind_box();
 
+  day_day_draw_benefit();
+
   back();
   backN(1);
 }
 
 /* tasks */
 
+function day_day_draw_benefit() {
+  console.log("天天抽福利 ...");
+  let backCnt = 0;
+  click(225, 692);
+  utils.mediumWait();
+
+  click(105, 600);
+  utils.mediumWait();
+
+  ocr.mode = "paddle"; /* 切换到 Paddle 工作模式. */
+  let x = 500;
+  let sy = 2100;
+  let ey = 1222;
+  let dur = 1000;
+  swipe(x, sy, x, ey, dur);
+  sleep(500);
+
+  let find = true;
+  while (find) {
+    find = false;
+    let resultList = ocr.detect([0, 1024, 1080, 1200]);
+    for (let index = resultList.length - 1; index >= 0; index--) {
+      let et = resultList[index];
+      if (et.label.includes("浏览页面")) {
+        console.log(et);
+        find = true;
+        click(950, et.bounds.top);
+        utils.longWait();
+        utils.longWait();
+        utils.longWait();
+        utils.mediumWait();
+        backN(1);
+        break;
+      }
+    }
+  }
+
+  console.log("complete, back");
+  click(1011, 884);
+  sleep(500);
+  backN(1);
+}
+
 function jd_star(screen) {
+  ocr.mode = "paddle"; /* 切换到 Paddle 工作模式. */
   /* launch app */
   app.launchApp("京东");
   utils.longWait();
@@ -44,6 +90,25 @@ function jd_star(screen) {
     for (let idx = 0; idx < drawBtnList.length; idx++) {
       let btn = drawBtnList[idx];
       click(btn.center());
+      utils.shortWait();
+
+      let resultList = ocr.detect([0, 1140, 1080, 1080]);
+      for (let index = resultList.length - 1; index >= 0; index--) {
+        let et = resultList[index];
+        let bs = et.bounds;
+        let x = (bs.left + bs.right) / 2;
+        let y = (bs.top + bs.bottom) / 2;
+        if (et.label === "已完成") {
+          console.log(et);
+          // todo do task
+        } else if (et.label === "去抽奖") {
+          console.log(et);
+          // todo draw
+        }
+      }
+
+      click(1031, 886);
+      utils.miniWait();
     }
   }
 

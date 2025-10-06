@@ -6,9 +6,9 @@ function run(screen) {
   app.launchApp("京东金融");
   utils.longWait();
 
+  double_sign();
   claim_pea();
   save_more();
-  double_sign();
 
   utils.backN(2);
   back();

@@ -1,5 +1,3 @@
-// console.log(ocr.detect([0,1140,1080,1180]));
-
 // let list = text("去抽奖").find(1000);
 // for (let idx = 0; idx < list.length; idx++) {
 //   let element = list[idx];
