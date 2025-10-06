@@ -47,7 +47,7 @@ function clothe_makup() {
   utils.mediumWait();
   backCnt++;
 
-  let list = text("image").depth(24).indexInParent(0).find(1000);
+  let list = text("image").depth(24).indexInParent(1).find(1000);
   let signBtn = null;
   for (let idx = 0; idx < list.length; idx++) {
     let element = list[idx];
@@ -393,18 +393,21 @@ function home_appliances_and_household_items() {
   utils.longWait();
   backCnt++;
 
-  let tmp = className("android.view.View")
-    .clickable(true)
-    .depth(22)
-    .findOne(1000);
-  if (!tmp || !tmp.parent()) {
+  let entry = null;
+  let list = className("android.view.View").depth(21).find(1000);
+  for (let idx = 0; idx < list.length; idx++) {
+    let el = list[idx];
+    if (el.center().x > 950) {
+      entry = el;
+    }
+  }
+  if (!entry) {
     console.log("missing 家电家居 float enter, back");
     backN(backCnt);
     utils.shortWait();
     return false;
   }
-  let enter = tmp.parent();
-  click(enter.center());
+  click(entry.center());
   utils.longWait();
   utils.longWait();
   backCnt++;
@@ -788,13 +791,8 @@ function homePageGetEnter(name) {
     .depth(23)
     .findOne(1000);
 
-  if (enter && enter.center().x > 0 && enter.center().x < 1045) {
-    if (
-      name !== "在线医生" ||
-      (name === "在线医生" && enter.parent().center().x < 1080)
-    ) {
-      return enter;
-    }
+  if (enter && utils.isPointInBounds(enter.center(), [0, 449, 1080, 628])) {
+    return enter;
   }
   swipe(ex, y, sx, y, dur);
   utils.shortWait();
