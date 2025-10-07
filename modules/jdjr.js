@@ -184,6 +184,9 @@ function getGameTaskListByName(name) {
   }
   click(game.center());
   utils.longWait();
+  if (name === "养猪猪") {
+    utils.mediumWait();
+  }
 
   let taskEnter = textContains("10元还款券").findOne(1000);
   if (!taskEnter) {
