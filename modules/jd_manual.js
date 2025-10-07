@@ -6,25 +6,22 @@ function run(screen) {
   app.launchApp("京东");
   utils.longWait();
 
-  interactive_game(screen);
   /* run task */
-  blind_box();
-  blind_box();
+  interactive_game(screen);
   blind_box();
 
   day_day_draw_benefit();
 
   back();
-  backN(1);
+  utils.backN(1);
 }
 
 /* tasks */
 
 function day_day_draw_benefit() {
   console.log("天天抽福利 ...");
-  let backCnt = 0;
   click(225, 692);
-  utils.mediumWait();
+  utils.longWait();
 
   click(105, 600);
   utils.mediumWait();
@@ -60,7 +57,7 @@ function day_day_draw_benefit() {
   console.log("complete, back");
   click(1011, 884);
   sleep(500);
-  backN(1);
+  utils.backN(1);
 }
 
 function jd_star(screen) {
@@ -119,7 +116,7 @@ function jd_star(screen) {
   switchTag("首页");
 
   back();
-  backN(1);
+  utils.backN(1);
 }
 
 function jd_star_scroll(up) {
