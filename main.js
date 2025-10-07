@@ -196,7 +196,7 @@ ui.panda.click(() => {
   });
 });
 
-ui.start.click(() => {
+ui.star.click(() => {
   threads.start(() => {
     const { jd_star } = require("./modules/jd_manual");
     jd_star();
