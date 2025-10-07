@@ -14,7 +14,7 @@ ui.layout(
     <button id="save" text="省钱中心" />
     <button id="jdjrm" text="京东金融 手动" />
     <button id="panda" text="熊猫乐园" />
-    <button id="test" text="test" />
+    <button id="star" text="超级明星" />
     <button id="exit" text="退出" />
   </vertical>
 );
@@ -196,9 +196,10 @@ ui.panda.click(() => {
   });
 });
 
-ui.test.click(() => {
+ui.start.click(() => {
   threads.start(() => {
-    console.log("test");
+    const { jd_star } = require("./modules/jd_manual");
+    jd_star();
   });
 });
 

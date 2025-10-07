@@ -17,7 +17,6 @@ function run(screen) {
 }
 
 /* tasks */
-
 function day_day_draw_benefit() {
   console.log("天天抽福利 ...");
   click(225, 692);
@@ -80,6 +79,7 @@ function jd_star(screen) {
   click(superStar.center());
   utils.longWait();
 
+  let resultList = null;
   let loopCnt = 3;
   for (let i = 0; i < loopCnt; i++) {
     jd_star_scroll(true);
@@ -88,19 +88,28 @@ function jd_star(screen) {
       let btn = drawBtnList[idx];
       click(btn.center());
       utils.shortWait();
-
-      let resultList = ocr.detect([0, 1140, 1080, 1080]);
-      for (let index = resultList.length - 1; index >= 0; index--) {
-        let et = resultList[index];
-        let bs = et.bounds;
-        let x = (bs.left + bs.right) / 2;
-        let y = (bs.top + bs.bottom) / 2;
-        if (et.label === "已完成") {
-          console.log(et);
-          // todo do task
-        } else if (et.label === "去抽奖") {
-          console.log(et);
-          // todo draw
+      let find = true;
+      while (find) {
+        find = false;
+        resultList = ocr.detect([0, 1140, 1080, 1080]);
+        for (let index = resultList.length - 1; index >= 0; index--) {
+          let et = resultList[index];
+          let bs = et.bounds;
+          let x = (bs.left + bs.right) / 2;
+          let y = (bs.top + bs.bottom) / 2;
+          if (et.label === "逛一逛") {
+            click(x, y);
+            utils.longWait();
+            utils.mediumWait();
+            backN(1);
+            find = true;
+            break;
+          } else if (et.label === "去抽奖") {
+            click(x, y);
+            utils.shortWait();
+            find = true;
+            break;
+          }
         }
       }
 

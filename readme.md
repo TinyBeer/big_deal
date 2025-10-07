@@ -1,8 +1,9 @@
 # TODO
 
-- [ ] super star： lack of media privilege
+- [ ] jdjr save money center
+- [x] super star
 - [x] jdjr Redeem Prize Tickets
-- [x] handle sign bug\*
+- [x] handle sign bug
 - [x] jd dong dong farm
 - [x] jd global shopping
 - [x] jd Home Appliances & Household Items
