@@ -1,4 +1,6 @@
-console.log(ocr.detect([0, 1024, 1080, 1200]));
+console.log(find_entery("浏览看病买药频道"));
+
+
 // let list = text("去抽奖").find(1000);
 // for (let idx = 0; idx < list.length; idx++) {
 //   let element = list[idx];

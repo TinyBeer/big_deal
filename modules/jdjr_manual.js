@@ -8,7 +8,6 @@ function run(screen) {
 
   double_sign();
   claim_pea();
-  save_more();
 
   utils.backN(2);
   back();
@@ -47,29 +46,6 @@ function claim_pea() {
 
   utils.backN(backCnt);
   return true;
-}
-
-function save_more() {
-  console.log("京东金融 赚钱更多京豆 ...");
-  let backCnt = 0;
-  let signEntry = text("签到").findOne(1000);
-  if (!signEntry) {
-    console.log("missing sign entry, skip");
-    return false;
-  }
-
-  click(signEntry.center());
-  utils.shortWait();
-  backCnt++;
-
-  let saveMore = text("每日省更多").findOne(1000);
-  if (saveMore) {
-    backCnt++;
-    click(saveMore.center());
-    utils.mediumWait();
-  }
-
-  utils.backN(backCnt);
 }
 
 function double_sign() {

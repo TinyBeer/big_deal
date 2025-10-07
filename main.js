@@ -11,6 +11,7 @@ ui.layout(
     <button id="jd" text="京东" />
     <button id="jdm" text="京东 手动" />
     <button id="ddep" text="天天赚京豆" />
+    <button id="save" text="省钱中心" />
     <button id="jdjrm" text="京东金融 手动" />
     <button id="panda" text="熊猫乐园" />
     <button id="test" text="test" />
@@ -142,6 +143,22 @@ ui.ddep.click(() => {
     console.log("已开启屏幕常亮");
 
     jdjr_ep.run(screenSize);
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.save.click(() => {
+  threads.start(() => {
+    const jdjr_sc = require("./modules/jdjr_save_center");
+    const ut = require("./modules/utils");
+    const screenSize = ut.getScreenSize();
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jdjr_sc.run(screenSize);
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
