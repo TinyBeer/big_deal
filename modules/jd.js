@@ -45,6 +45,11 @@ function clothe_makup() {
   }
   click(bb.center());
   utils.mediumWait();
+  back();
+  backN(1);
+
+  click(bb.center());
+  utils.mediumWait();
   backCnt++;
 
   let list = text("image").depth(24).indexInParent(1).find(1000);
@@ -779,7 +784,7 @@ function backN(cnt) {
 function homePageGetEnter(name) {
   console.log("enter", name);
   // swipe lefe
-  let y = 550;
+  let y = 987;
   let sx = 400;
   let ex = 900;
   let dur = 500;
@@ -791,7 +796,7 @@ function homePageGetEnter(name) {
     .depth(23)
     .findOne(1000);
 
-  if (enter && utils.isPointInBounds(enter.center(), [0, 449, 1080, 628])) {
+  if (enter && utils.isPointInBounds(enter.center(), [0, 907, 1080, 1086])) {
     return enter;
   }
   swipe(ex, y, sx, y, dur);

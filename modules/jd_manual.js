@@ -17,9 +17,10 @@ function run(screen) {
 }
 
 /* tasks */
+let dddbDetectRes = [];
 function day_day_draw_benefit() {
   console.log("天天抽福利 ...");
-  click(225, 692);
+  click(225, 1150);
   utils.longWait();
 
   click(105, 600);
@@ -36,9 +37,9 @@ function day_day_draw_benefit() {
   let find = true;
   while (find) {
     find = false;
-    let resultList = ocr.detect([0, 1024, 1080, 1200]);
-    for (let index = resultList.length - 1; index >= 0; index--) {
-      let et = resultList[index];
+    dddbDetectRes = ocr.detect([0, 1024, 1080, 1200]);
+    for (let index = dddbDetectRes.length - 1; index >= 0; index--) {
+      let et = dddbDetectRes[index];
       if (et.label.includes("浏览页面")) {
         console.log(et);
         find = true;
