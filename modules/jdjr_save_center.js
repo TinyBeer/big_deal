@@ -38,250 +38,65 @@ function saveMore() {
   click(saveMore.center());
   mediumWait();
 
-  goto_seeadoctor();
-  goto_watchvideo();
-  goto_viewwealthmember();
-  goto_viewtakeaway();
-  goto_playmahjomaster();
-  goto_viewchargepage();
-  goto_viewjdappvideo();
-  goto_newproduction();
-  goto_dailysubsidary();
-  goto_dailyrecommand();
-  goto_bestseller();
-  goto_lowprice();
-  goto_bestsellinghits();
-  goto_lowpricegoods();
+  goto_tasklist();
 
   longWait();
   backN(backCnt);
   return true;
 }
 
-function goto_lowpricegoods() {
-  let name = "浏览低价好物";
-  console.log(name, "...");
+function goto_tasklist() {
+  let taskList = [
+    { name: "浏览低价好物", jd: false },
+    { name: "浏览热销爆品", jd: false },
+    { name: "逛品质低价好物", jd: false },
+    { name: "逛每日热销好物", jd: false },
+    { name: "逛每日推荐好物", jd: false },
+    { name: "逛每日补贴好物", jd: false },
+    { name: "去新奇频道领京豆", jd: true },
+    { name: "看京东App视频", jd: true },
+    { name: "逛月黑风高频道", jd: false },
+    { name: "浏览外卖频道页", jd: false },
+    { name: "去玩雀神来也", jd: false },
+    { name: "浏览充值页10秒", jd: false ,delay:15},
+    { name: "浏览外卖频道页", jd: false },
+    { name: "浏览财富会员权益", jd: false , delay:15 },
+    { name: "浏览视频30秒", jd: false, delay: 35 },
+    { name: "浏览看病买药频道", jd: false },
+    { name: "看京东App视频", jd: false },
+  ];
+  let find = true;
+  while (find) {
+    find = false;
+    for (let idx = 0; idx < taskList.length; idx++) {
+      let task = taskList[idx];
+      let entry = find_entry(task.name);
+      if (!entry) {
+        continue;
+      }
+      console.log(task.name, "...");
+      find = true;
+      click(entry.center());
+      shortWait();
+      if (task.delay !== 0) {
+        sleep(task.delay);
+      } else {
+        mediumWait();
+      }
 
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
+      if (task.jd) {
+        back();
+        backN(1);
+      }
+      back();
+      backN(1);
+      mediumWait();
+    }
   }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_bestsellinghits() {
-  let name = "浏览热销爆品";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_lowprice() {
-  let name = "逛品质低价好物";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_bestseller() {
-  let name = "逛每日热销好物";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_dailyrecommand() {
-  let name = "逛每日推荐好物";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_dailysubsidary() {
-  let name = "逛每日补贴好物";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_newproduction() {
-  let name = "去新奇频道领京豆";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_viewjdappvideo() {
-  let name = "看京东App视频";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  shortWait();
-  back();
-  backN(1);
-  mediumWait();
-}
-
-function goto_viewchargepage() {
-  let name = "浏览充值页10秒";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  longWait();
-  longWait();
-  backN(1);
-}
-
-function goto_playmahjomaster() {
-  let name = "去玩雀神来也";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  longWait();
-  longWait();
-  backN(1);
-}
-
-function goto_viewtakeaway() {
-  let name = "浏览外卖频道页";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  longWait();
-  longWait();
-  backN(1);
-  shortWait();
-}
-
-function goto_viewwealthmember() {
-  let name = "浏览财富会员权益";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  longWait();
-  longWait();
-  backN(1);
-}
-
-function goto_watchvideo() {
-  let name = "浏览视频30秒";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  longWait();
-  longWait();
-  longWait();
-  longWait();
-  mediumWait();
-  backN(1);
-  return true;
-}
-
-function goto_seeadoctor() {
-  let name = "浏览看病买药频道";
-  console.log(name, "...");
-
-  let entry = find_entry(name);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
-  click(entry.center());
-  longWait();
-  backN(1);
 }
 
 function find_entry(name) {
-  let obj = textContains(name).findOne(1000);
+  let obj = textContains(name).findOne(200);
   if (!obj || !obj.parent() || !obj.parent().parent()) {
     return;
   }

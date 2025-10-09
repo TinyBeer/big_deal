@@ -461,7 +461,7 @@ function goto_takeaway() {
   }
   click(entry.center());
   utils.longWait();
-  sleep(15000);
+  utils.longWait();
   utils.backN(1);
   try_close_popup();
 }
