@@ -12,7 +12,7 @@ function run() {
 
 function panda() {
   let backCnt = 0;
-  let entry = text("天天薅羊毛").findOne(1000);
+  let entry = text("熊猫乐园").findOne(1000);
   if (!entry) {
     console.log("missing entry, skip");
     return false;
@@ -20,7 +20,7 @@ function panda() {
   click(entry.center());
   mediumWait();
 
-  click(300, 300);
+  // click(300, 300);
   longWait();
   longWait();
   longWait();
