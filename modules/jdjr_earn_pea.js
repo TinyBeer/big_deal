@@ -156,6 +156,7 @@ function goto_jmt() {
   }
   click(entry.center());
   utils.longWait();
+  utils.longWait();
 
   // utils.backN(2);
   // back();
