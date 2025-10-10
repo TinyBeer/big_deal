@@ -1,4 +1,11 @@
-const { longWait, backN, mediumWait, shortWait, tinyWait } = require("./utils");
+const {
+  longWait,
+  backN,
+  mediumWait,
+  shortWait,
+  tinyWait,
+  doubleBackN,
+} = require("./utils");
 
 let sc = null;
 
@@ -55,15 +62,18 @@ function goto_tasklist() {
     { name: "逛每日补贴好物", jd: false },
     { name: "去新奇频道领京豆", jd: true },
     { name: "看京东App视频", jd: true },
-    { name: "逛月黑风高频道", jd: false },
+    { name: "逛京东秒杀领京豆", jd: true },
+    { name: "逛月黑风高频道", jd: true },
     { name: "浏览外卖频道页", jd: false },
     { name: "去玩雀神来也", jd: false },
-    { name: "浏览充值页10秒", jd: false ,delay:15},
-    { name: "浏览外卖频道页", jd: false },
-    { name: "浏览财富会员权益", jd: false , delay:15 },
+    { name: "浏览充值页10秒", jd: false, delay: 15 },
+    { name: "浏览外卖频道页", jd: false, delay: 15 },
+    { name: "浏览财富会员权益", jd: false, delay: 15 },
     { name: "浏览视频30秒", jd: false, delay: 35 },
-    { name: "浏览看病买药频道", jd: false },
-    { name: "看京东App视频", jd: false },
+    { name: "浏览看病买药频道", jd: true },
+    { name: "看京东App视频", jd: true },
+    { name: "逛双11大促活动", jd: false },
+    { name: "领10元外卖券", jd: false, delay: 15 },
   ];
   let find = true;
   while (find) {
@@ -78,25 +88,26 @@ function goto_tasklist() {
       find = true;
       click(entry.center());
       shortWait();
-      if (task.delay !== 0) {
-        sleep(task.delay);
+      if (task.delay && task.delay !== 0) {
+        sleep(task.delay * 1000);
       } else {
         mediumWait();
       }
 
-      if (task.jd) {
-        back();
-        backN(1);
-      }
-      back();
-      backN(1);
+      doubleBackN(4, isInSaveMoney);
       mediumWait();
     }
   }
 }
 
+function isInSaveMoney() {
+  let earn = text("赚京豆当钱花").findOne(1000);
+  let browse = text("浏览App赚豆").findOne(1000);
+  return earn && browse;
+}
+
 function find_entry(name) {
-  let obj = textContains(name).findOne(200);
+  let obj = textContains(name).findOne(50);
   if (!obj || !obj.parent() || !obj.parent().parent()) {
     return;
   }

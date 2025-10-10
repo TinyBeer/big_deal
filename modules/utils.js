@@ -28,6 +28,19 @@ function backN(cnt, untilFunc) {
   }
 }
 
+
+function doubleBackN(cnt, untilFunc) {
+  for (let i = 0; i < cnt; i++) {
+    back();
+    back();
+    shortWait();
+    if (untilFunc && untilFunc()) {
+      break;
+    }
+  }
+}
+
+
 /**
  * 获取屏幕尺寸
  */
@@ -133,5 +146,6 @@ module.exports = {
   mediumWait,
   longWait,
   backN,
+  doubleBackN,
   isPointInBounds,
 };
