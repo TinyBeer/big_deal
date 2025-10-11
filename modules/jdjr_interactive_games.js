@@ -1,26 +1,51 @@
 /* import */
-const utils = require("./utils");
 
-let gameTaskList = [];
+const {
+  longWait,
+  storeConfig,
+  backN,
+  doubleBackN,
+  loadConfig,
+  preciseSleep,
+  mediumWait,
+} = require("./utils");
 
-function run(screen, nameList, moreGameTaskList) {
+const configName_TaskList = "interactive_game_task_list";
+
+function task(nameList, moreGameTaskList) {
   // launch app
   app.launchApp("京东金融");
-  sleep(5000);
+  longWait();
 
   // enter interactive games
   enterInteractiveGames();
+
   console.log(nameList);
   let tasks = getGameTaskList(nameList);
-  gameTaskList = tasks.concat(moreGameTaskList);
-  console.log(gameTaskList);
+  let taskList = tasks.concat(moreGameTaskList);
 
-  workWithName(screen, gameTaskList);
-  // workWithName(hotGameTaskList);
+  console.log(taskList);
+  storeConfig(configName_TaskList, taskList);
 
-  utils.backN(2);
-  back();
-  utils.backN(1);
+  backN(2);
+  doubleBackN(1);
+}
+
+function run(screen) {
+  // launch app
+  app.launchApp("京东金融");
+  longWait();
+
+  // enter interactive games
+  enterInteractiveGames();
+
+  let tasks = loadConfig(configName_TaskList);
+  console.log(tasks);
+
+  workWithName(screen, tasks);
+
+  backN(2);
+  doubleBackN(1);
 }
 
 function workWithName(screen, objList) {
@@ -60,7 +85,7 @@ function workWithName(screen, objList) {
 
       console.log(`act play [${e.name}] ${t / 60 / 1000}min`);
       click(obj.center());
-      utils.preciseSleep(t, false);
+      preciseSleep(t, false);
       back();
       back();
       sleep(2000);
@@ -86,7 +111,7 @@ function enterInteractiveGames() {
 
     let update = text("立即查看").findOne(1000);
     if (update) {
-      utils.backN(1);
+      backN(1);
     }
 
     let enter = text("互动游戏").findOne(1000);
@@ -168,7 +193,7 @@ function getGameTaskList(gameNameList) {
   for (let i = 0; i < gameNameList.length; i++) {
     let name = gameNameList[i];
     let tasks = getGameTaskListByName(name);
-    if (!tasks) {
+    if (!tasks || tasks.length === 0) {
       tasks = getGameTaskListByName(name);
     }
     taskList = taskList.concat(tasks);
@@ -183,9 +208,9 @@ function getGameTaskListByName(name) {
     return;
   }
   click(game.center());
-  utils.longWait();
+  mediumWait();
   if (name === "养猪猪") {
-    utils.mediumWait();
+    longWait();
   }
 
   let taskEnter = textContains("10元还款券").findOne(1000);
@@ -297,4 +322,5 @@ function traverse(view, visit) {
 //  导出函数（供其他脚本调用）
 module.exports = {
   run,
+  task,
 };

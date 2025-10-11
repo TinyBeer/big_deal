@@ -15,8 +15,9 @@ ui.layout(
       <button id="save" text="省钱中心" margin="5" />
     </horizontal>
     <horizontal gravity="left">
-      <button id="jdjr" text="京东金融-互动游戏" margin="5" />
-      <checkbox id="jdjrtimer" text="定时"></checkbox>
+      <button id="igtask" text="互动游戏-任务" margin="5" />
+      <button id="igrun" text="互动游戏-运行" margin="5" />
+      <checkbox id="igtimer" text="定时"></checkbox>
     </horizontal>
     <button id="panda" text="熊猫乐园" margin="5" />
     <button id="exit" text="退出" margin="5" />
@@ -43,13 +44,11 @@ ui.sign.click(() => {
   });
 });
 
-ui.jdjr.click(() => {
+ui.igtask.click(() => {
   threads.start(() => {
     const ut = require("./modules/utils");
-    const jdjr = require("./modules/jdjr");
-    const screenSize = ut.getScreenSize();
-    const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
-    const targetMinute = 5; // 目标分钟
+    const ig = require("./modules/jdjr_interactive_games");
+    
     /* config */
     let nameList = [
       "雀神来也",
@@ -66,7 +65,7 @@ ui.jdjr.click(() => {
     ];
     let moreGameTaskList = [
       { scroll: true },
-      // // round one
+      // round one
       { name: "百炼飞仙", dur_m: 15 },
       { name: "毛线大师", dur_m: 15 },
       { name: "点点2048", dur_m: 15 },
@@ -74,10 +73,7 @@ ui.jdjr.click(() => {
       { name: "无尽泡泡龙", dur_m: 15 },
       { name: "打螺丝王者", dur_m: 15 },
       { name: "数字喜加1", dur_m: 15 },
-      // { name: "纸牌接龙", dur_m: 15 },
       { name: "战争之王", dur_m: 15 },
-      // { name: "喵喵十消", dur_m: 15 },
-      // { name: "超级连连看", dur_m: 15 },
       // round two
       { name: "百炼飞仙", dur_m: 2 },
       { name: "毛线大师", dur_m: 2 },
@@ -86,20 +82,38 @@ ui.jdjr.click(() => {
       { name: "无尽泡泡龙", dur_m: 1 },
       { name: "打螺丝王者", dur_m: 1 },
       { name: "数字喜加1", dur_m: 1 },
-      // { name: "纸牌接龙", dur_m: 1 },
       { name: "战争之王", dur_m: 1 },
-      // { name: "喵喵十消", dur_m: 1 },
-      // { name: "超级连连看", dur_m: 1 },
     ];
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
+
+    ig.task(nameList, moreGameTaskList);
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.igrun.click(() => {
+  threads.start(() => {
+    const ut = require("./modules/utils");
+    const ig = require("./modules/jdjr_interactive_games");
+    const screenSize = ut.getScreenSize();
+    const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
+    const targetMinute = 5; // 目标分钟
+
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
     /* waiting until specific time */
     const waitTime = ut.getTimeToTarget(targetHour, targetMinute);
-    if (ui.jdjrtimer.checked) {
+    if (ui.igtimer.checked) {
       ut.preciseSleep(waitTime, true);
     }
-    jdjr.run(screenSize, nameList, moreGameTaskList);
+    ig.run(screenSize);
+
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
   });

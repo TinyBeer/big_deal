@@ -1,5 +1,17 @@
 /* import */
 
+/* storage */
+const storageName = "autojs"
+function storeConfig(name, conf) {
+  let sto = storages.create(storageName);
+  sto.put(name, conf);
+}
+
+function loadConfig(name) {
+  let sto = storages.create(storageName);
+  return sto.get(name);
+}
+
 /* message */
 function info(mes) {
   console.log(mes);
@@ -167,4 +179,6 @@ module.exports = {
   isPointInBounds,
   switchTag,
   info,
+  storeConfig,
+  loadConfig,
 };
