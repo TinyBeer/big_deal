@@ -1,3 +1,3 @@
-// let obj = text("赚京豆当钱花").findOne(1000);
-let obj = text("浏览App赚豆").findOne(1000);
+ocr.mode = "paddle"; /* 切换到 Paddle 工作模式. */
+let obj = ocr.detect([0, 1140, 1080, 1080]);
 console.log(obj);

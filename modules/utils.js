@@ -135,6 +135,20 @@ function isPointInBounds(point, bounds) {
   );
 }
 
+
+function switchTag(name) {
+  let tag = className("android.widget.TextView")
+    .depth(12)
+    .text(name)
+    .findOne(1000);
+  if (!tag) {
+    return false;
+  }
+
+  click(tag.center());
+  sleep(5000);
+}
+
 // 导出函数（供其他脚本调用）
 module.exports = {
   displayRemainTime,
@@ -148,4 +162,5 @@ module.exports = {
   backN,
   doubleBackN,
   isPointInBounds,
+  switchTag,
 };

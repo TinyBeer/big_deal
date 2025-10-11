@@ -5,16 +5,20 @@ ui.layout(
   <vertical>
     <button id="sign" text="签到任务" />
     <horizontal>
+      <button id="jd" text="京东" />
+      <button id="jdm" text="京东 手动" />
+      <button id="star" text="超级明星" />
+    </horizontal>
+    <horizontal>
+      <button id="jdjrm" text="京东金融 手动" />
+      <button id="ddep" text="天天赚京豆" />
+      <button id="save" text="省钱中心" />
+    </horizontal>
+    <horizontal>
       <button id="jdjr" text="京东金融-互动游戏" />
       <checkbox id="jdjrtimer">定时</checkbox>
     </horizontal>
-    <button id="jd" text="京东" />
-    <button id="jdm" text="京东 手动" />
-    <button id="ddep" text="天天赚京豆" />
-    <button id="save" text="省钱中心" />
-    <button id="jdjrm" text="京东金融 手动" />
     <button id="panda" text="熊猫乐园" />
-    <button id="star" text="超级明星" />
     <button id="exit" text="退出" />
   </vertical>
 );
@@ -198,8 +202,8 @@ ui.panda.click(() => {
 
 ui.star.click(() => {
   threads.start(() => {
-    const { jd_star } = require("./modules/jd_manual");
-    jd_star();
+    const star = require("./modules/jd_super_star");
+    star.run();
   });
 });
 

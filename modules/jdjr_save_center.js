@@ -65,7 +65,7 @@ function goto_tasklist() {
     { name: "逛京东秒杀领京豆", jd: true },
     { name: "逛月黑风高频道", jd: true },
     { name: "浏览外卖频道页", jd: false },
-    { name: "去玩雀神来也", jd: false },
+    { name: "去玩雀神来也", jd: false, delay: 15 },
     { name: "浏览充值页10秒", jd: false, delay: 15 },
     { name: "浏览外卖频道页", jd: false, delay: 15 },
     { name: "浏览财富会员权益", jd: false, delay: 15 },
