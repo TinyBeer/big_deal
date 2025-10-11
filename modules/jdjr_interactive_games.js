@@ -8,6 +8,7 @@ const {
   loadConfig,
   preciseSleep,
   mediumWait,
+  getScreenSize,
 } = require("./utils");
 
 const configName_TaskList = "interactive_game_task_list";
@@ -31,7 +32,8 @@ function task(nameList, moreGameTaskList) {
   doubleBackN(1);
 }
 
-function run(screen) {
+function run() {
+  let screen = getScreenSize();
   // launch app
   app.launchApp("京东金融");
   longWait();

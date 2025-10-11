@@ -1,4 +1,6 @@
-"ui"; // 声明使用UI
+"ui";
+
+// 声明使用UI
 auto();
 
 ui.layout(
@@ -46,49 +48,13 @@ ui.sign.click(() => {
 
 ui.igtask.click(() => {
   threads.start(() => {
-    const ut = require("./modules/utils");
     const ig = require("./modules/jdjr_interactive_games");
-    
-    /* config */
-    let nameList = [
-      "雀神来也",
-      "货柜趣消除",
-      "趣味叠叠乐",
-      "排队上车",
-      "方块拼图",
-      "养猪猪",
-      "消灭小萌星",
-      "麻将凑十",
-      "解压硬币",
-      "2048方块",
-      "无尽战歌",
-    ];
-    let moreGameTaskList = [
-      { scroll: true },
-      // round one
-      { name: "百炼飞仙", dur_m: 15 },
-      { name: "毛线大师", dur_m: 15 },
-      { name: "点点2048", dur_m: 15 },
-      { name: "合成原始人", dur_m: 15 },
-      { name: "无尽泡泡龙", dur_m: 15 },
-      { name: "打螺丝王者", dur_m: 15 },
-      { name: "数字喜加1", dur_m: 15 },
-      { name: "战争之王", dur_m: 15 },
-      // round two
-      { name: "百炼飞仙", dur_m: 2 },
-      { name: "毛线大师", dur_m: 2 },
-      { name: "点点2048", dur_m: 1 },
-      { name: "合成原始人", dur_m: 1 },
-      { name: "无尽泡泡龙", dur_m: 1 },
-      { name: "打螺丝王者", dur_m: 1 },
-      { name: "数字喜加1", dur_m: 1 },
-      { name: "战争之王", dur_m: 1 },
-    ];
+    const { interactive_games: igConfig } = require("./modules/config");
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
-    ig.task(nameList, moreGameTaskList);
+    ig.task(igConfig.name_list, igConfig.more_task_list);
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -99,20 +65,18 @@ ui.igrun.click(() => {
   threads.start(() => {
     const ut = require("./modules/utils");
     const ig = require("./modules/jdjr_interactive_games");
-    const screenSize = ut.getScreenSize();
-    const targetHour = 0; // 目标小时（24小时制，如 20 代表晚上 8 点）
-    const targetMinute = 5; // 目标分钟
+    const { interactive_games: igConfig } = require("./modules/config");
 
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
     /* waiting until specific time */
-    const waitTime = ut.getTimeToTarget(targetHour, targetMinute);
+    const waitTime = ut.getTimeToTarget(igConfig.houre, igConfig.minute);
     if (ui.igtimer.checked) {
       ut.preciseSleep(waitTime, true);
     }
-    ig.run(screenSize);
+    ig.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -121,15 +85,13 @@ ui.igrun.click(() => {
 
 ui.jd.click(() => {
   threads.start(() => {
-    const ut = require("./modules/utils");
-    const screenSize = ut.getScreenSize();
     const jd = require("./modules/jd");
 
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
-    jd.run(screenSize);
+    jd.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -138,15 +100,13 @@ ui.jd.click(() => {
 
 ui.jdm.click(() => {
   threads.start(() => {
-    const ut = require("./modules/utils");
-    const screenSize = ut.getScreenSize();
-
     const jd_manual = require("./modules/jd_manual");
+
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
-    jd_manual.run(screenSize);
+    jd_manual.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -156,13 +116,11 @@ ui.jdm.click(() => {
 ui.ddep.click(() => {
   threads.start(() => {
     const jdjr_ep = require("./modules/jdjr_earn_pea");
-    const ut = require("./modules/utils");
-    const screenSize = ut.getScreenSize();
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
-    jdjr_ep.run(screenSize);
+    jdjr_ep.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -172,13 +130,12 @@ ui.ddep.click(() => {
 ui.save.click(() => {
   threads.start(() => {
     const jdjr_sc = require("./modules/jdjr_save_center");
-    const ut = require("./modules/utils");
-    const screenSize = ut.getScreenSize();
+
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
-    jdjr_sc.run(screenSize);
+    jdjr_sc.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -188,8 +145,7 @@ ui.save.click(() => {
 ui.jdjrm.click(() => {
   threads.start(() => {
     const jdjrm = require("./modules/jdjr_manual");
-    const ut = require("./modules/utils");
-    const screenSize = ut.getScreenSize();
+
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
@@ -204,7 +160,7 @@ ui.jdjrm.click(() => {
 ui.panda.click(() => {
   threads.start(() => {
     const panda = require("./modules/china_mobile");
-    const ut = require("./modules/utils");
+
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");

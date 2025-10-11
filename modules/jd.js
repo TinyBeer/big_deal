@@ -3,7 +3,9 @@ const utils = require("./utils");
 
 /* conf data */
 
-function run(screen) {
+function run() {
+  let screen = utils.getScreenSize();
+
   /* launch app */
   app.launchApp("京东");
   utils.longWait();
@@ -29,8 +31,7 @@ function run(screen) {
   home_nurse();
   global_shopping();
 
-  back();
-  utils.backN(1);
+  utils.doubleBackN(1);
 }
 
 /* tasks */

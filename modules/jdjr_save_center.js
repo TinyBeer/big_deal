@@ -5,11 +5,13 @@ const {
   shortWait,
   tinyWait,
   doubleBackN,
+  getScreenSize,
 } = require("./utils");
 
 let sc = null;
 
 function run(screen) {
+  let screen = getScreenSize();
   // launch app
   app.launchApp("京东金融");
   longWait();

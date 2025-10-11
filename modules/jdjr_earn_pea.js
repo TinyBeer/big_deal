@@ -5,8 +5,8 @@ const closeButtonNameList = ["立即领取", "再领\\d+京豆"];
 
 let sc = null;
 
-function run(screen) {
-  sc = screen;
+function run() {
+  let screen = utils.getScreenSize();
   /* launch app */
   app.launchApp("京东金融");
   utils.longWait();

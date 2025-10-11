@@ -1,7 +1,8 @@
 /* import */
 const utils = require("./utils");
 
-function run(screen) {
+function run() {
+  let screen = utils.getScreenSize();
   /* launch app */
   app.launchApp("京东");
   utils.longWait();
