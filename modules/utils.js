@@ -1,5 +1,11 @@
 /* import */
 
+/* message */
+function info(mes) {
+  console.log(mes);
+  toast(mes);
+}
+
 /* delay */
 function miniWait() {
   sleep(500);
@@ -28,7 +34,6 @@ function backN(cnt, untilFunc) {
   }
 }
 
-
 function doubleBackN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
     back();
@@ -39,7 +44,6 @@ function doubleBackN(cnt, untilFunc) {
     }
   }
 }
-
 
 /**
  * 获取屏幕尺寸
@@ -135,7 +139,6 @@ function isPointInBounds(point, bounds) {
   );
 }
 
-
 function switchTag(name) {
   let tag = className("android.widget.TextView")
     .depth(12)
@@ -163,4 +166,5 @@ module.exports = {
   doubleBackN,
   isPointInBounds,
   switchTag,
+  info,
 };

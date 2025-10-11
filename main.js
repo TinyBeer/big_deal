@@ -2,39 +2,41 @@
 auto();
 
 ui.layout(
-  <vertical>
-    <button id="sign" text="签到任务" />
-    <horizontal>
-      <button id="jd" text="京东" />
-      <button id="jdm" text="京东 手动" />
-      <button id="star" text="超级明星" />
+  <vertical gravity="center_vertical">
+    <button id="sign" text="签到任务" margin="5" />
+    <horizontal gravity="left">
+      <button id="jd" text="京东" margin="5" />
+      <button id="jdm" text="京东 手动" margin="5" />
+      <button id="star" text="超级明星" margin="5" />
     </horizontal>
-    <horizontal>
-      <button id="jdjrm" text="京东金融 手动" />
-      <button id="ddep" text="天天赚京豆" />
-      <button id="save" text="省钱中心" />
+    <horizontal gravity="left">
+      <button id="jdjrm" text="京东金融 手动" margin="5" />
+      <button id="ddep" text="天天赚京豆" margin="5" />
+      <button id="save" text="省钱中心" margin="5" />
     </horizontal>
-    <horizontal>
-      <button id="jdjr" text="京东金融-互动游戏" />
-      <checkbox id="jdjrtimer">定时</checkbox>
+    <horizontal gravity="left">
+      <button id="jdjr" text="京东金融-互动游戏" margin="5" />
+      <checkbox id="jdjrtimer" text="定时"></checkbox>
     </horizontal>
-    <button id="panda" text="熊猫乐园" />
-    <button id="exit" text="退出" />
+    <button id="panda" text="熊猫乐园" margin="5" />
+    <button id="exit" text="退出" margin="5" />
   </vertical>
 );
 
 ui.sign.click(() => {
   threads.start(() => {
-    const smzdm = require("./modules/smzdm");
-    const ctcp = require("./modules/china_telecom_cloud_pan");
-    const sgo = require("./modules/state_grid_online");
+    const sign = require("./modules/sign");
+    // const smzdm = require("./modules/smzdm");
+    // const ctcp = require("./modules/china_telecom_cloud_pan");
+    // const sgo = require("./modules/state_grid_online");
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");
 
-    ctcp.run();
-    sgo.run();
-    smzdm.run();
+    sign.run();
+    // ctcp.run();
+    // sgo.run();
+    // smzdm.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");

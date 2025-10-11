@@ -10,7 +10,6 @@ const {
 } = require("./utils");
 
 function run(screen) {
-  ocr.mode = "paddle"; /* 切换到 Paddle 工作模式. */
   /* launch app */
   app.launchApp("京东");
   longWait();
@@ -44,7 +43,7 @@ function run(screen) {
       let find = true;
       while (find) {
         find = false;
-        resultList = ocr.detect([0, 1140, 1080, 1080]);
+        resultList = ocr.rapid.detect([0, 1140, 1080, 1080]);
         for (let index = resultList.length - 1; index >= 0; index--) {
           et = resultList[index];
           let bs = et.bounds;

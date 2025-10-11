@@ -26,7 +26,6 @@ function day_day_draw_benefit() {
   click(105, 600);
   utils.mediumWait();
 
-  ocr.mode = "paddle"; /* 切换到 Paddle 工作模式. */
   let x = 500;
   let sy = 2100;
   let ey = 1222;
@@ -37,7 +36,7 @@ function day_day_draw_benefit() {
   let find = true;
   while (find) {
     find = false;
-    dddbDetectRes = ocr.detect([0, 1024, 1080, 1200]);
+    dddbDetectRes = ocr.rapid.detect([0, 1024, 1080, 1200]);
     for (let index = dddbDetectRes.length - 1; index >= 0; index--) {
       let et = dddbDetectRes[index];
       if (et.label.includes("浏览页面")) {

@@ -1,0 +1,120 @@
+const {
+  longWait,
+  miniWait,
+  shortWait,
+  mediumWait,
+  info,
+  doubleBackN,
+} = require("./utils");
+
+function run() {
+  info("每日签到任务 开始...");
+  mediumWait();
+
+  chaina_telecom_cloud_pan();
+  state_grid_online();
+  smzdm();
+
+  info("每日签到任务 结束");
+}
+
+function smzdm() {
+  let appName = "什么值得买";
+  info(`${appName}...`);
+
+  app.launchApp(appName);
+  longWait();
+
+  if (id("dialog_home_close").exists()) {
+    id("dialog_home_close").findOne().click();
+  }
+  sleep(1000);
+
+  const signBtn = id("pag_left").findOne(1000);
+  if (!signBtn) {
+    console.log("not found sign button, skip");
+    back();
+    back();
+    sleep(5000);
+    return;
+  }
+  click(signBtn.center());
+  sleep(3000);
+
+  const closeBtn = id("iv_close").findOne(1000);
+  if (!closeBtn) {
+    console.log("smzdm sign failed!!!");
+    back();
+    back();
+    sleep(2000);
+    back();
+    back();
+    sleep(5000);
+    return;
+  }
+
+  click(closeBtn.center());
+  sleep(2000);
+
+  doubleBackN(2);
+  mediumWait();
+}
+
+function state_grid_online() {
+  let appName = "网上国网";
+  info(`${appName}...`);
+
+  app.launchApp(appName);
+  longWait();
+
+  var signBtn = text("签到").findOne(10000);
+  if (!signBtn) {
+    info("missing sign button, skip...");
+  }
+  click(signBtn.center());
+  mediumWait();
+
+  doubleBackN(2);
+  shortWait();
+}
+
+function chaina_telecom_cloud_pan() {
+  let appName = "天翼云盘";
+  info(`${appName}...`);
+
+  app.launchApp(appName);
+  longWait();
+
+  if (id("ivCancel").exists()) {
+    id("ivCancel").findOne().click();
+  }
+
+  //className("android.view.View").desc("我的服务").waitFor();
+  var imageViews = className("android.widget.ImageView")
+    .clickable(true)
+    .depth(13)
+    .find();
+  if (imageViews.length === 1) {
+    className("android.widget.ImageView")
+      .clickable(true)
+      .depth(13)
+      .findOne()
+      .click();
+    shortWait();
+  }
+
+  click(970, 2270);
+  className("android.view.View").desc("每日签到\n最高领500M").findOne().click();
+  shortWait();
+
+  id("close_icon").waitFor();
+  id("close_icon").findOne().click();
+  miniWait();
+  back();
+  back();
+  mediumWait();
+}
+
+module.exports = {
+  run,
+};

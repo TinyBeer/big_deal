@@ -1,3 +1,8 @@
-ocr.mode = "paddle"; /* 切换到 Paddle 工作模式. */
-let obj = ocr.detect([0, 1140, 1080, 1080]);
+let appName = "网上国网";
+// info(`${appName}...`);
+
+app.launchApp(appName);
+sleep(4000);
+// longWait();
+let obj = text("签到").findOne(20000);
 console.log(obj);
