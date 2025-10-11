@@ -373,6 +373,7 @@ function jd_campus() {
   backCnt++;
   click(133, enter.center().y);
   utils.longWait();
+  utils.longWait();
 
   let claim = text("今日签到").findOne(1000);
   if (!claim) {
@@ -784,7 +785,7 @@ function backN(cnt) {
 function homePageGetEnter(name) {
   console.log("enter", name);
   // swipe lefe
-  let y = 987;
+  let y = 538;
   let sx = 400;
   let ex = 900;
   let dur = 500;
@@ -796,7 +797,7 @@ function homePageGetEnter(name) {
     .depth(23)
     .findOne(1000);
 
-  if (enter && utils.isPointInBounds(enter.center(), [0, 907, 1080, 1086])) {
+  if (enter && utils.isPointInBounds(enter.center(), [0, 449, 1080, 628])) {
     return enter;
   }
   swipe(ex, y, sx, y, dur);
@@ -860,19 +861,6 @@ function search(content, waitTime) {
   searchBtn.click();
   sleep(waitTime);
 }
-
-// function switchTag(name) {
-//   let tag = className("android.widget.TextView")
-//     .depth(12)
-//     .text(name)
-//     .findOne(1000);
-//   if (!tag) {
-//     return false;
-//   }
-
-//   click(tag.center());
-//   sleep(5000);
-// }
 
 //  导出函数（供其他脚本调用）
 module.exports = {

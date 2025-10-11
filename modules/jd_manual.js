@@ -20,7 +20,7 @@ function run(screen) {
 let dddbDetectRes = [];
 function day_day_draw_benefit() {
   console.log("天天抽福利 ...");
-  click(225, 1150);
+  click(225, 692);
   utils.longWait();
 
   click(105, 600);
