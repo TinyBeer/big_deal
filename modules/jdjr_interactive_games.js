@@ -211,7 +211,7 @@ function getGameTaskListByName(name) {
   }
   click(game.center());
   mediumWait();
-  if (name === "养猪猪") {
+  if (name === "养猪猪" || name === "货柜趣消除") {
     longWait();
   }
 
