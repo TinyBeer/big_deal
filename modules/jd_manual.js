@@ -264,5 +264,4 @@ function backN(cnt) {
 //  导出函数（供其他脚本调用）
 module.exports = {
   run,
-  jd_star,
 };

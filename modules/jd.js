@@ -96,6 +96,10 @@ function mother_baby() {
   }
   click(bb.center());
   utils.mediumWait();
+  utils.doubleBackN(1);
+  utils.shortWait();
+  click(bb.center());
+  utils.mediumWait();
   backCnt++;
 
   for (let i = 0; i < 4; i++) {
@@ -296,7 +300,7 @@ function daily_claim_pean() {
   sleep(10000);
   backCnt++;
 
-  let signBtn = id("signBtn").findOne(1000);
+  let signBtn = id("signBtnId").findOne(1000);
   if (!signBtn) {
     console.log("missing sign bar, skip");
     backN(backCnt);
@@ -399,6 +403,12 @@ function home_appliances_and_household_items() {
   click(hh.center());
   utils.longWait();
   backCnt++;
+
+  let close = className("android.widget.Image").text("close").findOne(1000);
+  if (close) {
+    click(close.center());
+    utils.miniWait();
+  }
 
   let entry = null;
   let list = className("android.view.View").depth(21).find(1000);

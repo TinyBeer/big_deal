@@ -7,6 +7,7 @@ let sc = null;
 
 function run() {
   let screen = utils.getScreenSize();
+  sc = screen;
   /* launch app */
   app.launchApp("京东金融");
   utils.longWait();

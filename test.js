@@ -1,3 +1,4 @@
-// let sto = storages.create("autojs");
-// sto.put("test", {name:"99",delay:22, ok:true});
-// console.log(sto.get("test"));
+let claim = desc("翻倍领取").findOne(1000);
+if (claim) {
+  click(claim.center().x - 400, claim.center().y);
+}
