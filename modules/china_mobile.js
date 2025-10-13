@@ -1,4 +1,10 @@
-const { longWait, shortWait, mediumWait, backN } = require("./utils");
+const {
+  longWait,
+  shortWait,
+  mediumWait,
+  backN,
+  doubleBackN,
+} = require("./utils");
 
 function run() {
   app.launchApp("中国移动");
@@ -11,6 +17,7 @@ function run() {
 }
 
 function panda() {
+  let resultList = null;
   let backCnt = 0;
   let entry = text("熊猫乐园").findOne(1000);
   if (!entry) {
@@ -19,8 +26,6 @@ function panda() {
   }
   click(entry.center());
   mediumWait();
-
-  // click(300, 300);
   longWait();
   longWait();
   longWait();
@@ -31,14 +36,28 @@ function panda() {
   click(100, 2200);
   shortWait();
 
-  for (var i = 0; i < 12; i++) {
-    sleep(4000);
-    click(920, 1950);
-    sleep(12000);
-    back();
+  let find = true;
+  while (find) {
+    find = false;
+    resultList = ocr.rapid.detect([800, 1700, 280, 500]);
+    for (let index = resultList.length - 1; index >= 0; index--) {
+      let et = resultList[index];
+      let bs = et.bounds;
+      let x = (bs.left + bs.right) / 2;
+      let y = (bs.top + bs.bottom) / 2;
+      if (et.label.includes("去浏览")) {
+        console.log(et);
+        find = true;
+        click(x, y);
+        longWait();
+        mediumWait();
+        backN(1);
+        break;
+      }
+    }
   }
 
-  backN(backCnt);
+  doubleBackN(backCnt);
 }
 
 module.exports = {
