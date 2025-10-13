@@ -2,9 +2,9 @@
 - [ ] 京东金融  双签
 - [ ] 天天领豆  点击商品
 - [ ] 服饰美妆  处理优惠券浮窗
-- [ ] 服饰美妆  累计签到
-- [ ] 母婴馆  累计签到
-- [ ] 大牌澳莱  累计签到
+- [x] 服饰美妆  累计签到
+- [x] 母婴馆  累计签到
+- [x] 大牌澳莱  累计签到
 - [x] jdjr save money center
 - [x] super star
 - [x] jdjr Redeem Prize Tickets

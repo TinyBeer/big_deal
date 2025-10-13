@@ -11,30 +11,83 @@ function run() {
   utils.longWait();
 
   /* run task */
-  flash_sale();
-  jinxi_direct();
-  interactive_game_sign();
-  redeem_prize_tickets();
-  daily_claim_pean();
-  hardwar_city();
-  ecard();
-  jd_campus();
+  // flash_sale();
+  // jinxi_direct();
+  // interactive_game_sign();
+  // redeem_prize_tickets();
+  // daily_claim_pean();
+  // hardwar_city();
+  // ecard();
+  // jd_campus();
   big_brand();
+  big_brand_streak();
   clothe_makup();
-  //todo optimize
-  luck_reward();
-  // get_beans();
-  home_appliances_and_household_items();
-  online_doctor();
-  mother_baby();
-  dong_dong_farm();
-  home_nurse();
-  global_shopping();
+  clothe_makupsteak();
+  // //todo optimize
+  // luck_reward();
+  // // get_beans();
+  // home_appliances_and_household_items();
+  // online_doctor();
+  // mother_baby();
+  // mother_babystreak();
+  // dong_dong_farm();
+  // home_nurse();
+  // global_shopping();
 
   utils.doubleBackN(1);
 }
 
 /* tasks */
+
+function clothe_makupsteak() {
+  let backCnt = 0;
+  let bb = homePageGetEnter("服饰美妆");
+  if (!bb) {
+    console.log("missing 服饰美妆 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(bb.center());
+  utils.mediumWait();
+  back();
+  backN(1);
+
+  click(bb.center());
+  utils.mediumWait();
+  backCnt++;
+
+  let list = text("image").depth(24).indexInParent(1).find(1000);
+  let signBtn = null;
+  for (let idx = 0; idx < list.length; idx++) {
+    let element = list[idx];
+    if (element.center().x < 100) {
+      signBtn = element;
+      break;
+    }
+  }
+  if (!signBtn) {
+    console.log("missing sign entry, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(signBtn.center());
+  utils.longWait();
+  utils.mediumWait();
+  backCnt++;
+
+  let streak = text("今日可领").findOne(1000);
+  if (!streak) {
+    console.log("missing claim button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(streak.center().x, streak.center().y - 100);
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
 
 function clothe_makup() {
   let backCnt = 0;
@@ -86,6 +139,41 @@ function clothe_makup() {
   return true;
 }
 
+function mother_babystreak() {
+  let backCnt = 0;
+  let bb = homePageGetEnter("母婴馆");
+  if (!bb) {
+    console.log("missing 母婴馆 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(bb.center());
+  utils.mediumWait();
+  utils.doubleBackN(1);
+  utils.shortWait();
+  click(bb.center());
+  utils.mediumWait();
+  backCnt++;
+
+  for (let i = 0; i < 4; i++) {
+    scrollDown();
+    utils.shortWait();
+  }
+  utils.longWait();
+
+  let streak = text("今日可领").findOne(1000);
+  if (!streak) {
+    console.log("missing claim button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(streak.center().x, streak.center().y - 100);
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
+
 function mother_baby() {
   let backCnt = 0;
   let bb = homePageGetEnter("母婴馆");
@@ -116,6 +204,51 @@ function mother_baby() {
   }
 
   click(888, obj.center().y);
+  utils.shortWait();
+  backN(backCnt);
+  return true;
+}
+
+function big_brand_streak() {
+  let backCnt = 0;
+  let bb = homePageGetEnter("大牌奥莱");
+  if (!bb) {
+    console.log("missing 大牌奥莱 enter, back");
+    backN(backCnt);
+    return false;
+  }
+  click(bb.center());
+  utils.mediumWait();
+  backCnt++;
+
+  let list = text("image").depth(24).indexInParent(0).find(1000);
+  let signBtn = null;
+  for (let idx = 0; idx < list.length; idx++) {
+    let element = list[idx];
+    if (element.center().x < 100) {
+      signBtn = element;
+      break;
+    }
+  }
+  if (!signBtn) {
+    console.log("missing sign entry, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(signBtn.center());
+  utils.longWait();
+  utils.mediumWait();
+  backCnt++;
+
+  let streak = text("今日可领").findOne(1000);
+  if (!streak) {
+    console.log("missing claim button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  click(streak.center().x, streak.center().y - 100);
   utils.shortWait();
   backN(backCnt);
   return true;
