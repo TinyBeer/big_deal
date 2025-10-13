@@ -16,6 +16,7 @@ function run() {
   interactive_game_sign();
   redeem_prize_tickets();
   daily_claim_pean();
+  daily_claim_pean_goods();
   hardwar_city();
   ecard();
   jd_campus();
@@ -401,6 +402,71 @@ function hardwar_city() {
   }
 
   click(claimBtn.center());
+  utils.shortWait();
+
+  backN(backCnt);
+  return true;
+}
+
+function daily_claim_pean_goods() {
+  console.log("天天领豆");
+  let backCnt = 0;
+  let searchBar = desc("搜索栏").findOne(1000);
+  if (!searchBar) {
+    console.log("missing search bar, skip");
+    return false;
+  }
+  searchBar.click();
+  backCnt++;
+  sleep(500);
+  setText("天天领豆");
+  sleep(500);
+  backCnt++;
+
+  let searchBtn = text("搜索").findOne(1000);
+  if (!searchBtn) {
+    console.log("missing search button, skip");
+    backN(backCnt);
+    return false;
+  }
+
+  searchBtn.click();
+  sleep(10000);
+  backCnt++;
+
+  let btn = text("图片").findOne(1000);
+  if (!btn) {
+    console.log("missing target,skip");
+    return false;
+  }
+  scrollDown();
+  sleep(1000);
+  scrollDown();
+  sleep(1000);
+
+  let num = 6;
+  let cnt = 0;
+  let goods = depth(19).find(1000);
+  for (let idx = 0; idx < goods.length; idx++) {
+    let e = goods[idx];
+    if (e.center().y > 330) {
+      click(e.children()[0].center());
+      sleep(8000);
+      utils.doubleBackN(2, function () {
+        let obj = text("图片").findOne(500);
+        if (obj) {
+          return true;
+        }
+        return false;
+      });
+      sleep(1000);
+      cnt++;
+    }
+    if (cnt >= num) {
+      break;
+    }
+  }
+  click(btn.center());
   utils.shortWait();
 
   backN(backCnt);
