@@ -1,7 +1,17 @@
 /* import */
 
+/* element */
+const defaultDuration = 500;
+function findElementByText(tx, dur) {
+  let d = defaultDuration;
+  if (dur) {
+    d = dur;
+  }
+  return text(tx).findOne(d);
+}
+
 /* storage */
-const storageName = "autojs"
+const storageName = "autojs";
 function storeConfig(name, conf) {
   let sto = storages.create(storageName);
   sto.put(name, conf);
@@ -181,4 +191,5 @@ module.exports = {
   info,
   storeConfig,
   loadConfig,
+  findElementByText,
 };

@@ -60,7 +60,22 @@ function double_sign() {
   utils.shortWait();
   backCnt++;
 
-  let doubleSign = text("领京豆").findOne(1000);
+  let entryText = "领京豆";
+  for (let idx = 0; idx < 3; idx++) {
+    let doubleSign = utils.findElementByText(entryText);
+    if (!doubleSign) {
+      console.log("missing double sign entry, skip");
+      utils.backN(backCnt);
+      return false;
+    }
+    click(doubleSign.center());
+    utils.shortWait();
+    utils.doubleBackN(3, function () {
+      let e = utils.findElementByText(entryText);
+      return e;
+    });
+  }
+  let doubleSign = utils.findElementByText(entryText);
   if (!doubleSign) {
     console.log("missing double sign entry, skip");
     utils.backN(backCnt);
