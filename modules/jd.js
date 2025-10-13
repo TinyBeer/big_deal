@@ -11,28 +11,28 @@ function run() {
   utils.longWait();
 
   /* run task */
-  // flash_sale();
-  // jinxi_direct();
-  // interactive_game_sign();
-  // redeem_prize_tickets();
-  // daily_claim_pean();
-  // hardwar_city();
-  // ecard();
-  // jd_campus();
+  flash_sale();
+  jinxi_direct();
+  interactive_game_sign();
+  redeem_prize_tickets();
+  daily_claim_pean();
+  hardwar_city();
+  ecard();
+  jd_campus();
   big_brand();
   big_brand_streak();
   clothe_makup();
   clothe_makupsteak();
-  // //todo optimize
-  // luck_reward();
-  // // get_beans();
-  // home_appliances_and_household_items();
-  // online_doctor();
-  // mother_baby();
-  // mother_babystreak();
-  // dong_dong_farm();
-  // home_nurse();
-  // global_shopping();
+  //todo optimize
+  luck_reward();
+  // get_beans();
+  home_appliances_and_household_items();
+  online_doctor();
+  mother_baby();
+  mother_babystreak();
+  dong_dong_farm();
+  home_nurse();
+  global_shopping();
 
   utils.doubleBackN(1);
 }
