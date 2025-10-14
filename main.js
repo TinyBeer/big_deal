@@ -65,6 +65,7 @@ ui.igrun.click(() => {
   threads.start(() => {
     const ut = require("./modules/utils");
     const ig = require("./modules/jdjr_interactive_games");
+    const jdn = require("./modules/jd_night");
     const { interactive_games: igConfig } = require("./modules/config");
 
     /* keep screen on */
@@ -76,6 +77,8 @@ ui.igrun.click(() => {
     if (ui.igtimer.checked) {
       ut.preciseSleep(waitTime, true);
     }
+
+    jdn.run();
     ig.run();
 
     device.cancelKeepingAwake();
