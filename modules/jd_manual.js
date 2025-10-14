@@ -21,7 +21,12 @@ function run() {
 let dddbDetectRes = [];
 function day_day_draw_benefit() {
   console.log("天天抽福利 ...");
-  click(225, 692);
+  let entry = text("补贴价").findOne(500);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
   utils.longWait();
 
   click(105, 600);
@@ -205,7 +210,7 @@ function blind_box() {
         } else if (arr[0] === "逛逛权益中心") {
           sleep(15000);
         } else {
-          sleep(10000);
+          sleep(12000);
         }
         if (arr[0] === "逛逛买药频道") {
           click(540, 1897.5);

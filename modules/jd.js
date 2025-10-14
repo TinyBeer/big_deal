@@ -1,14 +1,30 @@
 /* import */
-const utils = require("./utils");
+
+const {
+  backN,
+  shortWait,
+  longWait,
+  mediumWait,
+  isPointInBounds,
+  doubleBackN,
+  miniWait,
+} = require("./utils");
 
 /* conf data */
 
-function run() {
-  let screen = utils.getScreenSize();
+let entryBar = null;
 
+function run() {
   /* launch app */
   app.launchApp("京东");
-  utils.longWait();
+  longWait();
+
+  entryBar = getEntryBar();
+  if (!entryBar) {
+    console.log("missing entery bar, skip");
+    doubleBackN(1);
+    return;
+  }
 
   /* run task */
   flash_sale();
@@ -35,7 +51,7 @@ function run() {
   home_nurse();
   global_shopping();
 
-  utils.doubleBackN(1);
+  doubleBackN(1);
 }
 
 /* tasks */
@@ -49,12 +65,12 @@ function clothe_makupsteak() {
     return false;
   }
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   back();
   backN(1);
 
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
   let list = text("image").depth(24).indexInParent(1).find(1000);
@@ -73,8 +89,8 @@ function clothe_makupsteak() {
   }
 
   click(signBtn.center());
-  utils.longWait();
-  utils.mediumWait();
+  longWait();
+  mediumWait();
   backCnt++;
 
   let streak = text("今日可领").findOne(1000);
@@ -85,7 +101,7 @@ function clothe_makupsteak() {
   }
 
   click(streak.center().x, streak.center().y - 100);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -99,12 +115,12 @@ function clothe_makup() {
     return false;
   }
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   back();
   backN(1);
 
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
   let list = text("image").depth(24).indexInParent(1).find(1000);
@@ -123,8 +139,8 @@ function clothe_makup() {
   }
 
   click(signBtn.center());
-  utils.longWait();
-  utils.mediumWait();
+  longWait();
+  mediumWait();
   backCnt++;
 
   let obj = text("待领取").findOne(1000);
@@ -135,7 +151,7 @@ function clothe_makup() {
   }
 
   click(888, obj.center().y);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -149,18 +165,18 @@ function mother_babystreak() {
     return false;
   }
   click(bb.center());
-  utils.mediumWait();
-  utils.doubleBackN(1);
-  utils.shortWait();
+  mediumWait();
+  doubleBackN(1);
+  shortWait();
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     scrollDown();
-    utils.shortWait();
+    shortWait();
   }
-  utils.longWait();
+  longWait();
 
   let streak = text("今日可领").findOne(1000);
   if (!streak) {
@@ -170,7 +186,7 @@ function mother_babystreak() {
   }
 
   click(streak.center().x, streak.center().y - 100);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -184,18 +200,18 @@ function mother_baby() {
     return false;
   }
   click(bb.center());
-  utils.mediumWait();
-  utils.doubleBackN(1);
-  utils.shortWait();
+  mediumWait();
+  doubleBackN(1);
+  shortWait();
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     scrollDown();
-    utils.shortWait();
+    shortWait();
   }
-  utils.longWait();
+  longWait();
 
   let obj = text("今日签到").findOne(1000);
   if (!obj) {
@@ -205,7 +221,7 @@ function mother_baby() {
   }
 
   click(888, obj.center().y);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -219,7 +235,7 @@ function big_brand_streak() {
     return false;
   }
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
   let list = text("image").depth(24).indexInParent(0).find(1000);
@@ -238,8 +254,8 @@ function big_brand_streak() {
   }
 
   click(signBtn.center());
-  utils.longWait();
-  utils.mediumWait();
+  longWait();
+  mediumWait();
   backCnt++;
 
   let streak = text("今日可领").findOne(1000);
@@ -250,7 +266,7 @@ function big_brand_streak() {
   }
 
   click(streak.center().x, streak.center().y - 100);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -264,7 +280,7 @@ function big_brand() {
     return false;
   }
   click(bb.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
   let list = text("image").depth(24).indexInParent(0).find(1000);
@@ -283,8 +299,8 @@ function big_brand() {
   }
 
   click(signBtn.center());
-  utils.longWait();
-  utils.mediumWait();
+  longWait();
+  mediumWait();
   backCnt++;
 
   let obj = text("连签奖励").findOne(1000);
@@ -295,7 +311,7 @@ function big_brand() {
   }
 
   click(888, 767);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -310,15 +326,15 @@ function home_nurse() {
   }
   click(od.center());
   backCnt++;
-  utils.mediumWait();
+  mediumWait();
 
-  utils.backN(1);
+  backN(1);
   click(od.center());
-  utils.mediumWait();
+  mediumWait();
 
   click(198, 493);
   backCnt++;
-  utils.mediumWait();
+  mediumWait();
 
   let claim = text("签到领京豆").findOne(1000);
   if (!claim) {
@@ -327,7 +343,7 @@ function home_nurse() {
     return false;
   }
   click(claim.center());
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -345,13 +361,13 @@ function ecard() {
     return false;
   }
   click(entry.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
   let obj = textMatches("天天抢\\d+京豆").findOne(1000);
   if (!obj) {
     console.log("missing claim button, skip");
-    utils.backN(backCnt);
+    backN(backCnt);
     return false;
   }
   let par = obj.parent();
@@ -359,17 +375,17 @@ function ecard() {
     let child = par.children()[idx];
     if (child.text() === "已领取") {
       console.log("already calimed, back");
-      utils.backN(backCnt);
+      backN(backCnt);
       return false;
     } else if (child.text() === "去领取") {
       click(child.center());
       sleep(2000);
-      utils.backN(backCnt);
+      backN(backCnt);
       return true;
     }
   }
   console.log("missing claim button, skip");
-  utils.backN(backCnt);
+  backN(backCnt);
   return false;
 }
 
@@ -402,7 +418,7 @@ function hardwar_city() {
   }
 
   click(claimBtn.center());
-  utils.shortWait();
+  shortWait();
 
   backN(backCnt);
   return true;
@@ -452,7 +468,7 @@ function daily_claim_pean_goods() {
     if (e.center().y > 330) {
       click(e.children()[0].center());
       sleep(8000);
-      utils.doubleBackN(2, function () {
+      doubleBackN(2, function () {
         let obj = text("图片").findOne(500);
         if (obj) {
           return true;
@@ -467,7 +483,7 @@ function daily_claim_pean_goods() {
     }
   }
   click(btn.center());
-  utils.shortWait();
+  shortWait();
 
   backN(backCnt);
   return true;
@@ -507,7 +523,7 @@ function daily_claim_pean() {
   }
 
   click(signBtn.center());
-  utils.shortWait();
+  shortWait();
 
   backN(backCnt);
   return true;
@@ -523,17 +539,17 @@ function online_doctor() {
   }
   click(od.center());
   backCnt++;
-  utils.mediumWait();
+  mediumWait();
 
   let closeBtn = className("android.widget.ImageView").depth(10).findOne(1000);
   if (closeBtn) {
     click(closeBtn.center());
-    utils.miniWait();
+    miniWait();
   }
 
   click(174, 430);
   backCnt++;
-  utils.mediumWait();
+  mediumWait();
 
   let claim = text("签到领京豆").findOne(1000);
   if (!claim) {
@@ -542,7 +558,7 @@ function online_doctor() {
     return false;
   }
   click(claim.center());
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -554,30 +570,30 @@ function jd_campus() {
   let jce = homePageGetEnter("京东校园");
   if (!jce) {
     console.log("missing 京东校园 enter, skip");
-    utils.shortWait();
+    shortWait();
     return false;
   }
   click(jce.center());
   backCnt++;
-  utils.mediumWait();
+  mediumWait();
 
   let obj = text("学生授权协议").findOne(1000);
   if (obj) {
     click(obj.center().x, obj.center().y - 100);
-    utils.shortWait();
+    shortWait();
   }
 
   let enter = textContains("签到领豆").findOne(1000);
   if (!enter) {
     console.log("missing sign enter, skip");
     backN(backCnt);
-    utils.shortWait();
+    shortWait();
     return false;
   }
   backCnt++;
   click(133, enter.center().y);
-  utils.longWait();
-  utils.longWait();
+  longWait();
+  longWait();
 
   let claim = text("今日签到").findOne(1000);
   if (!claim) {
@@ -586,7 +602,7 @@ function jd_campus() {
     return false;
   }
   click(899, claim.center().y);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -596,17 +612,17 @@ function home_appliances_and_household_items() {
   let hh = homePageGetEnter("家电家居");
   if (!hh) {
     console.log("missing 家电家居 enter, skip");
-    utils.shortWait();
+    shortWait();
     return false;
   }
   click(hh.center());
-  utils.longWait();
+  longWait();
   backCnt++;
 
   let close = className("android.widget.Image").text("close").findOne(1000);
   if (close) {
     click(close.center());
-    utils.miniWait();
+    miniWait();
   }
 
   let entry = null;
@@ -620,12 +636,12 @@ function home_appliances_and_household_items() {
   if (!entry) {
     console.log("missing 家电家居 float enter, back");
     backN(backCnt);
-    utils.shortWait();
+    shortWait();
     return false;
   }
   click(entry.center());
-  utils.longWait();
-  utils.longWait();
+  longWait();
+  longWait();
   backCnt++;
 
   let claim = textContains("领奖励").findOne(1000);
@@ -636,7 +652,7 @@ function home_appliances_and_household_items() {
   }
   // todo do not use act axis
   click(935, 1590);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 }
@@ -646,18 +662,18 @@ function global_shopping() {
   let gs = homePageGetEnter("全球购");
   if (!gs) {
     console.log("missing 全球购 enter, skip");
-    utils.shortWait();
+    shortWait();
     return false;
   }
 
   click(gs.center());
   backCnt++;
-  utils.longWait();
+  longWait();
 
   let closeBtn = id("dolphin_float_close_btn").findOne(1000);
   if (closeBtn) {
     click(closeBtn.center());
-    utils.shortWait();
+    shortWait();
   }
   let enter = className("android.view.View")
     .depth(18)
@@ -668,12 +684,12 @@ function global_shopping() {
   if (!enter) {
     console.log("missing 做任务赚京豆 enter, skip");
     back();
-    utils.shortWait();
+    shortWait();
     return false;
   }
 
   click(enter.center());
-  utils.longWait();
+  longWait();
   backCnt++;
 
   let claim = text("今日签到").findOne(1000);
@@ -683,14 +699,14 @@ function global_shopping() {
     return false;
   }
   click(899, claim.center().y);
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
   return true;
 
   // let sign = text("签到").findOne(1000);
   // if (sign) {
   //   click(sign.center());
-  //   utils.shortWait();
+  //   shortWait();
   // }
 
   // while (true) {
@@ -710,33 +726,33 @@ function global_shopping() {
   //       if (child.text().includes("商品")) {
   //         console.log(child.text());
   //         click(explore.center());
-  //         utils.mediumWait();
+  //         mediumWait();
   //         for (let i = 0; i < num; i++) {
   //           // todo do not use act axis
   //           let x = 270 + 540 * (i % 2);
   //           let y = 550 + Math.floor(i / 2) * 700;
   //           console.log("click", x, y);
   //           click(x, y);
-  //           utils.mediumWait();
+  //           mediumWait();
   //           back();
-  //           utils.shortWait();
+  //           shortWait();
   //         }
   //         back();
-  //         utils.shortWait();
+  //         shortWait();
   //       } else {
   //         console.log(child.text(), nums, "其他");
   //         for (let i = 0; i < num; i++) {
   //           click(explore.center());
-  //           utils.shortWait();
+  //           shortWait();
   //           back();
-  //           utils.shortWait();
+  //           shortWait();
   //         }
   //       }
   //     }
   //   }
   // }
   // back();
-  // utils.shortWait();
+  // shortWait();
 }
 
 function dong_dong_farm() {
@@ -746,12 +762,12 @@ function dong_dong_farm() {
     return false;
   }
   click(enter.center());
-  utils.longWait();
+  longWait();
 
   //todo spinning wheel
 
   back();
-  utils.shortWait();
+  shortWait();
 }
 
 function redeem_prize_tickets() {
@@ -762,7 +778,8 @@ function redeem_prize_tickets() {
     return false;
   }
   click(enter.center());
-  utils.shortWait();
+  shortWait();
+  shortWait();
   backCnt++;
 
   let gameEnter = text("互动游戏").findOne(1000);
@@ -771,7 +788,7 @@ function redeem_prize_tickets() {
     return false;
   }
   click(gameEnter.center());
-  utils.mediumWait();
+  mediumWait();
   backCnt++;
 
   let redeemEnter = text("兑换").findOne(1000);
@@ -781,7 +798,7 @@ function redeem_prize_tickets() {
   }
   click(redeemEnter.center());
   backCnt++;
-  utils.shortWait();
+  shortWait();
 
   let fifteenTickets = text("15").findOne(1000);
   if (!fifteenTickets) {
@@ -803,7 +820,7 @@ function redeem_prize_tickets() {
       continue;
     }
     click(tParent.children()[i].center());
-    utils.shortWait();
+    shortWait();
     var obj = text("确认兑换").findOne(1000);
     if (!obj) {
       console.log("sth wrong, break");
@@ -811,7 +828,7 @@ function redeem_prize_tickets() {
     }
     var redeemBtn = text("确认兑换").findOne(1000);
     click(redeemBtn.center());
-    utils.shortWait();
+    shortWait();
     break;
   }
 
@@ -824,19 +841,19 @@ function flash_sale() {
     return false;
   }
   click(enter.center());
-  utils.mediumWait();
+  mediumWait();
 
   let claimBtn = text("签到领豆").findOne(1000);
   if (!claimBtn) {
     console.log("missing claim button, skip");
     back();
-    utils.shortWait();
+    shortWait();
     return false;
   }
   click(claimBtn.center());
-  utils.shortWait();
+  shortWait();
   back();
-  utils.shortWait();
+  shortWait();
 }
 
 function luck_reward() {
@@ -845,19 +862,19 @@ function luck_reward() {
     return false;
   }
   click(enter.center());
-  utils.shortWait();
+  shortWait();
 
   let claimBtn = text("点击领取").findOne(1000);
   if (!claimBtn) {
     console.log("missing claim button, skip");
     back();
-    utils.shortWait();
+    shortWait();
     return false;
   }
   click(claimBtn.center());
-  utils.shortWait();
+  shortWait();
   back();
-  utils.shortWait();
+  shortWait();
 }
 
 function get_beans() {
@@ -866,7 +883,7 @@ function get_beans() {
     return false;
   }
   click(enter.center());
-  utils.shortWait();
+  shortWait();
 
   while (true) {
     let obj = text("点击领取").findOne(2000);
@@ -874,11 +891,11 @@ function get_beans() {
       break;
     }
     click(obj.center());
-    utils.shortWait();
+    shortWait();
   }
 
   back();
-  utils.shortWait();
+  shortWait();
 }
 
 function jinxi_direct() {
@@ -887,7 +904,7 @@ function jinxi_direct() {
     return false;
   }
   click(enter.center());
-  utils.longWait();
+  longWait();
 
   //   let obj = text("领京豆").findOne(1000);
   let obj = className("android.view.View")
@@ -899,14 +916,14 @@ function jinxi_direct() {
   if (!obj) {
     console.log("missing claim button, back");
     back();
-    utils.shortWait();
+    shortWait();
 
     let ex = text("退出").findOne(1000);
     if (ex) {
       click(ex.center());
       sleep(1000);
       back();
-      utils.shortWait();
+      shortWait();
     }
 
     return false;
@@ -914,32 +931,32 @@ function jinxi_direct() {
   if (obj.text().includes("订阅提醒")) {
     console.log("already claimed, back");
     back();
-    utils.shortWait();
+    shortWait();
 
     let ex = text("退出").findOne(1000);
     if (ex) {
       click(ex.center());
       sleep(1000);
       back();
-      utils.shortWait();
+      shortWait();
     }
     return true;
   }
 
-  utils.shortWait();
+  shortWait();
   if (obj) {
     click(400, obj.center().y);
-    utils.shortWait();
+    shortWait();
   }
 
   back();
-  utils.shortWait();
+  shortWait();
   let ex = text("退出").findOne(1000);
   if (ex) {
     click(ex.center());
     sleep(1000);
     back();
-    utils.shortWait();
+    shortWait();
   }
 }
 
@@ -949,10 +966,10 @@ function appliance_and_furniture() {
     return false;
   }
   click(enter.center());
-  utils.shortWait();
+  shortWait();
   //todo
   back();
-  utils.shortWait();
+  shortWait();
 }
 
 function interactive_game_sign() {
@@ -963,7 +980,7 @@ function interactive_game_sign() {
     return false;
   }
   click(enter.center());
-  utils.shortWait();
+  shortWait();
   backCnt++;
 
   let gameEnter = text("互动游戏").findOne(1000);
@@ -972,7 +989,7 @@ function interactive_game_sign() {
     return false;
   }
   click(gameEnter.center());
-  utils.longWait();
+  longWait();
   backCnt++;
 
   let sign = text("签到").findOne(1000);
@@ -981,37 +998,45 @@ function interactive_game_sign() {
     return false;
   }
   click(sign.center());
-  utils.shortWait();
+  shortWait();
   backN(backCnt);
 }
 
-function backN(cnt) {
-  for (let i = 0; i < cnt; i++) {
-    back();
-    utils.shortWait();
+function getEntryBar() {
+  let list = className("android.view.ViewGroup")
+    .depth(19)
+    .childCount(5)
+    .indexInParent(0)
+    .find(500);
+  for (let idx = 0; idx < list.length; idx++) {
+    let e = list[idx];
+    if (e.center().x < 800) {
+      return e;
+    }
   }
+  return;
 }
 
 function homePageGetEnter(name) {
   console.log("enter", name);
-  // swipe lefe
-  let y = 538;
+  // swipe left
+  let y = entryBar.center().y;
   let sx = 400;
   let ex = 900;
   let dur = 500;
 
   swipe(sx, y, ex, y, dur);
-  utils.shortWait();
+  shortWait();
   let enter = className("android.widget.TextView")
     .text(name)
     .depth(23)
     .findOne(1000);
 
-  if (enter && utils.isPointInBounds(enter.center(), [0, 449, 1080, 628])) {
+  if (enter && isPointInBounds(enter.center(), [0, entryBar.bounds().top, 1080, entryBar.bounds().bottom])) {
     return enter;
   }
   swipe(ex, y, sx, y, dur);
-  utils.shortWait();
+  shortWait();
   enter = className("android.widget.TextView")
     .text(name)
     .depth(23)

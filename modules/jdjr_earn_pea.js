@@ -445,6 +445,7 @@ function goto_takeaway() {
   click(entry.center());
   utils.longWait();
   utils.longWait();
+  utils.mediumWait();
   utils.doubleBackN(1);
   try_close_popup();
 }
