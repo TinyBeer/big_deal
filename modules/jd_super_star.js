@@ -32,7 +32,7 @@ function run(screen) {
   let drawBtnList = null;
   let btn = null;
   let et = null;
-  let loopCnt = 10;
+  let loopCnt = 8;
   for (let i = 0; i < loopCnt; i++) {
     jd_star_scroll(true);
     drawBtnList = getSuperStar();
@@ -166,12 +166,6 @@ function jd_star_scroll(up) {
   } else {
     swipe(x, ey, x, sy, dur);
   }
-  miniWait();
-  if (up) {
-    swipe(x, sy, x, ey, dur);
-  } else {
-    swipe(x, ey, x, sy, dur);
-  }
   shortWait();
 }
 
@@ -183,7 +177,7 @@ function getSuperStar() {
   }
   for (let idx = 1; idx < container.childCount(); idx++) {
     let child = container.children()[idx];
-    if (isPointInBounds(child.center(), [0, 456, 1080, 2218])) {
+    if (isPointInBounds(child.center(), [0, 556, 1080, 2118])) {
       stars.push(child);
     }
   }
