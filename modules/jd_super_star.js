@@ -68,7 +68,7 @@ function run(screen) {
             doubleBackN(1);
             find = true;
             break;
-          } 
+          }
         }
       }
 
@@ -161,6 +161,12 @@ function jd_star_scroll(up) {
   let sy = 2000;
   let ey = 1000;
   let dur = 500;
+  if (up) {
+    swipe(x, sy, x, ey, dur);
+  } else {
+    swipe(x, ey, x, sy, dur);
+  }
+  miniWait();
   if (up) {
     swipe(x, sy, x, ey, dur);
   } else {
