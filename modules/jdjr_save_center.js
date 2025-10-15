@@ -76,6 +76,8 @@ function goto_tasklist() {
     { name: "看京东App视频", jd: true },
     { name: "逛双11大促活动", jd: false },
     { name: "领10元外卖券", jd: false, delay: 15 },
+    { name: "浏览签到领金币" },
+    { name: "浏览少数派夺京豆", delay: 15 },
   ];
   let find = true;
   while (find) {
