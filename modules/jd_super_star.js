@@ -32,10 +32,10 @@ function run(screen) {
   let drawBtnList = null;
   let btn = null;
   let et = null;
-  let loopCnt = 3;
+  let loopCnt = 10;
   for (let i = 0; i < loopCnt; i++) {
     jd_star_scroll(true);
-    drawBtnList = getDrawButtons();
+    drawBtnList = getSuperStar();
     for (let idx = 0; idx < drawBtnList.length; idx++) {
       btn = drawBtnList[idx];
       click(btn.center());
@@ -43,7 +43,7 @@ function run(screen) {
       let find = true;
       while (find) {
         find = false;
-        resultList = ocr.rapid.detect([0, 1140, 1080, 1080]);
+        resultList = ocr.rapid.detect([700, 1140, 380, 1080]);
         for (let index = resultList.length - 1; index >= 0; index--) {
           et = resultList[index];
           let bs = et.bounds;
@@ -52,8 +52,9 @@ function run(screen) {
           if (et.label === "逛一逛") {
             click(x, y);
             longWait();
+            longWait();
             mediumWait();
-            backN(1);
+            doubleBackN(1);
             find = true;
             break;
           } else if (et.label === "去抽奖") {
@@ -61,12 +62,18 @@ function run(screen) {
             shortWait();
             find = true;
             break;
-          }
+          } else if (et.label === "去关注") {
+            click(x, y);
+            mediumWait();
+            doubleBackN(1);
+            find = true;
+            break;
+          } 
         }
       }
 
-      click(1031, 886);
-      miniWait();
+      click(1031, 776);
+      shortWait();
     }
   }
 
@@ -79,6 +86,76 @@ function run(screen) {
   doubleBackN(1);
 }
 
+// function run(screen) {
+//   /* launch app */
+//   app.launchApp("京东");
+//   longWait();
+
+//   console.log("超级明星...");
+
+//   switchTag("新品");
+
+//   let superStar = id("ea2").text("超级明星").findOne(1000);
+//   if (!superStar) {
+//     console.log("missing 超级明星 entry, skip");
+//     switchTag("首页");
+//     return false;
+//   }
+
+//   click(superStar.center());
+//   longWait();
+
+//   let resultList = null;
+//   let drawBtnList = null;
+//   let btn = null;
+//   let et = null;
+//   let loopCnt = 3;
+//   for (let i = 0; i < loopCnt; i++) {
+//     jd_star_scroll(true);
+//     drawBtnList = getDrawButtons();
+//     for (let idx = 0; idx < drawBtnList.length; idx++) {
+//       btn = drawBtnList[idx];
+//       click(btn.center());
+//       shortWait();
+//       let find = true;
+//       while (find) {
+//         find = false;
+//         resultList = ocr.rapid.detect([0, 1140, 1080, 1080]);
+//         for (let index = resultList.length - 1; index >= 0; index--) {
+//           et = resultList[index];
+//           let bs = et.bounds;
+//           let x = (bs.left + bs.right) / 2;
+//           let y = (bs.top + bs.bottom) / 2;
+//           if (et.label === "逛一逛") {
+//             click(x, y);
+//             longWait();
+//             mediumWait();
+//             backN(1);
+//             find = true;
+//             break;
+//           } else if (et.label === "去抽奖") {
+//             click(x, y);
+//             shortWait();
+//             find = true;
+//             break;
+//           }
+//         }
+//       }
+
+//       click(1031, 886);
+//       miniWait();
+//     }
+//   }
+
+//   for (let i = 0; i < loopCnt; i++) {
+//     jd_star_scroll(false);
+//   }
+
+//   switchTag("首页");
+
+//   doubleBackN(1);
+// }
+
 function jd_star_scroll(up) {
   let x = 500;
   let sy = 2000;
@@ -89,7 +166,22 @@ function jd_star_scroll(up) {
   } else {
     swipe(x, ey, x, sy, dur);
   }
-  miniWait();
+  shortWait();
+}
+
+function getSuperStar() {
+  let stars = [];
+  let container = id("super_star_collectible_card_feeds").findOne(1000);
+  if (!container) {
+    return stars;
+  }
+  for (let idx = 1; idx < container.childCount(); idx++) {
+    let child = container.children()[idx];
+    if (isPointInBounds(child.center(), [0, 456, 1080, 2218])) {
+      stars.push(child);
+    }
+  }
+  return stars;
 }
 
 function getDrawButtons() {
