@@ -36,15 +36,15 @@ function saveMore() {
   shortWait();
   backCnt++;
 
-  let saveMore = text("每日省更多").findOne(1000);
-  if (!saveMore) {
+  let saveMoreEntry = text("每日省更多").findOne(1000);
+  if (!saveMoreEntry) {
     console.log("missing save more entery, skip...");
     backN(backCnt);
     return false;
   }
 
   backCnt++;
-  click(saveMore.center());
+  click(saveMoreEntry.center());
   mediumWait();
 
   goto_tasklist();
@@ -98,7 +98,18 @@ function goto_tasklist() {
         mediumWait();
       }
 
-      doubleBackN(4, isInSaveMoney);
+      doubleBackN(4, function () {
+        if (isInSaveMoney()) {
+          return true;
+        }
+        let entry = text("每日省更多").findOne(200);
+        if (entry) {
+          click(entry.center());
+          shortWait();
+          return true;
+        }
+        return false;
+      });
       mediumWait();
     }
   }
@@ -107,7 +118,10 @@ function goto_tasklist() {
 function isInSaveMoney() {
   let earn = text("赚京豆当钱花").findOne(1000);
   let browse = text("浏览App赚豆").findOne(1000);
-  return earn && browse;
+  if (earn && browse) {
+    return true;
+  }
+  return false;
 }
 
 function find_entry(name) {
@@ -118,7 +132,7 @@ function find_entry(name) {
   let root = obj.parent().parent().parent();
   let entry = find_goto_button(root);
   if (
-    entry &&
+    !entry ||
     (entry.center().x < 0 ||
       entry.center().x > sc.width ||
       entry.center().y < 0 ||

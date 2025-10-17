@@ -8,11 +8,12 @@ ui.layout(
     <button id="sign" text="签到任务" margin="5" />
     <horizontal gravity="left">
       <button id="jd" text="京东" margin="5" />
-      <button id="jdm" text="京东 手动" margin="5" />
-      <button id="jdig" text="京东-互动游戏" margin="5" />
+      <button id="jdbb" text="京东-抽盲盒" margin="5" />
+      <button id="jddddb" text="京东-天天抽福利" margin="5" />
     </horizontal>
     <horizontal>
       <button id="jdss" text="京东-超级明星" margin="5" />
+      <button id="jdig" text="京东-互动游戏" margin="5" />
     </horizontal>
     <horizontal gravity="left">
       <button id="jdjrm" text="京东金融 手动" margin="5" />
@@ -104,21 +105,6 @@ ui.jd.click(() => {
   });
 });
 
-ui.jdm.click(() => {
-  threads.start(() => {
-    const jd_manual = require("./modules/jd_manual");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jd_manual.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
 ui.jdig.click(() => {
   threads.start(() => {
     const jdig = require("./modules/jd_interactive_games");
@@ -187,6 +173,34 @@ ui.panda.click(() => {
     console.log("已开启屏幕常亮");
 
     panda.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.jdbb.click(() => {
+  threads.start(() => {
+    const jdbb = require("./modules/jd_bline_box");
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jdbb.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.jddddb.click(() => {
+  threads.start(() => {
+    const jddddb = require("./modules/jd_day_day_benefit");
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jddddb.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");

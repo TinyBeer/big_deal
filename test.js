@@ -1,3 +1,41 @@
+
+console.log(find_entry("浏览财富会员权益"));
+
+
+function find_entry(name) {
+  let obj = textContains(name).findOne(50);
+  if (!obj || !obj.parent() || !obj.parent().parent()) {
+    return;
+  }
+  let root = obj.parent().parent().parent();
+  let entry = find_goto_button(root);
+  // if (
+  //   !entry ||
+  //   (entry.center().x < 0 ||
+  //     entry.center().x > sc.width ||
+  //     entry.center().y < 0 ||
+  //     entry.center().y > sc.height)
+  // ) {
+  //   return;
+  // }
+  return entry;
+}
+
+function find_goto_button(parent) {
+  for (let idx = 0; idx < parent.children().length; idx++) {
+    let child = parent.children()[idx];
+    if (child.text() === "去完成" || child.text() == "继续完成") {
+      return child;
+    }
+    if (child.childCount != 0) {
+      let ch = find_goto_button(child);
+      if (ch) {
+        return ch;
+      }
+    }
+  }
+  return;
+}
 // const x = 500;
 // const sy = 1000;
 // const ey = 300;
