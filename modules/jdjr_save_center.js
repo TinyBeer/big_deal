@@ -78,6 +78,7 @@ function goto_tasklist() {
     { name: "领10元外卖券", jd: false, delay: 15 },
     { name: "浏览签到领金币" },
     { name: "浏览少数派夺京豆", delay: 15 },
+    { name: "浏览集5鹅10秒", delay: 15 },
   ];
   let find = true;
   while (find) {
