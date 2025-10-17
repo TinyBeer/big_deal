@@ -224,35 +224,3 @@ ui.jdss.click(() => {
 ui.exit.click(() => {
   exit();
 });
-
-let hotGameTaskList = [
-  // round one
-  { name: "雀神来也", dur_m: 60 },
-  { name: "货柜趣消除", dur_m: 35 },
-  { name: "趣味叠叠乐", dur_m: 15 },
-  { name: "排队上车", dur_m: 15 },
-  { name: "方块拼图", dur_m: 15 },
-  { name: "养猪猪", dur_m: 4 },
-  { name: "京豆捕鱼", dur_m: 8 },
-  { name: "种菜领现金", dur_m: 0 },
-  { name: "消灭小萌星", dur_m: 30 },
-  { name: "麻将凑十", dur_m: 15 },
-  { name: "解压硬币", dur_m: 15 },
-  { name: "2048方块", dur_m: 60 },
-  { name: "无尽战歌", dur_m: 15 },
-  // round two
-  { name: "雀神来也", dur_m: 2 },
-  { name: "货柜趣消除", dur_m: 2 },
-  { name: "趣味叠叠乐", dur_m: 2 },
-  { name: "排队上车", dur_m: 2 },
-  { name: "方块拼图", dur_m: 2 },
-  { name: "养猪猪", dur_m: 5 },
-  { name: "京豆捕鱼", dur_m: 0 },
-  { name: "种菜领现金", dur_m: 0 },
-  { name: "消灭小萌星", dur_m: 2 },
-  { name: "麻将凑十", dur_m: 2 },
-  { name: "解压硬币", dur_m: 2 },
-  { name: "2048方块", dur_m: 2 },
-  { name: "无尽战歌", dur_m: 2 },
-  { name: "养猪猪", dur_m: 2 },
-];

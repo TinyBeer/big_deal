@@ -9,6 +9,7 @@ const {
   preciseSleep,
   mediumWait,
   getScreenSize,
+  shortWait,
 } = require("./utils");
 
 const configName_TaskList = "interactive_game_task_list";
@@ -194,11 +195,19 @@ function getGameTaskList(gameNameList) {
   let taskList = [];
   for (let i = 0; i < gameNameList.length; i++) {
     let name = gameNameList[i];
-    let tasks = getGameTaskListByName(name);
-    if (!tasks || tasks.length === 0) {
+    let tasks = [];
+    let cnt = 0;
+    while (!tasks || tasks.length === 0) {
       tasks = getGameTaskListByName(name);
+      cnt++;
+      if (cnt >= 5) {
+        break;
+      }
     }
-    taskList = taskList.concat(tasks);
+    console.log(name, tasks);
+    if (tasks) {
+      taskList = taskList.concat(tasks);
+    }
   }
   return taskList;
 }
@@ -210,31 +219,38 @@ function getGameTaskListByName(name) {
     return;
   }
   click(game.center());
-  mediumWait();
-  if (name === "养猪猪" || name === "货柜趣消除") {
+  shortWait();
+  if (name === "养猪猪" || name === "货柜趣消除" || name === "京豆捕鱼") {
     longWait();
   }
 
-  let taskEnter = textContains("10元还款券").findOne(1000);
+  let taskEnter = textContains("10元还款券").findOne(10000);
   if (!taskEnter) {
     return;
   }
   click(taskEnter.center());
   sleep(2000);
   let mins = getGameMins();
-  for (let j = 0; j < mins.length; j++) {
-    let min = mins[j];
-    if (j == 0) {
-      taskList.push({
-        name: name,
-        dur_m: min,
-      });
-    } else {
-      taskList.push({
-        name: name,
-        dur_m: min - mins[j - 1] + 1,
-      });
-    }
+  // for (let j = 0; j < mins.length; j++) {
+  //   let min = mins[j];
+  //   if (j == 0) {
+  //     taskList.push({
+  //       name: name,
+  //       dur_m: min,
+  //     });
+  //   } else {
+  //     taskList.push({
+  //       name: name,
+  //       dur_m: min - mins[j - 1] + 1,
+  //     });
+  //   }
+  // }
+  if (mins.length > 0) {
+    let m = parseInt(mins[mins.length - 1])
+    taskList.push({
+      name: name,
+      dur_m: Math.ceil(m*1.1),
+    });
   }
   back();
   sleep(1000);
