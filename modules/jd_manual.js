@@ -216,9 +216,7 @@ function blind_box() {
           click(540, 1897.5);
           sleep(1000);
         }
-        back();
-        back();
-        sleep(4000);
+        utils.doubleBackN(1)
       } else if (arr[3] === "拆盲盒") {
         console.log("claim...");
         click(880, 1540);

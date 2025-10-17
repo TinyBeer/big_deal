@@ -9,7 +9,10 @@ ui.layout(
     <horizontal gravity="left">
       <button id="jd" text="京东" margin="5" />
       <button id="jdm" text="京东 手动" margin="5" />
-      <button id="star" text="超级明星" margin="5" />
+      <button id="jdig" text="京东-互动游戏" margin="5" />
+    </horizontal>
+    <horizontal>
+      <button id="jdss" text="京东-超级明星" margin="5" />
     </horizontal>
     <horizontal gravity="left">
       <button id="jdjrm" text="京东金融 手动" margin="5" />
@@ -116,6 +119,21 @@ ui.jdm.click(() => {
   });
 });
 
+ui.jdig.click(() => {
+  threads.start(() => {
+    const jdig = require("./modules/jd_interactive_games");
+
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jdig.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
 ui.ddep.click(() => {
   threads.start(() => {
     const jdjr_ep = require("./modules/jdjr_earn_pea");
@@ -175,10 +193,17 @@ ui.panda.click(() => {
   });
 });
 
-ui.star.click(() => {
+ui.jdss.click(() => {
   threads.start(() => {
-    const star = require("./modules/jd_super_star");
-    star.run();
+    const jdss = require("./modules/jd_super_star");
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jdss.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
   });
 });
 

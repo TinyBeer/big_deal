@@ -23,8 +23,6 @@ function run() {
   goto_qqreading();
   goto_chinamobile();
   goto_monkeyexpolorer();
-  goto_baidufast();
-  goto_baidumap();
   goto_mantisshrimp();
   goto_diantao();
   goto_ucfast();
@@ -38,10 +36,34 @@ function run() {
   goto_qualitylife();
   goto_daydaylowprice();
   goto_dailysubsidarygood();
+  goto_baidufast();
+  goto_baidumap();
+  goto_iou();
 
   back_from_daily_earn_pean();
 
   utils.doubleBackN(1);
+}
+
+function goto_iou() {
+  let name = "浏览白条频道10秒";
+  console.log(name, "...");
+  let entry = find_entry(name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+  utils.longWait();
+  utils.longWait();
+  utils.mediumWait();
+
+  utils.doubleBackN(3, function () {
+    if (try_close_popup() || isDayDayEarnPeaPage()) {
+      return true;
+    }
+    return false;
+  });
 }
 
 function goto_dailysubsidarygood() {
@@ -560,6 +582,15 @@ function find_goto_button(parent) {
     }
   }
   return;
+}
+/* 页面检查 */
+function isDayDayEarnPeaPage() {
+  let title = text("做任务开福袋").findOne(200);
+  let subTitle = text("做任务赚京豆").findOne(200);
+  if (title && subTitle) {
+    return true;
+  }
+  return false;
 }
 
 // 导出函数（供其他脚本调用）

@@ -115,9 +115,8 @@ function clothe_makup() {
     return false;
   }
   click(bb.center());
-  mediumWait();
-  back();
-  backN(1);
+  longWait();
+  doubleBackN(1);
 
   click(bb.center());
   mediumWait();
@@ -462,7 +461,7 @@ function daily_claim_pean_goods() {
 
   let num = 6;
   let cnt = 0;
-  let goods = depth(19).find(1000);
+  let goods = text("").depth(19).childCount(4).find(1000);
   for (let idx = 0; idx < goods.length; idx++) {
     let e = goods[idx];
     if (e.center().y > 330) {
@@ -1032,7 +1031,15 @@ function homePageGetEnter(name) {
     .depth(23)
     .findOne(1000);
 
-  if (enter && isPointInBounds(enter.center(), [0, entryBar.bounds().top, 1080, entryBar.bounds().bottom])) {
+  if (
+    enter &&
+    isPointInBounds(enter.center(), [
+      0,
+      entryBar.bounds().top,
+      1080,
+      entryBar.bounds().bottom,
+    ])
+  ) {
     return enter;
   }
   swipe(ex, y, sx, y, dur);
