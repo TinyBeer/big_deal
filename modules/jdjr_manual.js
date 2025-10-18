@@ -57,7 +57,7 @@ function double_sign() {
     return false;
   }
   click(signEntry.center());
-  utils.shortWait();
+  utils.longWait();
   backCnt++;
 
   let entryText = "领京豆";

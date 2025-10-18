@@ -54,18 +54,18 @@ function run(screen) {
             longWait();
             longWait();
             mediumWait();
-            doubleBackN(1);
+            doubleBackN(2, isSuperStarPage);
             find = true;
             break;
           } else if (et.label === "去抽奖") {
             click(x, y);
-            shortWait();
+            mediumWait();
             find = true;
             break;
           } else if (et.label === "去关注") {
             click(x, y);
             mediumWait();
-            doubleBackN(1);
+            doubleBackN(2, isSuperStarPage);
             find = true;
             break;
           }
@@ -195,6 +195,17 @@ function getDrawButtons() {
   }
   return btns;
 }
+
+function isSuperStarPage() {
+  let star = text("超级明星").findOne(500);
+  let container = id("super_star_collectible_card_feeds").findOne(500);
+
+  if (star && container) {
+    return true;
+  }
+  return false;
+}
+
 //  导出函数（供其他脚本调用）
 module.exports = {
   run,
