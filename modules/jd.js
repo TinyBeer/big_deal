@@ -44,7 +44,6 @@ function run() {
   home_appliances_and_household_items();
   online_doctor();
   mother_baby();
-  mother_babystreak();
   // dong_dong_farm();
   home_nurse();
   global_shopping();

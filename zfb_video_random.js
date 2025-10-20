@@ -2,7 +2,7 @@ const x = 500;
 const sy = 1000;
 const ey = 300;
 const dur = 300;
-for (let idx = 0; idx < 50; idx++) {
+for (let idx = 0; idx < 150; idx++) {
   let flag = true;
   while (flag) {
     flag = false;
@@ -24,3 +24,4 @@ for (let idx = 0; idx < 50; idx++) {
     sleep(2000 + r * 10000);
   }
 }
+notice("支付宝", "mission complete");

@@ -2,7 +2,7 @@ const x = 500;
 const sy = 1000;
 const ey = 300;
 const dur = 300;
-for (let idx = 0; idx < 50; idx++) {
+for (let idx = 0; idx < 150; idx++) {
   // let r = random();
   // console.log(r);
   // let flag = r > 0.5;
@@ -22,3 +22,4 @@ for (let idx = 0; idx < 50; idx++) {
   }
   sleep(10000);
 }
+notice("支付宝", "mission complete");
