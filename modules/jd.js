@@ -33,13 +33,11 @@ function run() {
   redeem_prize_tickets();
   daily_claim_pean();
   daily_claim_pean_goods();
-  hardwar_city();
-  ecard();
+  // hardwar_city();
+  // ecard();
   jd_campus();
   big_brand();
-  big_brand_streak();
   clothe_makup();
-  clothe_makupsteak();
   //todo optimize
   luck_reward();
   // get_beans();
@@ -47,7 +45,7 @@ function run() {
   online_doctor();
   mother_baby();
   mother_babystreak();
-  dong_dong_farm();
+  // dong_dong_farm();
   home_nurse();
   global_shopping();
 
@@ -55,56 +53,6 @@ function run() {
 }
 
 /* tasks */
-
-function clothe_makupsteak() {
-  let backCnt = 0;
-  let bb = homePageGetEnter("服饰美妆");
-  if (!bb) {
-    console.log("missing 服饰美妆 enter, back");
-    backN(backCnt);
-    return false;
-  }
-  click(bb.center());
-  mediumWait();
-  back();
-  backN(1);
-
-  click(bb.center());
-  mediumWait();
-  backCnt++;
-
-  let list = text("image").depth(24).indexInParent(1).find(1000);
-  let signBtn = null;
-  for (let idx = 0; idx < list.length; idx++) {
-    let element = list[idx];
-    if (element.center().x < 100) {
-      signBtn = element;
-      break;
-    }
-  }
-  if (!signBtn) {
-    console.log("missing sign entry, skip");
-    backN(backCnt);
-    return false;
-  }
-
-  click(signBtn.center());
-  longWait();
-  mediumWait();
-  backCnt++;
-
-  let streak = text("今日可领").findOne(1000);
-  if (!streak) {
-    console.log("missing claim button, skip");
-    backN(backCnt);
-    return false;
-  }
-
-  click(streak.center().x, streak.center().y - 100);
-  shortWait();
-  backN(backCnt);
-  return true;
-}
 
 function clothe_makup() {
   let backCnt = 0;
@@ -143,49 +91,17 @@ function clothe_makup() {
   backCnt++;
 
   let obj = text("待领取").findOne(1000);
-  if (!obj) {
-    console.log("missing claim button, skip");
-    backN(backCnt);
-    return false;
+  if (obj) {
+    click(888, obj.center().y);
+    longWait();
   }
-
-  click(888, obj.center().y);
-  shortWait();
-  backN(backCnt);
-  return true;
-}
-
-function mother_babystreak() {
-  let backCnt = 0;
-  let bb = homePageGetEnter("母婴馆");
-  if (!bb) {
-    console.log("missing 母婴馆 enter, back");
-    backN(backCnt);
-    return false;
-  }
-  click(bb.center());
-  mediumWait();
-  doubleBackN(1);
-  shortWait();
-  click(bb.center());
-  mediumWait();
-  backCnt++;
-
-  for (let i = 0; i < 5; i++) {
-    scrollDown();
-    shortWait();
-  }
-  longWait();
 
   let streak = text("今日可领").findOne(1000);
-  if (!streak) {
-    console.log("missing claim button, skip");
-    backN(backCnt);
-    return false;
+  if (streak) {
+    click(streak.center().x, streak.center().y - 100);
+    shortWait();
   }
 
-  click(streak.center().x, streak.center().y - 100);
-  shortWait();
   backN(backCnt);
   return true;
 }
@@ -213,14 +129,19 @@ function mother_baby() {
   longWait();
 
   let obj = text("今日签到").findOne(1000);
-  if (!obj) {
-    console.log("missing claim button, skip");
-    backN(backCnt);
-    return false;
+  if (obj) {
+    console.log("claim sign");
+    click(888, obj.center().y);
+    longWait();
   }
 
-  click(888, obj.center().y);
-  shortWait();
+  let streak = text("今日可领").findOne(1000);
+  if (streak) {
+    console.log("claim streak");
+    click(streak.center().x, streak.center().y - 100);
+    shortWait();
+  }
+
   backN(backCnt);
   return true;
 }

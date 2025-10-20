@@ -3,10 +3,7 @@ const sy = 1000;
 const ey = 300;
 const dur = 300;
 for (let idx = 0; idx < 50; idx++) {
-  let r = random();
-  console.log(r);
-  let flag = r > 0.5;
-  // let flag = true;
+  let flag = true;
   while (flag) {
     flag = false;
     swipe(x, sy, x, ey, dur);
@@ -21,4 +18,9 @@ for (let idx = 0; idx < 50; idx++) {
     confirm("真人验证提示", "确认");
   }
   sleep(10000);
+  let r = random();
+  console.log(r);
+  if (r > 0.5) {
+    sleep(2000 + r * 10000);
+  }
 }

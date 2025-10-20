@@ -75,9 +75,15 @@ function workWithName(screen, objList) {
       console.log(`cant not found [${e.name}], skip`);
       continue;
     }
-    let obj = tmp.parent();
-    console.log(` get [${e.name}] pos[${obj.center()}]`);
+
     for (; dur > 0; ) {
+      let entry = text(e.name).findOne(1000);
+      if (!entry) {
+        console.log(`cant not found [${e.name}], skip`);
+        continue;
+      }
+      let entryPos = entry.parent().center();
+      console.log(` get [${e.name}] pos[${entryPos}]`);
       var t = 8 * 60 * 1000;
       if (dur <= t) {
         t = dur;
@@ -87,7 +93,7 @@ function workWithName(screen, objList) {
       }
 
       console.log(`act play [${e.name}] ${t / 60 / 1000}min`);
-      click(obj.center());
+      click(entryPos);
       preciseSleep(t, false);
       back();
       back();
@@ -246,10 +252,10 @@ function getGameTaskListByName(name) {
   //   }
   // }
   if (mins.length > 0) {
-    let m = parseInt(mins[mins.length - 1])
+    let m = parseInt(mins[mins.length - 1]);
     taskList.push({
       name: name,
-      dur_m: Math.ceil(m*1.1),
+      dur_m: Math.ceil(m * 1.1),
     });
   }
   back();
