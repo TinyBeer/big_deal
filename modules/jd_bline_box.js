@@ -105,7 +105,7 @@ function blind_box() {
 function blineBoxSleep(seconds) {
   for (let sec = 0; sec < seconds; sec++) {
     sleep(1000);
-    let fin = text("点击立即返回").findOne(500);
+    let fin = text("点击立即返回").findOne(100);
     if (fin) {
       break;
     }

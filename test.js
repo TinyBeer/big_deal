@@ -1,4 +1,4 @@
-let obj = text("点击立即返回").findOne(500);
+let fin = text("点击立即返回").findOne(500);
 console.log(obj);
 
 
