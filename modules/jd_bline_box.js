@@ -64,11 +64,11 @@ function blind_box() {
         console.log("goto ");
         click(880, 1540);
         if (arr[0] === "逛逛精选新奇好物 ") {
-          sleep(30000);
+          blineBoxSleep(30)
         } else if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
-          sleep(25000);
+          blineBoxSleep(25)
         } else {
-          sleep(18000);
+          blineBoxSleep(18)
         }
         if (arr[0] === "逛逛买药频道") {
           click(540, 1897.5);
@@ -100,6 +100,17 @@ function blind_box() {
   back();
   sleep(1000);
   switchTag("首页");
+}
+
+function blineBoxSleep(seconds) {
+  for (let sec = 0; sec < seconds; sec++) {
+    sleep(1000);
+    let fin = text("点击立即返回").findOne(500);
+    if (fin) {
+      break;
+    }
+  }
+  return;
 }
 
 function switchTag(name) {

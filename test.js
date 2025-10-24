@@ -1,14 +1,19 @@
-let list = text("image").depth(24).indexInParent(1).find(1000);
-let signBtn = null;
-for (let idx = 0; idx < list.length; idx++) {
-  let element = list[idx];
-  if (element.center().x < 100) {
-    signBtn = element;
-    break;
-  }
-}
-console.log(signBtn);
-click(signBtn.center());
+let obj = text("点击立即返回").findOne(500);
+console.log(obj);
+
+
+// let list = text("image").depth(24).indexInParent(1).find(1000);
+// let signBtn = null;
+// for (let idx = 0; idx < list.length; idx++) {
+//   let element = list[idx];
+//   if (element.center().x < 100) {
+//     signBtn = element;
+//     break;
+//   }
+// }
+// console.log(signBtn);
+// click(signBtn.center());
+
 // let obj = text("合成2048掉落碰撞畅快合成").findOne(500);
 // console.log(click(obj.center()));
 

@@ -73,45 +73,52 @@ function goto_tasklist() {
     { name: "浏览财富会员权益", jd: false, delay: 15 },
     { name: "浏览视频30秒", jd: false, delay: 35 },
     { name: "浏览看病买药频道", jd: true },
-    { name: "看京东App视频", jd: true },
     { name: "逛双11大促活动", jd: false },
     { name: "领10元外卖券", jd: false, delay: 15 },
     { name: "浏览签到领金币" },
     { name: "浏览少数派夺京豆", delay: 15 },
     { name: "浏览集5鹅10秒", delay: 15 },
+    { name: "参与白条活动提额" },
+    { name: "逛白条频道10秒", delay: 15 },
   ];
+
   let find = true;
   while (find) {
     find = false;
+    let obj = textMatch(".*(\\d/\\d)").findOne(500);
+    if (!obj) {
+      break;
+    }
+    console.log("found", obj.text());
+
     for (let idx = 0; idx < taskList.length; idx++) {
       let task = taskList[idx];
-      let entry = find_entry(task.name);
-      if (!entry) {
-        continue;
-      }
-      console.log(task.name, "...");
-      find = true;
-      click(entry.center());
-      shortWait();
-      if (task.delay && task.delay !== 0) {
-        sleep(task.delay * 1000);
-      } else {
+      if (obj.text().includes(task.name)) {
+        find = true;
+        console.log(task.name, "...");
+        let entry = find_entry(task.name);
+        click(entry.center());
+        shortWait();
+        if (task.delay && task.delay !== 0) {
+          sleep(task.delay * 1000);
+        } else {
+          mediumWait();
+        }
+
+        doubleBackN(4, function () {
+          if (isInSaveMoney()) {
+            return true;
+          }
+          let entry = text("每日省更多").findOne(200);
+          if (entry) {
+            click(entry.center());
+            shortWait();
+            return true;
+          }
+          return false;
+        });
         mediumWait();
       }
-
-      doubleBackN(4, function () {
-        if (isInSaveMoney()) {
-          return true;
-        }
-        let entry = text("每日省更多").findOne(200);
-        if (entry) {
-          click(entry.center());
-          shortWait();
-          return true;
-        }
-        return false;
-      });
-      mediumWait();
     }
   }
 }
@@ -134,10 +141,10 @@ function find_entry(name) {
   let entry = find_goto_button(root);
   if (
     !entry ||
-    (entry.center().x < 0 ||
-      entry.center().x > sc.width ||
-      entry.center().y < 0 ||
-      entry.center().y > sc.height)
+    entry.center().x < 0 ||
+    entry.center().x > sc.width ||
+    entry.center().y < 0 ||
+    entry.center().y > sc.height
   ) {
     return;
   }
