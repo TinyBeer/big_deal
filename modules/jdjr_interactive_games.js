@@ -55,6 +55,7 @@ function workWithName(screen, objList) {
   var scorlled = false;
   for (let i = 0; i < objList.length; i++) {
     let e = objList[i];
+    shortWait();
     if (e.scroll) {
       scrollDown();
       sleep(1000);

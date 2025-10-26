@@ -1,6 +1,4 @@
-let fin = text("点击立即返回").findOne(500);
-console.log(obj);
-
+scrollDown();
 
 // let list = text("image").depth(24).indexInParent(1).find(1000);
 // let signBtn = null;
