@@ -29,8 +29,7 @@ function run() {
   /* run task */
   flash_sale();
   jinxi_direct();
-  interactive_game_sign();
-  redeem_prize_tickets();
+  interactive_game();
   daily_claim_pean();
   daily_claim_pean_goods();
   // hardwar_city();
@@ -39,7 +38,6 @@ function run() {
   big_brand();
   clothe_makup();
   //todo optimize
-  luck_reward();
   // get_beans();
   home_appliances_and_household_items();
   online_doctor();
@@ -689,109 +687,29 @@ function dong_dong_farm() {
   shortWait();
 }
 
-function redeem_prize_tickets() {
-  console.log("奖票兑换...");
-  let backCnt = 0;
-  let enter = text("我的").findOne(1000);
-  if (!enter) {
-    return false;
-  }
-  click(enter.center());
-  shortWait();
-  shortWait();
-  backCnt++;
-
-  let gameEnter = text("互动游戏").findOne(1000);
-  if (!gameEnter) {
-    backN(backCnt);
-    return false;
-  }
-  click(gameEnter.center());
-  mediumWait();
-  backCnt++;
-
-  let redeemEnter = text("兑换").findOne(1000);
-  if (!redeemEnter) {
-    backN(backCnt);
-    return false;
-  }
-  click(redeemEnter.center());
-  backCnt++;
-  shortWait();
-
-  let fifteenTickets = text("15").findOne(1000);
-  if (!fifteenTickets) {
-    console.log("fifteen tickets not found");
-    backN(backCnt);
-    return false;
-  }
-  let tParent = fifteenTickets.parent();
-  if (!tParent || tParent.childCount() != 3) {
-    console.log("get wrong target");
-    backN(backCnt);
-    return false;
-  }
-  for (let i = 0; i < tParent.childCount(); i++) {
-    if (
-      tParent.children()[i].text() === "15" ||
-      tParent.children()[i].text() === "奖票"
-    ) {
-      continue;
-    }
-    click(tParent.children()[i].center());
-    shortWait();
-    var obj = text("确认兑换").findOne(1000);
-    if (!obj) {
-      console.log("sth wrong, break");
-      break;
-    }
-    var redeemBtn = text("确认兑换").findOne(1000);
-    click(redeemBtn.center());
-    shortWait();
-    break;
-  }
-
-  backN(backCnt);
-}
-
 function flash_sale() {
   let enter = homePageGetEnter("秒杀");
   if (!enter) {
     return false;
   }
   click(enter.center());
-  mediumWait();
+  longWait();
 
-  let claimBtn = text("签到领豆").findOne(1000);
-  if (!claimBtn) {
-    console.log("missing claim button, skip");
-    back();
-    shortWait();
-    return false;
+  let signBtn = text("签到领豆").findOne(1000);
+  if (signBtn) {
+    click(signBtn.center());
+    longWait();
+  } else {
+    console.log("missing sign button, skip");
   }
-  click(claimBtn.center());
-  shortWait();
-  back();
-  shortWait();
-}
-
-function luck_reward() {
-  let enter = homePageGetEnter("秒杀");
-  if (!enter) {
-    return false;
-  }
-  click(enter.center());
-  shortWait();
-
   let claimBtn = text("点击领取").findOne(1000);
-  if (!claimBtn) {
-    console.log("missing claim button, skip");
-    back();
+  if (claimBtn) {
+    click(claimBtn.center());
     shortWait();
-    return false;
+  } else {
+    console.log("missing claim button, skip");
   }
-  click(claimBtn.center());
-  shortWait();
+
   back();
   shortWait();
 }
@@ -891,8 +809,8 @@ function appliance_and_furniture() {
   shortWait();
 }
 
-function interactive_game_sign() {
-  console.log("互动游戏签到...");
+function interactive_game() {
+  console.log("互动游戏...");
   let backCnt = 0;
   let enter = text("我的").findOne(1000);
   if (!enter) {
@@ -911,13 +829,55 @@ function interactive_game_sign() {
   longWait();
   backCnt++;
 
+  // 签到
   let sign = text("签到").findOne(1000);
-  if (!sign) {
-    backN(backCnt);
-    return false;
+  if (sign) {
+    click(sign.center());
+    mediumWait();
+  } else {
+    console.log("missing sign button, skip...");
   }
-  click(sign.center());
-  shortWait();
+
+  // 兑换
+  let redeemEnter = text("兑换").findOne(1000);
+  if (redeemEnter) {
+    click(redeemEnter.center());
+    shortWait();
+
+    let fifteenTickets = text("15").findOne(1000);
+    if (fifteenTickets) {
+      let tParent = fifteenTickets.parent();
+      if (tParent && tParent.childCount() === 3) {
+        for (let i = 0; i < tParent.childCount(); i++) {
+          if (
+            tParent.children()[i].text() === "15" ||
+            tParent.children()[i].text() === "奖票"
+          ) {
+            continue;
+          }
+          click(tParent.children()[i].center());
+          shortWait();
+          var obj = text("确认兑换").findOne(1000);
+          if (!obj) {
+            console.log("sth wrong, break");
+            break;
+          }
+          var redeemBtn = text("确认兑换").findOne(1000);
+          click(redeemBtn.center());
+          shortWait();
+          break;
+        }
+      } else {
+        console.log("get wrong target");
+      }
+    } else {
+      console.log("fifteen tickets not found");
+    }
+    backN(1);
+  } else {
+    console.log("missing redeem button, skip...");
+  }
+
   backN(backCnt);
 }
 
