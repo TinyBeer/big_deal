@@ -1,4 +1,5 @@
-scrollDown();
+let obj = text("明日可领").findOne(100);
+console.log(obj);
 
 // let list = text("image").depth(24).indexInParent(1).find(1000);
 // let signBtn = null;
