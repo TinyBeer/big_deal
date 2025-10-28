@@ -837,47 +837,6 @@ function interactive_game() {
   } else {
     console.log("missing sign button, skip...");
   }
-
-  // 兑换
-  let redeemEnter = text("兑换").findOne(1000);
-  if (redeemEnter) {
-    click(redeemEnter.center());
-    shortWait();
-
-    let fifteenTickets = text("15").findOne(1000);
-    if (fifteenTickets) {
-      let tParent = fifteenTickets.parent();
-      if (tParent && tParent.childCount() === 3) {
-        for (let i = 0; i < tParent.childCount(); i++) {
-          if (
-            tParent.children()[i].text() === "15" ||
-            tParent.children()[i].text() === "奖票"
-          ) {
-            continue;
-          }
-          click(tParent.children()[i].center());
-          shortWait();
-          var obj = text("确认兑换").findOne(1000);
-          if (!obj) {
-            console.log("sth wrong, break");
-            break;
-          }
-          var redeemBtn = text("确认兑换").findOne(1000);
-          click(redeemBtn.center());
-          shortWait();
-          break;
-        }
-      } else {
-        console.log("get wrong target");
-      }
-    } else {
-      console.log("fifteen tickets not found");
-    }
-    backN(1);
-  } else {
-    console.log("missing redeem button, skip...");
-  }
-
   backN(backCnt);
 }
 
