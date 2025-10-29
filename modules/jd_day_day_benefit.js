@@ -1,6 +1,12 @@
 /* import */
 
-const { doubleBackN, longWait, mediumWait, backN } = require("./utils");
+const {
+  doubleBackN,
+  longWait,
+  mediumWait,
+  backN,
+  miniWait,
+} = require("./utils");
 
 function run() {
   /* launch app */
@@ -30,7 +36,7 @@ function day_day_draw_benefit() {
 
   let x = 500;
   let sy = 2100;
-  let ey = 1222;
+  let ey = 1000;
   let dur = 1000;
   swipe(x, sy, x, ey, dur);
   sleep(500);
@@ -39,16 +45,18 @@ function day_day_draw_benefit() {
   while (find) {
     find = false;
     dddbDetectRes = ocr.rapid.detect([0, 1024, 1080, 1200]);
-    for (let index = dddbDetectRes.length - 1; index >= 0; index--) {
+    for (let index = 0; index < dddbDetectRes.length; index++) {
       let et = dddbDetectRes[index];
       if (et.label.includes("浏览页面")) {
         console.log(et);
         find = true;
         click(950, et.bounds.top);
-        longWait();
-        longWait();
-        longWait();
-        mediumWait();
+        for (let idx = 0; idx < 50; idx++) {
+          miniWait();
+          if (text("点击立即返回").findOne(100)) {
+            break;
+          }
+        }
         backN(1);
         break;
       }
