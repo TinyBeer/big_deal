@@ -15,13 +15,15 @@ for (let idx = 0; idx < 150; idx++) {
     flag = btn != null;
   }
 
-  if (textContains("依次点击").findOne(100) || 
-  textContains("为保障您的正常访问请进行验证").findOne(100)) {
+  if (
+    textContains("依次点击").findOne(100) ||
+    textContains("为保障您的正常访问请进行验证").findOne(100)
+  ) {
     notice("支付宝浏览视频", "真人验证");
     confirm("真人验证提示", "确认");
   }
 
-  if (text("已领完").findOne(500)) {
+  if (text("已领完").findOne(100) || text("明日可领").findOne(100)) {
     notice("支付宝浏览视频", "任务完成");
     confirm("任务完成提示", "确认");
   }
