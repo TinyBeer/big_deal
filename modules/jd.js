@@ -31,7 +31,6 @@ function run() {
   jinxi_direct();
   interactive_game();
   daily_claim_pean();
-  daily_claim_pean_goods();
   // hardwar_city();
   // ecard();
   jd_campus();
@@ -341,7 +340,7 @@ function hardwar_city() {
   return true;
 }
 
-function daily_claim_pean_goods() {
+function daily_claim_pean() {
   console.log("天天领豆");
   let backCnt = 0;
   let searchBar = desc("搜索栏").findOne(1000);
@@ -366,6 +365,15 @@ function daily_claim_pean_goods() {
   searchBtn.click();
   sleep(10000);
   backCnt++;
+
+  let signBtn = text("立即刮卡").findOne(1000);
+  if (signBtn) {
+    click(signBtn.center());
+    longWait();
+  } else {
+    console.log("missing target,skip");
+    miniWait();
+  }
 
   let btn = text("图片").findOne(1000);
   if (!btn) {
@@ -400,46 +408,6 @@ function daily_claim_pean_goods() {
     }
   }
   click(btn.center());
-  shortWait();
-
-  backN(backCnt);
-  return true;
-}
-
-function daily_claim_pean() {
-  console.log("天天领豆");
-  let backCnt = 0;
-  let searchBar = desc("搜索栏").findOne(1000);
-  if (!searchBar) {
-    console.log("missing search bar, skip");
-    return false;
-  }
-  searchBar.click();
-  backCnt++;
-  sleep(500);
-  setText("天天领豆");
-  sleep(500);
-  backCnt++;
-
-  let searchBtn = text("搜索").findOne(1000);
-  if (!searchBtn) {
-    console.log("missing search button, skip");
-    backN(backCnt);
-    return false;
-  }
-
-  searchBtn.click();
-  sleep(10000);
-  backCnt++;
-
-  let signBtn = id("signBtnId").findOne(1000);
-  if (!signBtn) {
-    console.log("missing sign bar, skip");
-    backN(backCnt);
-    return false;
-  }
-
-  click(signBtn.center());
   shortWait();
 
   backN(backCnt);
@@ -742,6 +710,7 @@ function jinxi_direct() {
   }
   click(enter.center());
   longWait();
+  longWait();
 
   //   let obj = text("领京豆").findOne(1000);
   let obj = className("android.view.View")
@@ -749,7 +718,7 @@ function jinxi_direct() {
       // "领京豆 签到 大牌同厂 满1元5折 万人团 拼团价更低 零食代工厂 品质零食 地标美食 正宗好味"
       "领京豆"
     )
-    .findOne(6000);
+    .findOne(500);
   if (!obj) {
     console.log("missing claim button, back");
     back();

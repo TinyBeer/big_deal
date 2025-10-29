@@ -25,7 +25,7 @@ function day_day_draw_benefit() {
   click(entry.center());
   longWait();
 
-  click(105, 600);
+  click(105, 660);
   mediumWait();
 
   let x = 500;
