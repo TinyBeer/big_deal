@@ -30,34 +30,23 @@ function smzdm() {
   }
   sleep(1000);
 
-  const signBtn = id("pag_left").findOne(1000);
-  if (!signBtn) {
-    console.log("not found sign button, skip");
-    back();
-    back();
-    sleep(5000);
-    return;
+  let mine = text("我的").findOne(100);
+  if (!mine) {
+    console.log("missing mine entry, skip");
+    return false;
   }
-  click(signBtn.center());
-  sleep(3000);
+  click(mine.center());
+  mediumWait();
 
-  const closeBtn = id("iv_close").findOne(1000);
-  if (!closeBtn) {
-    console.log("smzdm sign failed!!!");
-    back();
-    back();
-    sleep(2000);
-    back();
-    back();
-    sleep(5000);
-    return;
+  let signEntry = text("签到领奖").findOne(100);
+  if (!signEntry) {
+    console.log("missing sign entry, skip");
+    return false;
   }
-
-  click(closeBtn.center());
-  sleep(2000);
+  click(signEntry.center());
+  mediumWait()
 
   doubleBackN(2);
-  mediumWait();
 }
 
 function state_grid_online() {

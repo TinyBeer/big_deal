@@ -1,5 +1,8 @@
-let obj = text("点击立即返回").findOne(100);
-console.log(obj);
+let signEntry = text("签到领奖").findOne(100);
+// if (!signEntry) {
+//   console.log("missing sign entry, skip");
+// }
+click(signEntry.center());
 
 // let list = text("image").depth(24).indexInParent(1).find(1000);
 // let signBtn = null;
