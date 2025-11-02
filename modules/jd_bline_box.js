@@ -36,7 +36,7 @@ function blind_box() {
   }
 
   let taskPage = null;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 3; i++) {
     click(entry.center());
     sleep(4000);
     taskPage = className("android.view.View")

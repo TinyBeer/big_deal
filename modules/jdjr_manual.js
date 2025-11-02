@@ -24,8 +24,8 @@ function claim_pea() {
   }
 
   click(signEntry.center());
-  utils.shortWait();
   backCnt++;
+  utils.shortWait();
 
   let saveMore = textMatches("领\\d+京豆").findOne(1000);
   if (!saveMore) {
@@ -57,8 +57,10 @@ function double_sign() {
     return false;
   }
   click(signEntry.center());
-  utils.longWait();
   backCnt++;
+  utils.longWait();
+  utils.longWait();
+  utils.longWait();
 
   let entryText = "领京豆";
   for (let idx = 0; idx < 3; idx++) {
