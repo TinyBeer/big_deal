@@ -81,7 +81,7 @@ function workWithName(screen, objList) {
       let entry = text(e.name).findOne(1000);
       if (!entry) {
         console.log(`cant not found [${e.name}], skip`);
-        continue;
+        break;
       }
       let entryPos = entry.parent().center();
       console.log(` get [${e.name}] pos[${entryPos}]`);

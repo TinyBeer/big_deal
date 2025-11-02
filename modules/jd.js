@@ -33,7 +33,7 @@ function run() {
   daily_claim_pean();
   // hardwar_city();
   // ecard();
-  jd_campus();
+  // jd_campus();
   big_brand();
   clothe_makup();
   //todo optimize
@@ -727,9 +727,9 @@ function jinxi_direct() {
     let ex = text("退出").findOne(1000);
     if (ex) {
       click(ex.center());
-      sleep(1000);
-      back();
-      shortWait();
+      shortWait()
+      // back();
+      // shortWait();
     }
 
     return false;

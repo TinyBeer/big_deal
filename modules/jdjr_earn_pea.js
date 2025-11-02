@@ -36,8 +36,8 @@ function run() {
   goto_qualitylife();
   goto_daydaylowprice();
   goto_dailysubsidarygood();
-  goto_baidufast();
-  goto_baidumap();
+  // goto_baidufast();
+  // goto_baidumap();
   goto_iou();
 
   back_from_daily_earn_pean();
