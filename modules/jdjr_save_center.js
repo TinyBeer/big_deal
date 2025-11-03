@@ -81,6 +81,7 @@ function goto_tasklist() {
     { name: "参与白条活动提额" },
     { name: "逛白条频道10秒", delay: 15 },
     { name: "赢2025元红包"},
+    { name: "查看国民养老页"},
   ];
 
   let find = true;
