@@ -197,6 +197,9 @@ function big_brand() {
   }
   click(bb.center());
   mediumWait();
+  backN(1);
+  click(od.center());
+  mediumWait();
   backCnt++;
 
   let list = text("image").depth(24).indexInParent(0).find(1000);
@@ -375,9 +378,16 @@ function daily_claim_pean() {
     miniWait();
   }
 
+  let claimed = textContains("已领取奖励").findOne(100);
+  if (claimed) {
+    console.log("already claimed explore goods,skip");
+    backN(backCnt);
+    return false;
+  }
   let btn = text("图片").findOne(1000);
   if (!btn) {
     console.log("missing target,skip");
+    backN(backCnt);
     return false;
   }
   scrollDown();
@@ -727,7 +737,7 @@ function jinxi_direct() {
     let ex = text("退出").findOne(1000);
     if (ex) {
       click(ex.center());
-      shortWait()
+      shortWait();
       // back();
       // shortWait();
     }
