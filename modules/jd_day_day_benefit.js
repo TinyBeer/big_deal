@@ -36,7 +36,7 @@ function day_day_draw_benefit() {
 
   let x = 500;
   let sy = 2100;
-  let ey = 1000;
+  let ey = 1500;
   let dur = 1000;
   swipe(x, sy, x, ey, dur);
   sleep(500);
