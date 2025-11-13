@@ -42,6 +42,13 @@ function scratchTask() {
   longWait();
   backCnt++;
 
+  let claim = text("今天").findOne(100);
+  if (claim) {
+    console.log("claim streak ...");
+    click(claim.center());
+    mediumWait();
+  }
+
   for (let i = 0; i < 3; i++) {
     let task = getCurScratchCardTask();
     if (
