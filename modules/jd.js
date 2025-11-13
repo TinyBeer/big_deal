@@ -28,7 +28,6 @@ function run() {
 
   /* run task */
   flash_sale();
-  jinxi_direct();
   interactive_game();
   daily_claim_pean();
   // hardwar_city();
@@ -688,102 +687,6 @@ function flash_sale() {
     console.log("missing claim button, skip");
   }
 
-  back();
-  shortWait();
-}
-
-function get_beans() {
-  let enter = homePageGetEnter("种豆得豆");
-  if (!enter) {
-    return false;
-  }
-  click(enter.center());
-  shortWait();
-
-  while (true) {
-    let obj = text("点击领取").findOne(2000);
-    if (!obj) {
-      break;
-    }
-    click(obj.center());
-    shortWait();
-  }
-
-  back();
-  shortWait();
-}
-
-function jinxi_direct() {
-  let enter = homePageGetEnter("京喜自营");
-  if (!enter) {
-    return false;
-  }
-  click(enter.center());
-  longWait();
-  longWait();
-
-  //   let obj = text("领京豆").findOne(1000);
-  let obj = className("android.view.View")
-    .textContains(
-      // "领京豆 签到 大牌同厂 满1元5折 万人团 拼团价更低 零食代工厂 品质零食 地标美食 正宗好味"
-      "领京豆"
-    )
-    .findOne(500);
-  if (!obj) {
-    console.log("missing claim button, back");
-    back();
-    shortWait();
-
-    let ex = text("退出").findOne(1000);
-    if (ex) {
-      click(ex.center());
-      shortWait();
-      // back();
-      // shortWait();
-    }
-
-    return false;
-  }
-  if (obj.text().includes("订阅提醒")) {
-    console.log("already claimed, back");
-    back();
-    shortWait();
-
-    let ex = text("退出").findOne(1000);
-    if (ex) {
-      click(ex.center());
-      sleep(1000);
-      back();
-      shortWait();
-    }
-    return true;
-  }
-
-  shortWait();
-  if (obj) {
-    click(400, obj.center().y);
-    shortWait();
-  }
-
-  back();
-  shortWait();
-  let ex = text("退出").findOne(1000);
-  if (ex) {
-    click(ex.center());
-    sleep(1000);
-    back();
-    shortWait();
-  }
-}
-
-function appliance_and_furniture() {
-  let enter = homePageGetEnter("家电家居");
-  if (!enter) {
-    return false;
-  }
-  click(enter.center());
-  shortWait();
-  //todo
   back();
   shortWait();
 }

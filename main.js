@@ -12,6 +12,7 @@ ui.layout(
       <button id="jddddb" text="京东-天天抽福利" margin="5" />
     </horizontal>
     <horizontal>
+      <button id="jd121" text="121京豆" margin="5" />
       <button id="jdss" text="京东-超级明星" margin="5" />
       <button id="jdig" text="京东-互动游戏" margin="5" />
     </horizontal>
@@ -215,6 +216,20 @@ ui.jdss.click(() => {
     console.log("已开启屏幕常亮");
 
     jdss.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.jd121.click(() => {
+  threads.start(() => {
+    const jd121 = require("./modules/jd_121pea");
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jd121.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");

@@ -15,4 +15,3 @@
 - [x] jd Home Appliances & Household Items
 - [x] jd online doctor
 - [x] jd campus
-- [x] bline box

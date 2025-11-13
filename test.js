@@ -1,4 +1,5 @@
-console.log(findHotGames());
+
+// console.log(findHotGames());
 
 function findHotGames() {
   let names = [];
