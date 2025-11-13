@@ -1,4 +1,9 @@
 # TODO
+- [ ] 京喜自营 领取121京豆
+- [ ] 京东 浏览任务
+- [ ] 京东 奖票任务
+- [ ] 优化京东金融 互动游戏
+- [ ] 重构 天天领京豆
 - [x] 服饰美妆  处理优惠券浮窗
 - [x] 支付宝 浏览视频
 - [x] 京东金融  双签
@@ -6,12 +11,3 @@
 - [x] 服饰美妆  累计签到
 - [x] 母婴馆  累计签到
 - [x] 大牌澳莱  累计签到
-- [x] jdjr save money center
-- [x] super star
-- [x] jdjr Redeem Prize Tickets
-- [x] handle sign bug
-- [x] jd dong dong farm
-- [x] jd global shopping
-- [x] jd Home Appliances & Household Items
-- [x] jd online doctor
-- [x] jd campus
