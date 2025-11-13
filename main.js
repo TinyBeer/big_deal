@@ -13,8 +13,9 @@ ui.layout(
     </horizontal>
     <horizontal>
       <button id="jd121" text="121京豆" margin="5" />
-      <button id="jdss" text="京东-超级明星" margin="5" />
-      <button id="jdig" text="京东-互动游戏" margin="5" />
+      <button id="jdst" text="刮卡任务" margin="5" />
+      <button id="jdss" text="超级明星" margin="5" />
+      <button id="jdig" text="互动游戏" margin="5" />
     </horizontal>
     <horizontal gravity="left">
       <button id="jdjrm" text="京东金融 手动" margin="5" />
@@ -230,6 +231,20 @@ ui.jd121.click(() => {
     console.log("已开启屏幕常亮");
 
     jd121.run();
+
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+});
+
+ui.jdst.click(() => {
+  threads.start(() => {
+    const jdst = require("./modules/jd_scratch_task")
+    /* keep screen on */
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+
+    jdst.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
