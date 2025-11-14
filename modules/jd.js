@@ -197,7 +197,7 @@ function big_brand() {
   click(bb.center());
   mediumWait();
   backN(1);
-  click(od.center());
+  click(bb.center());
   mediumWait();
   backCnt++;
 
