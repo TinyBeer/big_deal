@@ -1,3 +1,7 @@
+let obj = textContains("喵喵十消").findOne(100)
+console.log(obj);
+
+
 // console.log(findHotGames());
 
 function findHotGames() {

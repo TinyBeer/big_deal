@@ -3,6 +3,7 @@ module.exports = {
     houre: 0,
     minute: 5,
     name_list: [
+      "喵喵十消数字凑十比拼智商",
       "合成2048掉落碰撞畅快合成",
       "披萨餐厅策略餐厅经营",
       "麻将滑滑乐滑动消除麻将",
@@ -22,15 +23,16 @@ module.exports = {
     more_task_list: [
       { scroll: true },
       // round one
-      { name: "百炼飞仙", dur_m: 17 },
-      { name: "毛线大师", dur_m: 17 },
-      { name: "点点2048", dur_m: 17 },
-      { name: "合成原始人", dur_m: 17 },
-      { name: "无尽泡泡龙", dur_m: 17 },
-      { name: "打螺丝王者", dur_m: 17 },
-      { name: "数字喜加1", dur_m: 17 },
-      { name: "合成2048", dur_m: 17 },
-      { name: "战争之王", dur_m: 17 },
+      { name: "百炼飞仙", dur_m: 16 },
+      { name: "毛线大师", dur_m: 16 },
+      { name: "点点2048", dur_m: 16 },
+      { name: "麻将滑滑乐", dur_m: 16 },
+      { name: "合成原始人", dur_m: 16 },
+      { name: "无尽泡泡龙", dur_m: 16 },
+      { name: "打螺丝王者", dur_m: 16 },
+      { name: "数字喜加1", dur_m: 16 },
+      { name: "合成2048", dur_m: 16 },
+      { name: "战争之王", dur_m: 16 },
     ],
   },
 };
