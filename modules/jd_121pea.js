@@ -75,7 +75,7 @@ function _121pean() {
     }
     console.log("mission complete, back");
   };
-  // claim121();
+  claim121();
 
   backHomePage(backCnt);
   return true;
