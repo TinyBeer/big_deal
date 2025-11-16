@@ -85,7 +85,7 @@ function workWithName(screen, objList) {
       }
       let entryPos = entry.parent().center();
       console.log(` get [${e.name}] pos[${entryPos}]`);
-      var t = 8 * 60 * 1000;
+      var t = 14 * 60 * 1000;
       if (dur <= t) {
         t = dur;
         dur = 0;
