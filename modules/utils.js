@@ -45,6 +45,30 @@ function longWait() {
   sleep(8000);
 }
 
+/**
+ * 条件等待
+ * @param {number} ms - longest waiting ms
+ * @param {function () boolean } uf - wait until function return true
+ */
+function waitUntil(ms, uf) {
+  let remaining = ms;
+  const eachMs = 500;
+  if (!remaining || remaining <= 0) {
+    remaining = eachMs;
+  }
+
+  // 循环检查，补偿误差
+  while (remaining > 0) {
+    // 每次最多休眠remaining，避免过度休眠
+    sleep(Math.min(remaining, eachMs)); // 每次最多休眠 eachMs ms，平衡精度和性能
+    remaining -= eachMs;
+    if (uf && uf()) {
+      break;
+    }
+  }
+  return;
+}
+
 /* back */
 function backN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
@@ -184,6 +208,7 @@ module.exports = {
   shortWait,
   mediumWait,
   longWait,
+  waitUntil,
   backN,
   doubleBackN,
   isPointInBounds,
