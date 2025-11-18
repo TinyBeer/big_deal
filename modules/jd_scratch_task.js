@@ -93,7 +93,7 @@ function getCurScratchCardTask() {
   for (let idx = 0; idx < list.length; idx++) {
     let element = list[idx];
     let ex = element.center().x;
-    if (ex > 400 && ex < 800) {
+    if (ex > 400 && ex < 800 && !element.text().includes("+") ) {
       return element;
     }
   }
