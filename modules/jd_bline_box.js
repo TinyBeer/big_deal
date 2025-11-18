@@ -39,10 +39,7 @@ function blind_box() {
   for (let i = 0; i < 3; i++) {
     click(entry.center());
     sleep(4000);
-    taskPage = className("android.view.View")
-      .textContains("抽盲盒机会")
-      .depth(29)
-      .findOne(1000);
+    taskPage = blineBoxGetTask();
     if (taskPage) {
       break;
     }
@@ -64,11 +61,11 @@ function blind_box() {
         console.log("goto ");
         click(880, 1540);
         if (arr[0] === "逛逛精选新奇好物 ") {
-          blineBoxSleep(30)
+          blineBoxSleep(30);
         } else if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
-          blineBoxSleep(25)
+          blineBoxSleep(25);
         } else {
-          blineBoxSleep(18)
+          blineBoxSleep(18);
         }
         if (arr[0] === "逛逛买药频道") {
           click(540, 1897.5);
@@ -89,10 +86,7 @@ function blind_box() {
         break;
       }
     }
-    taskPage = className("android.view.View")
-      .textContains("抽盲盒机会")
-      .depth(29)
-      .findOne(1000);
+    taskPage = blineBoxGetTask();
   }
 
   click(1031, 1091);
@@ -100,6 +94,12 @@ function blind_box() {
   back();
   sleep(1000);
   switchTag("首页");
+}
+
+function blineBoxGetTask() {
+  return className("android.view.View")
+    .textContains("抽盲盒机会")
+    .findOne(100);
 }
 
 function blineBoxSleep(seconds) {
