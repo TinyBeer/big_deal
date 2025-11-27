@@ -84,7 +84,6 @@ ui.igrun.click(() => {
       ut.preciseSleep(waitTime, true);
     }
 
-    jdn.run();
     ig.run();
 
     device.cancelKeepingAwake();

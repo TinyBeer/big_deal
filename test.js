@@ -1,4 +1,4 @@
-let obj = textContains("喵喵十消").findOne(100)
+let obj = textContains("鲜花消消").findOne(100)
 console.log(obj);
 
 

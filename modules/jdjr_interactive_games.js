@@ -71,14 +71,14 @@ function workWithName(screen, objList) {
       console.log("task time == " + dur + " skip task");
       continue;
     }
-    let tmp = text(e.name).findOne(1000);
+    let tmp = textContains(e.name).findOne(1000);
     if (!tmp) {
       console.log(`cant not found [${e.name}], skip`);
       continue;
     }
 
     for (; dur > 0; ) {
-      let entry = text(e.name).findOne(1000);
+      let entry = textContains(e.name).findOne(1000);
       if (!entry) {
         console.log(`cant not found [${e.name}], skip`);
         break;
@@ -256,7 +256,7 @@ function getGameTaskListByName(name) {
     let m = parseInt(mins[mins.length - 1]);
     taskList.push({
       name: name,
-      dur_m: Math.ceil(m * 1.1),
+      dur_m: Math.ceil(m + 2),
     });
   }
   back();
