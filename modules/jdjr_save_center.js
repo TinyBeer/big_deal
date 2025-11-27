@@ -83,6 +83,8 @@ function goto_tasklist() {
     { name: "赢2025元红包" },
     { name: "查看国民养老页" },
     { name: "浏览股票学堂", delay: 15 },
+    { name: "浏览养大鹅10秒", delay: 15 },
+    { name: "百亿补贴抽8元", delay: 15 },
   ];
 
   let find = true;
