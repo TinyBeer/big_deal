@@ -5,6 +5,7 @@ const {
   doubleBackN,
   miniWait,
   mediumWait,
+  info,
 } = require("./utils");
 
 function run() {
@@ -48,7 +49,7 @@ function scratchTask() {
       task &&
       (task.text() === "飞行赢红包领福利" || task.text().includes("6s"))
     ) {
-      console.log(task.text());
+      info(task.text());
       let btn = textContains("做任务解锁刮卡").findOne(100);
       if (btn) {
         click(btn.center());
@@ -89,11 +90,11 @@ function scratchTask() {
 }
 
 function getCurScratchCardTask() {
-  let list = depth(21).childCount(0).indexInParent(0).find(200);
+  let list = depth(21).childCount(0).indexInParent(1).find(200);
   for (let idx = 0; idx < list.length; idx++) {
     let element = list[idx];
     let ex = element.center().x;
-    if (ex > 400 && ex < 800 && !element.text().includes("+") ) {
+    if (ex > 400 && ex < 800 && element.text().includes("刮卡") ) {
       return element;
     }
   }
