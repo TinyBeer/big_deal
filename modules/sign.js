@@ -11,43 +11,42 @@ function run() {
   info("每日签到任务 开始...");
   mediumWait();
 
-  chaina_telecom_cloud_pan();
+  china_telecom_cloud_pan();
   state_grid_online();
-  smzdm();
 
   info("每日签到任务 结束");
 }
 
-function smzdm() {
-  let appName = "什么值得买";
-  info(`${appName}...`);
+// function smzdm() {
+//   let appName = "什么值得买";
+//   info(`${appName}...`);
 
-  app.launchApp(appName);
-  longWait();
+//   app.launchApp(appName);
+//   longWait();
 
-  if (id("dialog_home_close").exists()) {
-    id("dialog_home_close").findOne().click();
-  }
-  sleep(1000);
+//   if (id("dialog_home_close").exists()) {
+//     id("dialog_home_close").findOne().click();
+//   }
+//   sleep(1000);
 
-  let mine = text("我的").findOne(100);
-  if (!mine) {
-    console.log("missing mine entry, skip");
-    return false;
-  }
-  click(mine.center());
-  mediumWait();
+//   let mine = text("我的").findOne(100);
+//   if (!mine) {
+//     console.log("missing mine entry, skip");
+//     return false;
+//   }
+//   click(mine.center());
+//   mediumWait();
 
-  let signEntry = text("签到领奖").findOne(100);
-  if (!signEntry) {
-    console.log("missing sign entry, skip");
-    return false;
-  }
-  click(signEntry.center());
-  mediumWait()
+//   let signEntry = text("签到领奖").findOne(100);
+//   if (!signEntry) {
+//     console.log("missing sign entry, skip");
+//     return false;
+//   }
+//   click(signEntry.center());
+//   mediumWait()
 
-  doubleBackN(2);
-}
+//   doubleBackN(2);
+// }
 
 function state_grid_online() {
   let appName = "网上国网";
@@ -67,7 +66,7 @@ function state_grid_online() {
   shortWait();
 }
 
-function chaina_telecom_cloud_pan() {
+function china_telecom_cloud_pan() {
   let appName = "天翼云盘";
   info(`${appName}...`);
 

@@ -43,9 +43,6 @@ ui.sign.click(() => {
     console.log("已开启屏幕常亮");
 
     sign.run();
-    // ctcp.run();
-    // sgo.run();
-    // smzdm.run();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
