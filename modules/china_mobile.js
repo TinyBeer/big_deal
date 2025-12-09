@@ -24,13 +24,20 @@ function panda() {
     console.log("missing entry, skip");
     return false;
   }
-  click(entry.center());
+  click(972,227);
+  mediumWait();
+
+  entry = id("float_window_img_bottom").findOne(1000);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
   mediumWait();
   longWait();
   longWait();
   longWait();
+  
   console.log("start task...");
-
   backCnt += 2;
 
   click(100, 2200);

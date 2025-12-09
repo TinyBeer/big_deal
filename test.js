@@ -1,11 +1,6 @@
- let list = depth(21).childCount(0).indexInParent(1).find(200);
-  for (let idx = 0; idx < list.length; idx++) {
-    let element = list[idx];
-    let ex = element.center().x;
-    if (ex > 400 && ex < 800 && element.text().includes("刮卡") ) {
-      log(element.text());
-    }
-  }
+let obj = text("我的").findOne(100);
+console.log(obj);
+
 
 
 // console.log(findHotGames());
