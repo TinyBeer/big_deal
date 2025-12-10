@@ -1,7 +1,5 @@
-let obj = text("我的").findOne(100);
-console.log(obj);
-
-
+let entry = id("float_window_img_bottom").findOne(1000);
+console.log(entry);
 
 // console.log(findHotGames());
 
