@@ -88,6 +88,8 @@ function goto_tasklist() {
     { name: "9.9频道抽红包"},
     { name: "查看稳稳盈爆品"},
     { name: "京东健康天天得金"},
+    { name: "浏览实盘大赛"},
+    { name: "去领大额购物红包"},
   ];
 
   let find = true;
