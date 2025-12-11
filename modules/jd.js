@@ -394,6 +394,12 @@ function daily_claim_pean() {
   scrollDown();
   sleep(1000);
 
+  let plus = textContains("限时开PLUS特惠").findOne(100);
+  if (plus) {
+    click(1006, 2183);
+    shortWait();
+  }
+
   let num = 6;
   let cnt = 0;
   let goods = text("").depth(19).childCount(4).find(1000);

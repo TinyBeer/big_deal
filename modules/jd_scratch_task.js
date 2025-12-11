@@ -44,13 +44,20 @@ function scratchTask() {
   backCnt++;
 
   for (let i = 0; i < 3; i++) {
+    let btn = text("立即刮卡").findOne(100);
+    if (btn) {
+      click(btn.center());
+      longWait();
+      i--;
+      continue;
+    }
     let task = getCurScratchCardTask();
     if (
       task &&
       (task.text() === "飞行赢红包领福利" || task.text().includes("6s"))
     ) {
       info(task.text());
-      let btn = textContains("做任务解锁刮卡").findOne(100);
+      btn = textContains("做任务解锁刮卡").findOne(100);
       if (btn) {
         click(btn.center());
         shortWait();
@@ -73,13 +80,6 @@ function scratchTask() {
         mediumWait();
         continue;
       }
-      btn = text("立即刮卡").findOne(100);
-      if (btn) {
-        click(btn.center());
-        longWait();
-        i--;
-        continue;
-      }
     }
     let y = task.center().y;
     swipe(sx, y, ex, y, dur);
@@ -94,7 +94,7 @@ function getCurScratchCardTask() {
   for (let idx = 0; idx < list.length; idx++) {
     let element = list[idx];
     let ex = element.center().x;
-    if (ex > 400 && ex < 800 && element.text().includes("刮卡") ) {
+    if (ex > 400 && ex < 800 && element.text().includes("刮卡")) {
       return element;
     }
   }
