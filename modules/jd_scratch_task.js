@@ -69,6 +69,7 @@ function scratchTask() {
           continue;
         }
         longWait();
+        mediumWait();
         i--;
         doubleBackN(2, function () {
           let obj = text("京豆").findOne(100);
@@ -81,7 +82,7 @@ function scratchTask() {
         continue;
       }
     }
-    let y = task.center().y;
+    const y = 740;
     swipe(sx, y, ex, y, dur);
     miniWait();
   }
