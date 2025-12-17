@@ -231,7 +231,7 @@ function getGameTaskListByName(name) {
     longWait();
   }
 
-  let taskEnter = textContains("10元还款券").findOne(10000);
+  let taskEnter = textContains("至少50京豆").findOne(10000);
   if (!taskEnter) {
     return;
   }
