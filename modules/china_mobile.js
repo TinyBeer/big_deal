@@ -24,16 +24,20 @@ function panda() {
     console.log("missing entry, skip");
     return false;
   }
-  click(972, 2270);
-  mediumWait();
 
-  entry = id("float_window_img_bottom").findOne(1000);
-  if (!entry) {
-    console.log("missing entry, skip");
-    return false;
-  }
   click(entry.center());
   mediumWait();
+  // click(972, 2270);
+  // mediumWait();
+
+  // entry = id("float_window_img_bottom").findOne(1000);
+  // if (!entry) {
+  //   console.log("missing entry, skip");
+  //   return false;
+  // }
+  // click(entry.center());
+  // mediumWait();
+
   longWait();
   longWait();
   longWait();
