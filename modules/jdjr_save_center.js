@@ -93,6 +93,10 @@ function goto_tasklist() {
     { name: "参与抽10g黄金" },
     { name: "新奇好物1元捡漏" },
     { name: "浏览免息优先活动", delay: 15 },
+    { name: "逛京喜 王牌5折", jd: true },
+    { name: "逛一逛京东保频道" },
+    { name: "去AI助手提问", delay: 15 },
+    { name: "去抽1千毫克黄金" },
   ];
 
   let find = true;
