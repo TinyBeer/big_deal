@@ -97,6 +97,7 @@ function goto_tasklist() {
     { name: "逛一逛京东保频道" },
     { name: "去AI助手提问", delay: 15 },
     { name: "去抽1千毫克黄金" },
+    { name: "成为城市推荐官" },
   ];
 
   let find = true;
