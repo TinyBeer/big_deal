@@ -2,39 +2,46 @@
 
 const {
   longWait,
-  storeConfig,
   backN,
   doubleBackN,
-  loadConfig,
+  // getScreenSize,
   preciseSleep,
-  mediumWait,
-  getScreenSize,
   shortWait,
 } = require("./utils");
 
-const configName_TaskList = "interactive_game_task_list";
+const igtasks = [
+  { name: "雀神来也", dur_m: 60 },
+  { name: "货柜趣消除", dur_m: 15 },
+  { name: "趣味叠叠乐", dur_m: 15 },
+  { name: "排队上车", dur_m: 15 },
+  { name: "方块拼图", dur_m: 15 },
+  { name: "养猪猪", dur_m: 7 },
+  { name: "京豆捕鱼", dur_m: 7 },
+  { name: "财富庄园", dur_m: 7 },
+  { name: "消灭小萌星", dur_m: 30 },
+  { name: "麻将凑十", dur_m: 15 },
+  { name: "解压硬币", dur_m: 15 },
+  { name: "2048方块", dur_m: 30 },
+  { name: "无尽战歌", dur_m: 15 },
 
-function task(nameList, moreGameTaskList) {
-  // launch app
-  app.launchApp("京东金融");
-  longWait();
+  { scroll: true },
+  { name: "百炼飞仙", dur_m: 15 },
+  { name: "毛线大师", dur_m: 15 },
+  { name: "点点2048", dur_m: 15 },
+  { name: "合成原始人", dur_m: 15 },
+  { name: "无尽泡泡龙", dur_m: 15 },
+  { name: "数字喜加1", dur_m: 15 },
+  { name: "战争之王", dur_m: 15 },
 
-  // enter interactive games
-  enterInteractiveGames();
-
-  console.log(nameList);
-  let tasks = getGameTaskList(nameList);
-  let taskList = tasks.concat(moreGameTaskList);
-
-  console.log(taskList);
-  storeConfig(configName_TaskList, taskList);
-
-  backN(2);
-  doubleBackN(1);
-}
+  { scroll: true },
+  { name: "2048碰碰球", dur_m: 15 },
+  { name: "动物排排队", dur_m: 15 },
+  { name: "喵喵十消", dur_m: 15 },
+  { name: "超级连连看", dur_m: 15 },
+];
 
 function run() {
-  let screen = getScreenSize();
+  // let screen = getScreenSize();
   // launch app
   app.launchApp("京东金融");
   longWait();
@@ -42,26 +49,19 @@ function run() {
   // enter interactive games
   enterInteractiveGames();
 
-  let tasks = loadConfig(configName_TaskList);
-  console.log(tasks);
-
-  workWithName(screen, tasks);
+  workWithName(igtasks);
 
   backN(2);
   doubleBackN(1);
 }
 
-function workWithName(screen, objList) {
-  var scorlled = false;
+function workWithName(objList) {
   for (let i = 0; i < objList.length; i++) {
     let e = objList[i];
     shortWait();
     if (e.scroll) {
       scrollDown();
       sleep(1000);
-      scrollDown();
-      sleep(1000);
-      scorlled = true;
       continue;
     }
 
@@ -85,25 +85,19 @@ function workWithName(screen, objList) {
       }
       let entryPos = entry.parent().center();
       console.log(` get [${e.name}] pos[${entryPos}]`);
-      var t = 14 * 60 * 1000;
+      var t = 30 * 60 * 1000;
       if (dur <= t) {
         t = dur;
         dur = 0;
       } else {
         dur = dur - t;
       }
-
       console.log(`act play [${e.name}] ${t / 60 / 1000}min`);
       click(entryPos);
-      preciseSleep(t, false);
+      preciseSleep(t + 30 * 1000, false);
       back();
       back();
       sleep(2000);
-
-      if (!open_box(scorlled, screen)) {
-        console.log("open box failed, break");
-        break;
-      }
     }
   }
 }
@@ -143,209 +137,7 @@ function enterInteractiveGames() {
   }
 }
 
-function open_box(scrolld, screen) {
-  if (scrolld) {
-    scrollUp();
-    sleep(1000);
-    scrollUp();
-    sleep(1000);
-  }
-  let box = textContains("个盲盒待开").findOne(1000);
-  if (!box) {
-    if (scrolld) {
-      scrollDown();
-      sleep(1000);
-      scrollDown();
-      sleep(1000);
-    }
-    return true;
-  }
-  console.log(box.text());
-
-  click(box.center());
-  sleep(2000);
-
-  let open = text("一键开启").findOne(1000);
-  if (!open) {
-    return false;
-  }
-
-  click(open.center());
-  sleep(5000);
-  let pean = textContains("京豆+").findOne(3000);
-  if (!pean) {
-    return false;
-  }
-
-  back();
-  sleep(2000);
-
-  let enter = text("互动游戏").findOne(1000);
-  if (enter) {
-    click(enter.center());
-    sleep(8000);
-  } else {
-    console.log("missing 互动游戏");
-    return false;
-  }
-
-  if (scrolld) {
-    scrollDown();
-    sleep(1000);
-    scrollDown();
-    sleep(1000);
-  }
-  return true;
-}
-
-function getGameTaskList(gameNameList) {
-  let taskList = [];
-  for (let i = 0; i < gameNameList.length; i++) {
-    let name = gameNameList[i];
-    let tasks = [];
-    let cnt = 0;
-    while (!tasks || tasks.length === 0) {
-      tasks = getGameTaskListByName(name);
-      cnt++;
-      if (cnt >= 5) {
-        break;
-      }
-    }
-    console.log(name, tasks);
-    if (tasks) {
-      taskList = taskList.concat(tasks);
-    }
-  }
-  return taskList;
-}
-
-function getGameTaskListByName(name) {
-  let taskList = [];
-  let game = text(name).findOne(500);
-  if (!game) {
-    return;
-  }
-  click(game.center());
-  shortWait();
-  if (name === "养猪猪" || name === "货柜趣消除" || name === "京豆捕鱼") {
-    longWait();
-  }
-
-  let taskEnter = textContains("至少50京豆").findOne(10000);
-  if (!taskEnter) {
-    return;
-  }
-  click(taskEnter.center());
-  sleep(2000);
-  let mins = getGameMins();
-  // for (let j = 0; j < mins.length; j++) {
-  //   let min = mins[j];
-  //   if (j == 0) {
-  //     taskList.push({
-  //       name: name,
-  //       dur_m: min,
-  //     });
-  //   } else {
-  //     taskList.push({
-  //       name: name,
-  //       dur_m: min - mins[j - 1] + 1,
-  //     });
-  //   }
-  // }
-  if (mins.length > 0) {
-    let m = parseInt(mins[mins.length - 1]);
-    taskList.push({
-      name: name,
-      dur_m: Math.ceil(m + 2),
-    });
-  }
-  back();
-  sleep(1000);
-  return taskList;
-}
-
-function getGameMins() {
-  let obj = textContains("分钟").find(1000);
-  let mins = [];
-  for (let index = 0; index < obj.length; index++) {
-    let element = obj[index];
-    let nums = extractNumbersWithDecimal(element.text());
-    // console.log(element.text(), nums);
-
-    if (nums.length == 1) {
-      mins.push(nums[0]);
-    }
-  }
-  return mins;
-}
-
-function extractNumbersWithDecimal(str) {
-  var numbers = [];
-  var currentNumber = "";
-  var hasDecimal = false; // 标记是否已经有小数点
-
-  for (var i = 0; i < str.length; i++) {
-    var char = str.charAt(i);
-    // 允许数字和一个小数点
-    if (!isNaN(char) && char !== " ") {
-      currentNumber += char;
-    } else if (char === "." && !hasDecimal) {
-      currentNumber += char;
-      hasDecimal = true;
-    } else {
-      if (currentNumber !== "") {
-        numbers.push(currentNumber);
-        currentNumber = "";
-        hasDecimal = false;
-      }
-    }
-  }
-
-  if (currentNumber !== "") {
-    numbers.push(currentNumber);
-  }
-
-  return numbers;
-}
-
-function getGameNameList(pivotName, ignorePivot) {
-  let pivot = textContains(pivotName).findOne(1000);
-  let container = pivot.parent();
-  let gameNameList = [];
-
-  traverse(container, function (view) {
-    if (
-      view.text().length !== 0 &&
-      !view.text().includes("q70") &&
-      !view.text().includes("+") &&
-      !view.text().includes("blindBox") &&
-      !(view.text() === pivotName && ignorePivot) &&
-      view.text() !== "种菜领现金"
-    ) {
-      gameNameList.push(view.text());
-      return;
-    }
-  });
-  return gameNameList;
-}
-
-function traverse(view, visit) {
-  if (!view) return;
-  //   var indent = "  ".repeat(depth);
-  //   log(indent + "类名: " + view.getClassName());
-  //   log(indent + "ID: " + view.id());
-  //   log(indent + "文本: " + view.getText());
-  //   log(indent + "-------------------");
-  visit(view);
-  // 递归遍历子节点
-  var childCount = view.getChildCount();
-  for (var i = 0; i < childCount; i++) {
-    traverse(view.children()[i], visit);
-  }
-}
-
 //  导出函数（供其他脚本调用）
 module.exports = {
   run,
-  task,
 };

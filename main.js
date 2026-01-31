@@ -23,13 +23,12 @@ ui.layout(
       <button id="save" text="省钱中心" margin="5" />
     </horizontal>
     <horizontal gravity="left">
-      <button id="igtask" text="互动游戏-任务" margin="5" />
       <button id="igrun" text="互动游戏-运行" margin="5" />
       <checkbox id="igtimer" text="定时"></checkbox>
     </horizontal>
     <button id="panda" text="熊猫乐园" margin="5" />
     <button id="exit" text="退出" margin="5" />
-  </vertical>
+  </vertical>,
 );
 
 ui.sign.click(() => {
@@ -43,21 +42,6 @@ ui.sign.click(() => {
     console.log("已开启屏幕常亮");
 
     sign.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.igtask.click(() => {
-  threads.start(() => {
-    const ig = require("./modules/jdjr_interactive_games");
-    const { interactive_games: igConfig } = require("./modules/config");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    ig.task(igConfig.name_list, igConfig.more_task_list);
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");
@@ -235,7 +219,7 @@ ui.jd121.click(() => {
 
 ui.jdst.click(() => {
   threads.start(() => {
-    const jdst = require("./modules/jd_scratch_task")
+    const jdst = require("./modules/jd_scratch_task");
     /* keep screen on */
     device.keepScreenOn();
     console.log("已开启屏幕常亮");

@@ -1,4 +1,4 @@
-
+scrollDown();
 
 // console.log(findHotGames());
 
@@ -55,7 +55,7 @@ function findText(root, depth, f) {
   for (let index = 0; index < root.children().length; index++) {
     let element = root.children()[index];
     if (element.text() !== "") {
-      // console.log(element.text(), depth);
+      console.log(element.text(), depth);
       if (f) {
         f(element);
       }
