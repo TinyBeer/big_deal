@@ -70,6 +70,7 @@ function scratchTask() {
         }
         longWait();
         mediumWait();
+        shortWait();
         i--;
         doubleBackN(2, function () {
           let obj = text("京豆").findOne(100);
@@ -91,11 +92,11 @@ function scratchTask() {
 }
 
 function getCurScratchCardTask() {
-  let list = depth(21).childCount(0).indexInParent(1).find(200);
+  let list = textMatch(".*浏览\\ds 刮卡\\+\\d").find(200);
   for (let idx = 0; idx < list.length; idx++) {
     let element = list[idx];
     let ex = element.center().x;
-    if (ex > 400 && ex < 800 && element.text().includes("刮卡")) {
+    if (ex > 400 && ex < 800 && element.text().includes("刮卡+")) {
       return element;
     }
   }
