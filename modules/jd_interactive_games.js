@@ -1,9 +1,17 @@
 /* import */
 
-const { longWait, doubleBackN, shortWait, miniWait } = require("./utils");
+const {
+  longWait,
+  doubleBackN,
+  shortWait,
+  miniWait,
+  getScreenSize,
+  backN,
+  mediumWait,
+} = require("./utils");
 
 function run() {
-  let screen = utils.getScreenSize();
+  let screen = getScreenSize();
   /* launch app */
   app.launchApp("京东");
   longWait();
@@ -37,60 +45,28 @@ function interactive_game(screen) {
   longWait();
   backCnt++;
 
-  scrollDown();
-  shortWait();
-
-  let moreEnter = text("玩更多").findOne(1000);
-  if (!moreEnter) {
-    backN(backCnt);
-    return false;
-  }
-  click(moreEnter.center());
-  longWait();
-  backCnt++;
-
-  while (true) {
-    let games = textContains("秒(0/1)").find(200);
-    if (!games || games.length === 0) {
-      break;
-    }
-    for (let i = 0; i < games.length; i++) {
-      let game = games[i];
-      if (game.center().x < 0 || game.center().x > screen.width) {
-        continue;
-      }
-      console.log(`find game[${game.text()}] pos[${game.center()}] act`);
-      playGameTraverse(game.text(), game.parent(), 0);
-    }
-    miniWait();
-  }
-
-  backN(backCnt);
+  view_task();
 }
 
-function playGameTraverse(name, view, depth) {
-  if (!view) return;
-  //   var indent = "  ".repeat(depth);
-  //   log(indent + "类名: " + view.getClassName());
-  //   log(indent + "ID: " + view.id());
-  //   log(indent + "文本: " + view.getText());
-  //   log(indent + "-------------------");
-  if (view.text() === "领奖励") {
-    console.log(name, "领奖励", view.center());
-    click(866, view.center().y);
-    shortWait();
-    return;
-  } else if (view.text() == "去完成") {
-    console.log(name, "去完成 60 s", view.center());
-    click(866, view.center().y);
-    sleep(65000);
-    doubleBackN(1);
+function view_task() {
+  let obj = textMatch("再完成\\d个任务").findOne(200);
+  if (!obj) {
+    console.log("missing view task");
     return;
   }
-  // 递归遍历子节点
-  var childCount = view.getChildCount();
-  for (var i = 0; i < childCount; i++) {
-    playGameTraverse(name, view.children()[i], depth + 1);
+
+  for (let idx = 0; idx < 8; idx++) {
+    let task = textMatch("浏览10s").findOne(200);
+    if (task) {
+      click(task.center());
+      longWait();
+      longWait();
+      mediumWait();
+      backN(3, function () {
+        return text("热门推荐").findOne(300);
+      });
+      mediumWait();
+    }
   }
 }
 
