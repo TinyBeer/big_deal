@@ -66,7 +66,6 @@ function goto_tasklist() {
     { name: "看京东App视频", jd: true },
     { name: "逛京东秒杀领京豆", jd: true },
     { name: "逛月黑风高频道", jd: true },
-    { name: "浏览外卖频道页", jd: false },
     { name: "去玩雀神来也", jd: false, delay: 15 },
     { name: "浏览充值页10秒", jd: false, delay: 15 },
     { name: "浏览外卖频道页", jd: false, delay: 15 },
@@ -98,6 +97,8 @@ function goto_tasklist() {
     { name: "去AI助手提问", delay: 15 },
     { name: "去抽1千毫克黄金" },
     { name: "成为城市推荐官" },
+    { name: "逛京东权益中心" },
+    { name: "浏览财富年货" },
   ];
 
   let find = true;
