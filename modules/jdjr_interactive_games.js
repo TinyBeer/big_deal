@@ -14,6 +14,7 @@ const igtasks = [
   { name: "城堡消消乐", dur_m: 15 },
   { name: "水果消块块", dur_m: 15 },
   { name: "雀神来也", dur_m: 60 },
+  { name: "解压硬币", dur_m: 15 },
   { name: "货柜趣消除", dur_m: 15 },
   { name: "2048方块", dur_m: 30 },
   { name: "方块拼图", dur_m: 15 },
@@ -26,7 +27,8 @@ const igtasks = [
   { name: "趣味叠叠乐", dur_m: 15 },
   { name: "数字喜加1", dur_m: 15 },
   { name: "排队上车", dur_m: 15 },
-
+  { scroll: true },
+  { scroll: true },
   { name: "百炼飞仙", dur_m: 15 },
   { name: "打螺丝王者", dur_m: 15 },
   { name: "麻将凑十", dur_m: 15 },
@@ -91,13 +93,6 @@ function run() {
 function workWithName2(objList) {
   for (let i = 0; i < objList.length; i++) {
     let e = objList[i];
-    shortWait();
-    if (e.scroll) {
-      scrollDown();
-      sleep(1000);
-      continue;
-    }
-
     console.log(`play [${e.name}] ${e.dur_m} minute`);
     var dur = e.dur_m * 60 * 1000;
     if (dur == 0) {
@@ -106,10 +101,9 @@ function workWithName2(objList) {
     }
     let tmp = textContains(e.name).findOne(1000);
     if (!tmp) {
-      console.log(`cant not found [${e.name}], skip`);
+      console.log(`can not found [${e.name}], skip`);
       continue;
     }
-
     while (tmp.center().y > 2200 || tmp.center().y < 200) {
       if (tmp.center().y > 2200) {
         scrollDown();
@@ -123,7 +117,7 @@ function workWithName2(objList) {
     for (; dur > 0; ) {
       let entry = textContains(e.name).findOne(1000);
       if (!entry) {
-        console.log(`cant not found [${e.name}], skip`);
+        console.log(`can not found [${e.name}], skip`);
         break;
       }
       let entryPos = entry.parent().center();
@@ -163,11 +157,12 @@ function workWithName(objList) {
     }
     let tmp = textContains(e.name).findOne(1000);
     if (!tmp) {
-      console.log(`cant not found [${e.name}], skip`);
+      console.log(`can not found [${e.name}], skip`);
       continue;
     }
 
     while (tmp.center().y > 2200 || tmp.center().y < 200) {
+      console.log(`get [${e.name}] pos[${tmp.center()}]`);
       if (tmp.center().y > 2200) {
         scrollDown();
       } else {
@@ -176,6 +171,7 @@ function workWithName(objList) {
       miniWait();
       tmp = textContains(e.name).findOne(1000);
     }
+
     for (; dur > 0; ) {
       let entry = textContains(e.name).findOne(1000);
       if (!entry) {
