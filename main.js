@@ -24,7 +24,6 @@ ui.layout(
     </horizontal>
     <horizontal gravity="left">
       <button id="igrun" text="互动游戏-运行" margin="5" />
-      <button id="igrun2" text="互动游戏-运行2" margin="5" />
       <checkbox id="igtimer" text="定时"></checkbox>
     </horizontal>
     <button id="panda" text="熊猫乐园" margin="5" />
@@ -66,29 +65,6 @@ ui.igrun.click(() => {
     }
 
     ig.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.igrun2.click(() => {
-  threads.start(() => {
-    const ut = require("./modules/utils");
-    const ig = require("./modules/jdjr_interactive_games");
-    const { interactive_games: igConfig } = require("./modules/config");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    /* waiting until specific time */
-    const waitTime = ut.getTimeToTarget(igConfig.houre, igConfig.minute);
-    if (ui.igtimer.checked) {
-      ut.preciseSleep(waitTime, true);
-    }
-
-    ig.run2();
 
     device.cancelKeepingAwake();
     console.log("已关闭屏幕常亮");

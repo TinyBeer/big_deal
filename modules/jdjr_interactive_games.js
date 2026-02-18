@@ -12,7 +12,7 @@ const {
 
 const igtasks = [
   { name: "城堡消消乐", dur_m: 15 },
-  { name: "水果消块块", dur_m: 15 },
+  { name: "百炼飞仙", dur_m: 15 },
   { name: "雀神来也", dur_m: 60 },
   { name: "解压硬币", dur_m: 15 },
   { name: "货柜趣消除", dur_m: 15 },
@@ -27,10 +27,9 @@ const igtasks = [
   { name: "趣味叠叠乐", dur_m: 15 },
   { name: "数字喜加1", dur_m: 15 },
   { name: "排队上车", dur_m: 15 },
-  { scroll: true },
-  { scroll: true },
-  { name: "百炼飞仙", dur_m: 15 },
-  { name: "打螺丝王者", dur_m: 15 },
+
+  { name: "水果消块块", dur_m: 15 },
+  { name: "麻将滑滑乐", dur_m: 15 },
   { name: "麻将凑十", dur_m: 15 },
   { name: "点点2048", dur_m: 15 },
   { name: "喵喵十消", dur_m: 15 },
@@ -38,42 +37,28 @@ const igtasks = [
   { name: "超级连连看", dur_m: 15 },
 
   { name: "箭头小画家", dur_m: 15 },
-  { name: "合成大乱斗", dur_m: 15 },
-  { name: "动物排排队", dur_m: 15 },
-];
-
-const igtasks2 = [
-  { name: "无尽战歌", dur_m: 15 },
-  { name: "合成原始人", dur_m: 15 },
-  { name: "2048碰碰球", dur_m: 15 },
-  { name: "悟空超市", dur_m: 15 },
-  { name: "战争之王", dur_m: 15 },
-  { name: "3D泡泡塔", dur_m: 15 },
   { name: "纸牌接龙", dur_m: 15 },
-  { name: "麻将滑滑乐", dur_m: 15 },
-  { name: "麻将对对碰", dur_m: 15 },
-  { name: "2248", dur_m: 15 },
-  { name: "鲜花消消", dur_m: 15 },
-  { name: "合成2048", dur_m: 15 },
-  { name: "最强螺丝王", dur_m: 15 },
-  { name: "蜂巢2048", dur_m: 15 },
-  { name: "连线消消乐", dur_m: 15 },
-  { name: "养了个羊", dur_m: 15 },
-  { name: "丛林爱消除", dur_m: 15 },
-  { name: "小鸡大战灰狼", dur_m: 15 },
+  // { name: "2048碰碰球", dur_m: 15 },
+  { name: "合成原始人", dur_m: 15 },
+
+  { name: "无尽战歌", dur_m: 15, left_entry: true },
+  { name: "动物排排队", dur_m: 15, left_entry: true },
+  { name: "悟空超市", dur_m: 15, left_entry: true },
+  { name: "战争之王", dur_m: 15, left_entry: true },
+  { name: "3D泡泡塔", dur_m: 15, left_entry: true },
+  { name: "合成大乱斗", dur_m: 15, left_entry: true },
+  { name: "打螺丝王者", dur_m: 15, left_entry: true },
+  { name: "麻将对对碰", dur_m: 15, left_entry: true },
+  { name: "2248", dur_m: 15, left_entry: true },
+  { name: "鲜花消消", dur_m: 15, left_entry: true },
+  { name: "合成2048", dur_m: 15, left_entry: true },
+  { name: "最强螺丝王", dur_m: 15, left_entry: true },
+  { name: "蜂巢2048", dur_m: 15, left_entry: true },
+  { name: "连线消消乐", dur_m: 15, left_entry: true },
+  { name: "养了个羊", dur_m: 15, left_entry: true },
+  { name: "丛林爱消除", dur_m: 15, left_entry: true },
+  { name: "小鸡大战灰狼", dur_m: 15, left_entry: true },
 ];
-
-function run2() {
-  // let screen = getScreenSize();
-  // launch app
-  app.launchApp("京东金融");
-  longWait();
-
-  workWithName2(igtasks2);
-
-  backN(2);
-  doubleBackN(1);
-}
 
 function run() {
   // let screen = getScreenSize();
@@ -84,13 +69,13 @@ function run() {
   // enter interactive games
   enterInteractiveGames();
 
-  workWithName(igtasks);
+  workWithName(igtasks, false);
 
   backN(2);
   doubleBackN(1);
 }
 
-function workWithName2(objList) {
+function workWithName(objList, isTest) {
   for (let i = 0; i < objList.length; i++) {
     let e = objList[i];
     console.log(`play [${e.name}] ${e.dur_m} minute`);
@@ -112,6 +97,10 @@ function workWithName2(objList) {
       }
       miniWait();
       tmp = textContains(e.name).findOne(1000);
+    }
+
+    if (isTest) {
+      dur = 10 * 1000;
     }
 
     for (; dur > 0; ) {
@@ -129,67 +118,16 @@ function workWithName2(objList) {
       } else {
         dur = dur - t;
       }
-      console.log(`act play [${e.name}] ${t / 60 / 1000}min`);
-      click(900, entryPos.y);
-      preciseSleep(t + 30 * 1000, false);
-      back();
-      back();
-      sleep(2000);
-    }
-  }
-}
-
-function workWithName(objList) {
-  for (let i = 0; i < objList.length; i++) {
-    let e = objList[i];
-    shortWait();
-    if (e.scroll) {
-      scrollDown();
-      sleep(1000);
-      continue;
-    }
-
-    console.log(`play [${e.name}] ${e.dur_m} minute`);
-    var dur = e.dur_m * 60 * 1000;
-    if (dur == 0) {
-      console.log("task time == " + dur + " skip task");
-      continue;
-    }
-    let tmp = textContains(e.name).findOne(1000);
-    if (!tmp) {
-      console.log(`can not found [${e.name}], skip`);
-      continue;
-    }
-
-    while (tmp.center().y > 2200 || tmp.center().y < 200) {
-      console.log(`get [${e.name}] pos[${tmp.center()}]`);
-      if (tmp.center().y > 2200) {
-        scrollDown();
+      if (!isTest) {
+        t += 30 * 1000;
+      }
+      console.log(`act play [${e.name}] ${t / 1000} s`);
+      if (e.left_entry) {
+        click(900, entryPos.y);
       } else {
-        scrollUp();
+        click(entryPos);
       }
-      miniWait();
-      tmp = textContains(e.name).findOne(1000);
-    }
-
-    for (; dur > 0; ) {
-      let entry = textContains(e.name).findOne(1000);
-      if (!entry) {
-        console.log(`cant not found [${e.name}], skip`);
-        break;
-      }
-      let entryPos = entry.parent().center();
-      console.log(` get [${e.name}] pos[${entryPos}]`);
-      var t = 30 * 60 * 1000;
-      if (dur <= t) {
-        t = dur;
-        dur = 0;
-      } else {
-        dur = dur - t;
-      }
-      console.log(`act play [${e.name}] ${t / 60 / 1000}min`);
-      click(entryPos);
-      preciseSleep(t + 30 * 1000, false);
+      preciseSleep(t, false);
       back();
       back();
       sleep(2000);
@@ -235,5 +173,4 @@ function enterInteractiveGames() {
 //  导出函数（供其他脚本调用）
 module.exports = {
   run,
-  run2,
 };
