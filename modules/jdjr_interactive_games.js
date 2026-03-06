@@ -12,53 +12,53 @@ const {
 
 const igtasks = [
   { name: "鲜花点点消", dur_m: 15 },
-  { name: "积木咖啡店", dur_m: 15 },
+  // { name: "积木咖啡店", dur_m: 15 },
   { name: "雀神来也", dur_m: 60 },
-  { name: "解压硬币", dur_m: 15 },
-  { name: "货柜趣消除", dur_m: 15 },
-  { name: "2048方块", dur_m: 30 },
-  { name: "方块拼图", dur_m: 15 },
+  // { name: "解压硬币", dur_m: 15 },
+  // { name: "货柜趣消除", dur_m: 15 },
+  // { name: "2048方块", dur_m: 30 },
+  // { name: "方块拼图", dur_m: 15 },
 
   { name: "养猪猪", dur_m: 7 },
-  { name: "财富庄园", dur_m: 7 },
-  { name: "京豆捕鱼", dur_m: 7 },
-  { name: "消灭小萌星", dur_m: 30 },
-  { name: "无尽泡泡龙", dur_m: 15 },
-  { name: "趣味叠叠乐", dur_m: 15 },
-  { name: "数字喜加1", dur_m: 15 },
-  { name: "排队上车", dur_m: 15 },
+  // { name: "财富庄园", dur_m: 7 },
+  // { name: "京豆捕鱼", dur_m: 7 },
+  // { name: "消灭小萌星", dur_m: 30 },
+  // { name: "无尽泡泡龙", dur_m: 15 },
+  // { name: "趣味叠叠乐", dur_m: 15 },
+  // { name: "数字喜加1", dur_m: 15 },
+  // { name: "排队上车", dur_m: 15 },
 
   { name: "百炼飞仙", dur_m: 15 },
-  { name: "城堡消消乐", dur_m: 15 },
-  { name: "麻将凑十", dur_m: 15 },
-  { name: "点点2048", dur_m: 15 },
-  { name: "喵喵十消", dur_m: 15 },
-  { name: "毛线大师", dur_m: 15 },
-  { name: "超级连连看", dur_m: 15 },
+  // { name: "城堡消消乐", dur_m: 15 },
+  // { name: "麻将凑十", dur_m: 15 },
+  // { name: "点点2048", dur_m: 15 },
+  // { name: "喵喵十消", dur_m: 15 },
+  // { name: "毛线大师", dur_m: 15 },
+  // { name: "超级连连看", dur_m: 15 },
 
-  { name: "3D泡泡塔", dur_m: 15 },
-  { name: "合成大乱斗", dur_m: 15 },
-  { name: "箭头小画家", dur_m: 15 },
-  { name: "水果消块块", dur_m: 15 },
+  // { name: "3D泡泡塔", dur_m: 15 },
+  // { name: "合成大乱斗", dur_m: 15 },
+  // { name: "箭头小画家", dur_m: 15 },
+  // { name: "水果消块块", dur_m: 15 },
 
-  { name: "无尽战歌", dur_m: 15, left_entry: true },
-  { name: "麻将滑滑乐", dur_m: 15, left_entry: true },
-  { name: "悟空超市", dur_m: 15, left_entry: true },
-  { name: "纸牌接龙", dur_m: 15, left_entry: true },
-  { name: "动物排排队", dur_m: 15, left_entry: true },
-  { name: "战争之王", dur_m: 15, left_entry: true },
-  { name: "打螺丝王者", dur_m: 15, left_entry: true },
-  { name: "麻将对对碰", dur_m: 15, left_entry: true },
-  { name: "合成原始人", dur_m: 15, left_entry: true },
-  { name: "2248", dur_m: 15, left_entry: true },
-  { name: "鲜花消消", dur_m: 15, left_entry: true },
-  { name: "合成2048", dur_m: 15, left_entry: true },
-  { name: "蜂巢2048", dur_m: 15, left_entry: true },
-  { name: "连线消消乐", dur_m: 15, left_entry: true },
-  { name: "养了个羊", dur_m: 15, left_entry: true },
-  { name: "丛林爱消除", dur_m: 15, left_entry: true },
-  { name: "小鸡大战灰狼", dur_m: 15, left_entry: true },
-  { name: "最强螺丝王", dur_m: 15, left_entry: true },
+  { name: "无尽战歌", dur_m: 15 },
+  // { name: "麻将滑滑乐", dur_m: 15 },
+  // { name: "悟空超市", dur_m: 15 },
+  // { name: "纸牌接龙", dur_m: 15 },
+  // { name: "动物排排队", dur_m: 15 },
+  // { name: "战争之王", dur_m: 15 },
+  // { name: "打螺丝王者", dur_m: 15 },
+  // { name: "麻将对对碰", dur_m: 15 },
+  // { name: "合成原始人", dur_m: 15 },
+  // { name: "2248", dur_m: 15 },
+  // { name: "鲜花消消", dur_m: 15 },
+  // { name: "合成2048", dur_m: 15 },
+  // { name: "蜂巢2048", dur_m: 15 },
+  // { name: "连线消消乐", dur_m: 15 },
+  // { name: "养了个羊", dur_m: 15 },
+  // { name: "丛林爱消除", dur_m: 15 },
+  // { name: "小鸡大战灰狼", dur_m: 15 },
+  // { name: "最强螺丝王", dur_m: 15 },
 ];
 
 function run() {
@@ -70,7 +70,7 @@ function run() {
   // enter interactive games
   enterInteractiveGames();
 
-  workWithName(igtasks, false);
+  workWithName(igtasks, true);
 
   backN(2);
   doubleBackN(1);
@@ -111,6 +111,10 @@ function workWithName(objList, isTest) {
         break;
       }
       let entryPos = entry.parent().center();
+      let playBtn = jdjriFindPlayButton(entry);
+      if (playBtn) {
+        entryPos = playBtn.center();
+      }
       console.log(` get [${e.name}] pos[${entryPos}]`);
       var t = 30 * 60 * 1000;
       if (dur <= t) {
@@ -123,11 +127,11 @@ function workWithName(objList, isTest) {
         t += 30 * 1000;
       }
       console.log(`act play [${e.name}] ${t / 1000} s`);
-      if (e.left_entry) {
-        click(900, entryPos.y);
-      } else {
-        click(entryPos);
-      }
+      // if (e.left_entry) {
+      //   click(900, entryPos.y);
+      // } else {
+      click(entryPos);
+      // }
       preciseSleep(t, false);
       back();
       back();
@@ -168,6 +172,33 @@ function enterInteractiveGames() {
     // first enter
     click(400, 1300);
     sleep(2000);
+  }
+}
+
+function jdjriFindPlayButton(obj) {
+  let ppp = obj.parent().parent().parent();
+  if (ppp.childCount() !== 3) {
+    return;
+  }
+  let btn = findTextInChildren(ppp, "去玩");
+  if (btn && btn.depth() === 23) {
+    return btn;
+  }
+}
+
+function findTextInChildren(obj, name) {
+  if (!obj) {
+    return;
+  }
+  if (obj.text() === name) {
+    return obj;
+  }
+
+  for (let idx = 0; idx < obj.children().length; idx++) {
+    let btn = findTextInChildren(obj.children()[idx], name);
+    if (btn) {
+      return btn;
+    }
   }
 }
 

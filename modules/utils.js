@@ -163,8 +163,8 @@ function displayRemainTime(waitTime) {
   // console.log(`当前时间：${new Date().toLocaleString()}`);
   console.log(
     `before ${new Date(
-      Date.now() + waitTime
-    ).toLocaleString()} 还有：${waitHours} 小时 ${waitMinutes} 分钟 ${waitSeconds} s`
+      Date.now() + waitTime,
+    ).toLocaleString()} 还有：${waitHours} 小时 ${waitMinutes} 分钟 ${waitSeconds} s`,
   );
   // console.log(`下次执行时间：${new Date(Date.now() + waitTime).toLocaleString()}`);
 }
