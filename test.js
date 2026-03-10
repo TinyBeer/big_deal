@@ -1,8 +1,10 @@
 console.log(jdjriFindPlayButton(text("无尽战歌").findOne(500)));
+console.log(jdjriFindPlayButton(text("鲜花点点消").findOne(500)));
 
 function jdjriFindPlayButton(obj) {
   let ppp = obj.parent().parent().parent();
-  if (ppp.childCount() !== 3) {
+  
+  if (ppp.childCount() !== 4) {
     return;
   }
   let btn = findTextInChildren(ppp, "去玩");
