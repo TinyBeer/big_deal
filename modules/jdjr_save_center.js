@@ -99,6 +99,7 @@ function goto_tasklist() {
     { name: "成为城市推荐官" },
     { name: "逛京东权益中心" },
     { name: "浏览财富年货" },
+    { name: "去市民服务领补贴" },
   ];
 
   let find = true;
