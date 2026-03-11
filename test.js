@@ -1,32 +1,8 @@
-console.log(jdjriFindPlayButton(text("无尽战歌").findOne(500)));
-console.log(jdjriFindPlayButton(text("鲜花点点消").findOne(500)));
+const task_tag = "浏览10s";
 
-function jdjriFindPlayButton(obj) {
-  let ppp = obj.parent().parent().parent();
-  
-  if (ppp.childCount() !== 4) {
-    return;
-  }
-  let btn = findTextInChildren(ppp, "去玩");
-  if (btn && btn.depth() === 23) {
-    return btn;
-  }
-}
+console.log(getOneViewTask());
 
-function findTextInChildren(obj, name) {
-  if (!obj) {
-    return;
-  }
-  console.log(obj.text(), obj.childCount(), obj.depth());
-
-  if (obj.text() === name) {
-    return obj;
-  }
-
-  for (let idx = 0; idx < obj.children().length; idx++) {
-    let btn = findTextInChildren(obj.children()[idx], name);
-    if (btn) {
-      return btn;
-    }
-  }
+function getOneViewTask() {
+  let obj = textMatch("再完成\\d+个任务").findOne(200);
+  return obj;
 }

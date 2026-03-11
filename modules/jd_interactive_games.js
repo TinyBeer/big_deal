@@ -48,26 +48,82 @@ function interactive_game(screen) {
   view_task();
 }
 
-function view_task() {
-  let obj = textMatch("再完成\\d个任务").findOne(200);
-  if (!obj) {
-    console.log("missing view task");
-    return;
-  }
+const task_tag = "浏览10s";
 
-  for (let idx = 0; idx < 8; idx++) {
-    let task = textMatch("浏览10s").findOne(200);
-    if (task) {
-      click(task.center());
-      longWait();
-      longWait();
-      mediumWait();
+function view_task() {
+  let singleBackTasks = [
+    "种豆得豆",
+    "东东农场",
+    "赚红包",
+    "欢乐挖宝",
+    "单单反",
+  ];
+
+  while (hasViewTasks()) {
+    let task = getOneViewTask();
+    if (!task) {
+      console.log("no task found!!!");
+      break;
+    }
+    let taskName = getViewTaskName(task);
+    let doubleBack = true;
+    for (let idx = 0; idx < singleBackTasks.length; idx++) {
+      let name = singleBackTasks[idx];
+      if (name === taskName) {
+        doubleBack = false;
+        break;
+      }
+    }
+    console.log(`view task[${taskName}]`);
+    
+    click(task.center());
+    longWait();
+    longWait();
+    mediumWait();
+    if (doubleBack) {
+      doubleBackN(3, function () {
+        return text("热门推荐").findOne(300);
+      });
+    } else {
       backN(3, function () {
         return text("热门推荐").findOne(300);
       });
-      mediumWait();
+    }
+    mediumWait();
+  }
+}
+
+function getViewTaskName(obj) {
+  if (!obj) {
+    return;
+  }
+
+  if (obj.text().length != 0 && obj.text() !== txt) {
+    return obj;
+  }
+
+  for (let idx = 0; idx < obj.children().length; idx++) {
+    let child = obj.children()[idx];
+    if (child.text() !== "" && child.text() !== task_tag) {
+      return child.text();
     }
   }
+
+  return;
+}
+
+function getOneViewTask() {
+  let obj = text(task_tag).findOne(500);
+  return obj.parent();
+}
+
+function hasViewTasks() {
+  let obj = textMatch("再完成\\d+个任务").findOne(200);
+  if (!obj) {
+    console.log("no view task");
+    return false;
+  }
+  return true;
 }
 
 //  导出函数（供其他脚本调用）
