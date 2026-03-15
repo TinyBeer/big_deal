@@ -28,65 +28,48 @@ function blind_box() {
   click(newGoodsShop.center());
   mediumWait();
 
-  let entry = id("novelBlindBoxEntry").findOne(1000);
+  let entry = id("novelBlindBoxEntry").findOne(200);
   if (!entry) {
     console.log("missing 盲盒 entry, skip");
     switchTag("首页");
     return;
   }
 
-  let taskPage = null;
+  let taskInfo = null;
   for (let i = 0; i < 3; i++) {
     click(entry.center());
     sleep(4000);
-    taskPage = blineBoxGetTask();
-    if (taskPage) {
+    taskInfo = get_jdblindboxtask();
+    if (taskInfo) {
       break;
     }
-    click(1031, 1091);
+    click(1021, 989.5);
     sleep(1000);
   }
-  if (!taskPage) {
+  if (!taskInfo) {
     console.log("missing taskpage skip");
     switchTag("首页");
     return false;
   }
 
-  while (taskPage) {
-    var arr = taskPage.text().split(" ");
-    if (arr.length > 4) {
-      console.log(arr[0], arr[1], arr[2], arr[3]);
-
-      if (arr[3] === "去逛逛") {
-        console.log("goto ");
-        click(880, 1540);
-        if (arr[0] === "逛逛精选新奇好物 ") {
-          blineBoxSleep(30);
-        } else if (arr[0] === "逛逛新奇好物" || arr[0] === "逛逛指数频道") {
-          blineBoxSleep(25);
-        } else {
-          blineBoxSleep(18);
-        }
-        if (arr[0] === "逛逛买药频道") {
-          click(540, 1897.5);
-          sleep(1000);
-        }
-        doubleBackN(1);
-      } else if (arr[3] === "拆盲盒") {
-        console.log("claim...");
-        click(880, 1540);
-        sleep(7000);
-      } else if (arr[3] === "去完成") {
-        click(880, 1540);
-        sleep(26000);
-        click(entry.center());
-        sleep(4000);
-      } else {
-        console.log("mission complete, back");
-        break;
-      }
+  while (taskInfo) {
+    console.log(`find bline box task: ${taskInfo.name}`);
+    if (taskInfo.btnName === "去逛逛") {
+      console.log("goto ");
+      click(taskInfo.entry);
+      blineBoxSleep(15);
+      doubleBackN(3, function () {
+        return id("novelBlindBoxEntry").findOne(1000);
+      });
+    } else if (taskInfo.btnName === "拆盲盒") {
+      console.log("claim...");
+      click(taskInfo.entry);
+      sleep(7000);
+    } else {
+      console.log("mission complete, back");
+      break;
     }
-    taskPage = blineBoxGetTask();
+    taskInfo = get_jdblindboxtask();
   }
 
   click(1031, 1091);
@@ -124,6 +107,21 @@ function switchTag(name) {
 
   click(tag.center());
   sleep(5000);
+}
+
+
+function get_jdblindboxtask() {
+  let btn = textMatch("(去逛逛|拆盲盒)").findOne(200)
+  if (!btn) {
+    return
+  }
+
+  let taskName = btn.parent().parent().children()[1].text()
+  return {
+    name: taskName,
+    btnName: btn.text(),
+    entry: btn.center(),
+  }
 }
 
 //  导出函数（供其他脚本调用）

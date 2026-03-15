@@ -1,8 +1,16 @@
-const task_tag = "浏览10s";
+console.log(get_jdblindboxtask());
 
-console.log(getOneViewTask());
 
-function getOneViewTask() {
-  let obj = textMatch("再完成\\d+个任务").findOne(200);
-  return obj;
+function get_jdblindboxtask() {
+  let btn = textMatch("(去逛逛|抽盲盒)").findOne(200)
+  if (!btn) {
+    return
+  }
+
+  let taskName = btn.parent().parent().children()[1].text()
+  return {
+    name: taskName,
+    btnName: btn.text(),
+    entry: btn.center(),
+  }
 }
