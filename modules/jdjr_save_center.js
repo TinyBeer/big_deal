@@ -104,7 +104,7 @@ function goto_tasklist() {
     { name: "逛京东权益中心" },
     { name: "浏览财富年货" },
     { name: "去市民服务领补贴" },
-    { name: "去市民服务领补贴" },
+    { name: "浏览财富庄园游戏", delay: 15 },
   ];
 
   let find = true;
