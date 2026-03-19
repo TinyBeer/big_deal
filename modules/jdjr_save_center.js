@@ -6,6 +6,7 @@ const {
   tinyWait,
   doubleBackN,
   getScreenSize,
+  miniWait,
 } = require("./utils");
 
 let sc = null;
@@ -33,8 +34,11 @@ function saveMore() {
   }
 
   click(signEntry.center());
-  shortWait();
+  longWait();
   backCnt++;
+
+  swipe(800, 1961, 300, 1961, 500);
+  miniWait();
 
   let saveMoreEntry = text("每日省更多").findOne(1000);
   if (!saveMoreEntry) {
@@ -99,6 +103,7 @@ function goto_tasklist() {
     { name: "成为城市推荐官" },
     { name: "逛京东权益中心" },
     { name: "浏览财富年货" },
+    { name: "去市民服务领补贴" },
     { name: "去市民服务领补贴" },
   ];
 
