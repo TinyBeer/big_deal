@@ -57,6 +57,7 @@ function view_task() {
     "赚红包",
     "欢乐挖宝",
     "单单反",
+    "京东小游戏",
   ];
 
   while (hasViewTasks()) {
@@ -75,7 +76,7 @@ function view_task() {
       }
     }
     console.log(`view task[${taskName}]`);
-    
+
     click(task.center());
     longWait();
     longWait();
