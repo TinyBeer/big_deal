@@ -181,7 +181,7 @@ function jdjriFindPlayButton(obj) {
     return;
   }
   let btn = findTextInChildren(ppp, "去玩");
-  if (btn && btn.depth() === 23) {
+  if (btn && btn.depth() === 24) {
     return btn;
   }
 }
