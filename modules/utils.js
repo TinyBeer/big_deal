@@ -198,6 +198,46 @@ function switchTag(name) {
   sleep(5000);
 }
 
+function getJDHomePageEntry(name) {
+  console.log("enter", name);
+  // swipe left
+  let y = 528;
+  let sx = 400;
+  let ex = 900;
+  let dur = 500;
+
+  swipe(sx, y, ex, y, dur);
+  shortWait();
+  let enter = className("android.widget.TextView")
+    .text(name)
+    .depth(8)
+    .findOne(1000);
+
+  let screen = getScreenSize();
+  if (
+    enter &&
+    enter.x > 0 &&
+    enter.x < screen.width
+    // enter &&
+    // isPointInBounds(enter.center(), [
+    //   0,
+    //   entryBar.bounds().top,
+    //   1080,
+    //   entryBar.bounds().bottom,
+    // ])
+  ) {
+    return enter;
+  }
+  swipe(ex, y, sx, y, dur);
+  shortWait();
+  enter = className("android.widget.TextView")
+    .text(name)
+    .depth(8)
+    .findOne(1000);
+
+  return enter;
+}
+
 // 导出函数（供其他脚本调用）
 module.exports = {
   displayRemainTime,
@@ -217,4 +257,5 @@ module.exports = {
   storeConfig,
   loadConfig,
   findElementByText,
+  getJDHomePageEntry,
 };

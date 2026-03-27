@@ -1,6 +1,11 @@
 /* import */
 
-const { doubleBackN, mediumWait, longWait } = require("./utils");
+const {
+  doubleBackN,
+  mediumWait,
+  longWait,
+  getJDHomePageEntry,
+} = require("./utils");
 
 function run() {
   /* launch app */
@@ -16,12 +21,9 @@ function run() {
 function blind_box() {
   console.log("抽盲盒");
 
-  switchTag("新品");
-
-  let newGoodsShop = id("ea2").text("新奇集市").findOne(1000);
+  let newGoodsShop = getJDHomePageEntry("新奇集市");
   if (!newGoodsShop) {
-    console.log("missing 新奇集市 entry, skip");
-    switchTag("首页");
+    console.log("missing entry, skip");
     return false;
   }
 
@@ -58,7 +60,7 @@ function blind_box() {
       console.log("goto ");
       click(taskInfo.entry);
       blineBoxSleep(15);
-      doubleBackN(3, function () {
+      doubleBackN(4, function () {
         return id("novelBlindBoxEntry").findOne(1000);
       });
     } else if (taskInfo.btnName === "拆盲盒") {
@@ -80,9 +82,7 @@ function blind_box() {
 }
 
 function blineBoxGetTask() {
-  return className("android.view.View")
-    .textContains("抽盲盒机会")
-    .findOne(100);
+  return className("android.view.View").textContains("抽盲盒机会").findOne(100);
 }
 
 function blineBoxSleep(seconds) {
@@ -109,19 +109,18 @@ function switchTag(name) {
   sleep(5000);
 }
 
-
 function get_jdblindboxtask() {
-  let btn = textMatch("(去逛逛|拆盲盒)").findOne(200)
+  let btn = textMatch("(去逛逛|拆盲盒)").findOne(200);
   if (!btn) {
-    return
+    return;
   }
 
-  let taskName = btn.parent().parent().children()[1].text()
+  let taskName = btn.parent().parent().children()[1].text();
   return {
     name: taskName,
     btnName: btn.text(),
     entry: btn.center(),
-  }
+  };
 }
 
 //  导出函数（供其他脚本调用）
