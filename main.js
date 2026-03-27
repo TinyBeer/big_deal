@@ -9,7 +9,7 @@ ui.layout(
     <horizontal gravity="left">
       <button id="jd" text="京东" margin="5" />
       <button id="jdbb" text="京东-抽盲盒" margin="5" />
-      <button id="jddddb" text="京东-天天抽福利" margin="5" />
+      <button id="jddddb" text="京东-国补" margin="5" />
     </horizontal>
     <horizontal>
       <button id="jd121" text="121京豆" margin="5" />

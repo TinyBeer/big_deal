@@ -63,10 +63,10 @@ function waitUntil(ms, uf) {
     sleep(Math.min(remaining, eachMs)); // 每次最多休眠 eachMs ms，平衡精度和性能
     remaining -= eachMs;
     if (uf && uf()) {
-      break;
+      return true;
     }
   }
-  return;
+  return false;
 }
 
 /* back */

@@ -6,6 +6,9 @@ const {
   mediumWait,
   backN,
   miniWait,
+  waitUntil,
+  info,
+  shortWait,
 } = require("./utils");
 
 function run() {
@@ -20,9 +23,8 @@ function run() {
 }
 
 /* tasks */
-let dddbDetectRes = [];
 function day_day_draw_benefit() {
-  console.log("天天抽福利 ...");
+  console.log("国补任务 ...");
   let entry = text("补贴价").findOne(500);
   if (!entry) {
     console.log("missing entry, skip");
@@ -31,7 +33,13 @@ function day_day_draw_benefit() {
   click(entry.center());
   longWait();
 
-  click(105, 660);
+  let btn = text("手动点击翻转测试").findOne(100);
+  if (!btn) {
+    console.log("missing entry button, skip");
+    backN(1);
+    return false;
+  }
+  click(btn.center());
   mediumWait();
 
   let x = 500;
@@ -39,34 +47,67 @@ function day_day_draw_benefit() {
   let ey = 1500;
   let dur = 1000;
   swipe(x, sy, x, ey, dur);
-  sleep(500);
+  shortWait();
 
-  let find = true;
-  while (find) {
-    find = false;
-    dddbDetectRes = ocr.rapid.detect([0, 1024, 1080, 1200]);
-    for (let index = 0; index < dddbDetectRes.length; index++) {
-      let et = dddbDetectRes[index];
-      if (et.label.includes("浏览页面")) {
-        console.log(et);
-        find = true;
-        click(950, et.bounds.top);
-        for (let idx = 0; idx < 50; idx++) {
-          miniWait();
-          if (text("点击立即返回").findOne(100)) {
-            break;
+  while (true) {
+    let order = text("去下单").findOne(100);
+    if (order) {
+      obj
+        .parent()
+        .children()
+        .forEach((element) => {
+          if (element.clickable()) {
+            element.click();
           }
-        }
-        backN(1);
-        break;
+        });
+
+      shortWait();
+      continue;
+    }
+    let close = text("开心收下").findOne(100);
+    if (close) {
+      click(close.center());
+      shortWait();
+      continue;
+    }
+    let claim = text("领取奖励").findOne(100);
+    if (claim) {
+      click(claim.center());
+      shortWait();
+      continue;
+    }
+
+    let task = textContains("浏览页面").findOne(100);
+    if (!task) {
+      backN(1);
+      break;
+    }
+    click(task.center());
+
+    let res = waitUntil(18000, function () {
+      let fin = text("点击立即返回").findOne(100);
+      if (fin) {
+        console.log("立即返回");
+        click(fin.center());
+        shortWait();
+        return true;
       }
+      return false;
+    });
+    if (!res) {
+      backN(3, function () {
+        let kk = text("国家补贴").findOne(100);
+        if (kk) {
+          return true;
+        }
+        return false;
+      });
+      shortWait();
     }
   }
 
-  console.log("complete, back");
-  click(1011, 884);
-  sleep(500);
-  backN(1);
+  info("国家补贴任务完成");
+  backN(2);
 }
 
 //  导出函数（供其他脚本调用）
