@@ -28,15 +28,16 @@ function interactive_game(screen) {
   console.log("互动游戏...");
 
   let backCnt = 0;
-  let enter = text("我的").findOne(1000);
+  let enter = desc("我的").findOne(1000);
   if (!enter) {
+    console.log("missinge entry");
     return false;
   }
   click(enter.center());
   shortWait();
   backCnt++;
 
-  let gameEnter = text("互动游戏").findOne(1000);
+  let gameEnter = desc("互动游戏点击抽幸运京豆").findOne(1000);
   if (!gameEnter) {
     backN(backCnt);
     return false;
@@ -76,22 +77,35 @@ function view_task() {
       }
     }
     console.log(`view task[${taskName}]`);
-
     click(task.center());
-    longWait();
-    longWait();
-    mediumWait();
-    if (doubleBack) {
-      doubleBackN(3, function () {
-        return text("热门推荐").findOne(300);
-      });
-    } else {
-      backN(3, function () {
-        return text("热门推荐").findOne(300);
-      });
+
+    if (!viewTaskSleep(18)) {
+      if (doubleBack) {
+        doubleBackN(3, function () {
+          return text("热门推荐").findOne(300);
+        });
+      } else {
+        backN(3, function () {
+          return text("热门推荐").findOne(300);
+        });
+      }
+      mediumWait();
     }
-    mediumWait();
   }
+}
+
+function viewTaskSleep(seconds) {
+  for (let sec = 0; sec < seconds; sec++) {
+    sleep(1000);
+    let fin = text("点击立即返回").findOne(100);
+    if (fin) {
+      console.log("立即返回");
+      click(fin.center());
+      shortWait();
+      return true;
+    }
+  }
+  return false;
 }
 
 function getViewTaskName(obj) {
