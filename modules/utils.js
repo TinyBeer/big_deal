@@ -102,7 +102,6 @@ function getScreenSize() {
 
   return {
     width: width,
-
     height: height,
   };
 }
@@ -210,14 +209,14 @@ function getJDHomePageEntry(name) {
   shortWait();
   let enter = className("android.widget.TextView")
     .text(name)
-    .depth(8)
-    .findOne(1000);
+    .depth(23)
+    .findOne(200);
 
   let screen = getScreenSize();
   if (
     enter &&
-    enter.x > 0 &&
-    enter.x < screen.width
+    enter.center().x > 0 &&
+    enter.center().x < screen.width
     // enter &&
     // isPointInBounds(enter.center(), [
     //   0,
@@ -232,8 +231,8 @@ function getJDHomePageEntry(name) {
   shortWait();
   enter = className("android.widget.TextView")
     .text(name)
-    .depth(8)
-    .findOne(1000);
+    .depth(23)
+    .findOne(200);
 
   return enter;
 }
