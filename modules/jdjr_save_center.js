@@ -106,6 +106,7 @@ function goto_tasklist() {
     { name: "去市民服务领补贴" },
     { name: "浏览财富庄园游戏", delay: 15 },
     { name: "黄金茅台1元起拍" },
+    { name: "减重1斤赢黄金" },
   ];
 
   let find = true;
