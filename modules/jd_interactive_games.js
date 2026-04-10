@@ -37,7 +37,7 @@ function interactive_game(screen) {
   shortWait();
   backCnt++;
 
-  let gameEnter = desc("互动游戏点击抽幸运京豆").findOne(1000);
+  let gameEnter = text("互动游戏").findOne(1000);
   if (!gameEnter) {
     backN(backCnt);
     return false;
