@@ -11,8 +11,8 @@ const {
 } = require("./utils");
 
 const igtasks = [
-  { name: "鲜花点点消", dur_m: 15 },
-  { name: "积木咖啡店", dur_m: 15 },
+  // { name: "鲜花点点消", dur_m: 15 },
+  // { name: "积木咖啡店", dur_m: 15 },
   { name: "雀神来也", dur_m: 60 },
   { name: "解压硬币", dur_m: 15 },
   { name: "货柜趣消除", dur_m: 15 },
@@ -28,13 +28,13 @@ const igtasks = [
   { name: "数字喜加1", dur_m: 20 },
   { name: "排队上车", dur_m: 30 },
 
-  { name: "百炼飞仙", dur_m: 20 },
-  { name: "城堡消消乐", dur_m: 20 },
   { name: "麻将凑十", dur_m: 30 },
   { name: "点点2048", dur_m: 30 },
   { name: "喵喵十消", dur_m: 20 },
   { name: "毛线大师", dur_m: 30 },
   { name: "超级连连看", dur_m: 20 },
+  { name: "百炼飞仙", dur_m: 20 },
+  { name: "城堡消消乐", dur_m: 20 },
 
   { name: "3D泡泡塔", dur_m: 15 },
   { name: "合成大乱斗", dur_m: 15 },
