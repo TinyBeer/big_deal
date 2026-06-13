@@ -1,4 +1,6 @@
-let obj = text("养猪猪").findOne(100).parent().parent().parent();
+let obj = text("箭头小画家").findOne(100).parent().parent().parent();
+console.log(obj.child(2).child(0));
+
 displayArchitecture(obj, 1)
 
 function displayArchitecture_Name(name) {

@@ -38,7 +38,7 @@ const igtasks = [
 
   { name: "3D泡泡塔", dur_m: 15 },
   { name: "合成大乱斗", dur_m: 15 },
-  { name: "箭头小画家", dur_m: 15 },
+  // { name: "箭头小画家", dur_m: 15 },
   { name: "水果消块块", dur_m: 15 },
 
   { name: "无尽战歌", dur_m: 15 },
@@ -69,8 +69,12 @@ function run() {
 
   // enter interactive games
   enterInteractiveGames();
+  shortWait();
+  doubleBackN(1);
+  shortWait();
+  enterInteractiveGames();
 
-  workWithName(igtasks, false);
+  workWithName(igtasks, true);
 
   backN(2);
   doubleBackN(1);
@@ -96,7 +100,7 @@ function workWithName(objList, isTest) {
       } else {
         scrollUp();
       }
-      miniWait();
+      shortWait();
       tmp = textContains(e.name).findOne(1000);
     }
 
@@ -104,7 +108,7 @@ function workWithName(objList, isTest) {
       dur = 10 * 1000;
     }
 
-    for (; dur > 0; ) {
+    for (; dur > 0;) {
       let entry = textContains(e.name).findOne(1000);
       if (!entry) {
         console.log(`can not found [${e.name}], skip`);
@@ -167,21 +171,21 @@ function enterInteractiveGames() {
     sleep(5000);
   }
 
-  let pean = textContains("京豆+").findOne(3000);
-  if (pean) {
-    // first enter
-    click(400, 1300);
-    sleep(2000);
-  }
+  // let pean = textContains("京豆+").findOne(3000);
+  // if (pean) {
+  //   // first enter
+  //   click(400, 1300);
+  //   sleep(2000);
+  // }
 }
 
 function jdjriFindPlayButton(obj) {
   let ppp = obj.parent().parent().parent();
-  if (ppp.childCount() !== 4) {
-    return;
-  }
+  // if (ppp.childCount() !== 3) {
+  //   return;
+  // }
   let btn = findTextInChildren(ppp, "去玩");
-  if (btn && btn.depth() === 24) {
+  if (btn && btn.depth() === 23) {
     return btn;
   }
 }
