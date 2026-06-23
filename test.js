@@ -1,7 +1,17 @@
-let obj = text("箭头小画家").findOne(100).parent().parent().parent();
-console.log(obj.child(2).child(0));
+function Person(name) {
+    this.name = name;
+}
 
-displayArchitecture(obj, 1)
+Person.prototype.say = function() {
+    console.log(this.name);
+}
+
+let p = new Person("测试");
+p.say();
+
+
+
+// displayArchitecture(obj, 1)
 
 function displayArchitecture_Name(name) {
   let root = text(name).findOne(100);

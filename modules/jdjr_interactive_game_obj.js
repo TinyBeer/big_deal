@@ -1,0 +1,238 @@
+/* import */
+
+const {
+  longWait,
+  backN,
+  doubleBackN,
+  // getScreenSize,
+  preciseSleep,
+  shortWait,
+  miniWait,
+} = require("./utils");
+
+function InteractiveGame(taskList) {
+  this.entry_name = "互动游戏";
+  this.task_list = taskList;
+}
+
+InteractiveGame.prototype.do = function () {
+  for (let index = 0; index < this.task_list.length; index++) {
+    let element = this.task_list[index];
+    element.do();
+  }
+};
+
+function IGTask(name, dur_m, isTest) {
+  this.name = name;
+  this.dur_m;
+  this.is_test = isTest;
+}
+
+IGTask.prototype.do = function () {
+  console.log(`play [${this.name}] ${this.dur_m} minute`);
+  var dur_ms = this.dur_m * 60 * 1000;
+  if (dur_ms == 0) {
+    console.log("missing task time, skip");
+    return;
+  }
+  let tmp = textContains(this.name).findOne(1000);
+  if (!tmp) {
+    console.log(`can not found [${this.name}], skip`);
+    return;
+  }
+  while (tmp.center().y > 2200 || tmp.center().y < 200) {
+    if (tmp.center().y > 2200) {
+      scrollDown();
+    } else {
+      scrollUp();
+    }
+    shortWait();
+    tmp = textContains(e.name).findOne(1000);
+  }
+
+  if (this.is_test) {
+    dur_ms = 10 * 1000;
+  }
+
+  for (; dur_ms > 0; ) {
+    let entry = textContains(this.name).findOne(1000);
+    if (!entry) {
+      console.log(`can not found [${this.name}], skip`);
+      break;
+    }
+    let entryPos = entry.parent().center();
+    let playBtn = jdjriFindPlayButton(entry);
+    if (playBtn) {
+      entryPos = playBtn.center();
+    }
+    console.log(` get [${this.name}] pos[${entryPos}]`);
+    var t = 30 * 60 * 1000;
+    if (dur_ms <= t) {
+      t = dur_ms;
+      dur_ms = 0;
+    } else {
+      dur_ms = dur_ms - t;
+    }
+    if (!this.is_test) {
+      t += 30 * 1000;
+    }
+    console.log(`act play [${this.name}] ${t / 1000} s`);
+    // if (e.left_entry) {
+    //   click(900, entryPos.y);
+    // } else {
+    click(entryPos);
+    // }
+    preciseSleep(t, false);
+    back();
+    back();
+    sleep(2000);
+  }
+};
+
+const igtasks = [
+  // { name: "鲜花点点消", dur_m: 15 },
+  // { name: "积木咖啡店", dur_m: 15 },
+  { name: "雀神来也", dur_m: 60 },
+  { name: "解压硬币", dur_m: 15 },
+  { name: "货柜趣消除", dur_m: 15 },
+  { name: "2048方块", dur_m: 30 },
+  { name: "方块拼图", dur_m: 15 },
+
+  { name: "养猪猪", dur_m: 7 },
+  { name: "财富庄园", dur_m: 7 },
+  { name: "京豆捕鱼", dur_m: 7 },
+  { name: "消灭小萌星", dur_m: 30 },
+  { name: "无尽泡泡龙", dur_m: 20 },
+  { name: "趣味叠叠乐", dur_m: 30 },
+  { name: "数字喜加1", dur_m: 20 },
+  { name: "排队上车", dur_m: 30 },
+
+  { name: "麻将凑十", dur_m: 30 },
+  { name: "点点2048", dur_m: 30 },
+  { name: "喵喵十消", dur_m: 20 },
+  { name: "毛线大师", dur_m: 30 },
+  { name: "超级连连看", dur_m: 20 },
+  { name: "百炼飞仙", dur_m: 20 },
+  { name: "城堡消消乐", dur_m: 20 },
+
+  { name: "3D泡泡塔", dur_m: 15 },
+  { name: "合成大乱斗", dur_m: 15 },
+  // { name: "箭头小画家", dur_m: 15 },
+  { name: "水果消块块", dur_m: 15 },
+
+  { name: "无尽战歌", dur_m: 15 },
+  { name: "麻将滑滑乐", dur_m: 15 },
+  { name: "悟空超市", dur_m: 15 },
+  { name: "纸牌接龙", dur_m: 15 },
+  { name: "动物排排队", dur_m: 15 },
+  { name: "战争之王", dur_m: 15 },
+  { name: "打螺丝王者", dur_m: 15 },
+  { name: "麻将对对碰", dur_m: 15 },
+  { name: "合成原始人", dur_m: 15 },
+  { name: "2248", dur_m: 15 },
+  { name: "鲜花消消", dur_m: 15 },
+  { name: "合成2048", dur_m: 15 },
+  { name: "蜂巢2048", dur_m: 15 },
+  { name: "连线消消乐", dur_m: 15 },
+  { name: "养了个羊", dur_m: 15 },
+  { name: "丛林爱消除", dur_m: 15 },
+  { name: "小鸡大战灰狼", dur_m: 15 },
+  { name: "最强螺丝王", dur_m: 15 },
+];
+
+function run() {
+  // let screen = getScreenSize();
+  // launch app
+  app.launchApp("京东金融");
+  longWait();
+
+  // enter interactive games
+  enterInteractiveGames();
+  shortWait();
+  doubleBackN(1);
+  shortWait();
+  enterInteractiveGames();
+
+  let taskList = generateIGTaskList(igtasks, true);
+  let ig = new InteractiveGame(taskList);
+  ig.do();
+
+  backN(2);
+  doubleBackN(1);
+}
+
+function generateIGTaskList(configList, isTest) {
+  let taskList = [];
+  for (let i = 0; i < configList.length; i++) {
+    let e = configList[i];
+    taskList.push(new IGTask(e.name, e.dur_m, isTest));
+  }
+  return taskList;
+}
+
+/* enter interactive games */
+function enterInteractiveGames() {
+  let interactiveGame = text("互动游戏").findOne(1000);
+  let sign = text("签到").findOne(1000);
+  let taskCenter = text("任务中心").findOne(1000);
+
+  if (!interactiveGame && sign && !taskCenter) {
+    // home page
+    click(900, 2250);
+    sleep(2000);
+
+    let update = text("立即查看").findOne(1000);
+    if (update) {
+      backN(1);
+    }
+
+    let enter = text("互动游戏").findOne(1000);
+    if (!enter) {
+      return false;
+    }
+    click(enter.center());
+    sleep(5000);
+  } else if (interactiveGame && !sign && !taskCenter) {
+    click(interactiveGame.center());
+    sleep(5000);
+  }
+
+  // let pean = textContains("京豆+").findOne(3000);
+  // if (pean) {
+  //   // first enter
+  //   click(400, 1300);
+  //   sleep(2000);
+  // }
+}
+
+function jdjriFindPlayButton(obj) {
+  let ppp = obj.parent().parent().parent();
+  // if (ppp.childCount() !== 3) {
+  //   return;
+  // }
+  let btn = findTextInChildren(ppp, "去玩");
+  if (btn && btn.depth() === 23) {
+    return btn;
+  }
+}
+
+function findTextInChildren(obj, name) {
+  if (!obj) {
+    return;
+  }
+  if (obj.text() === name) {
+    return obj;
+  }
+
+  for (let idx = 0; idx < obj.children().length; idx++) {
+    let btn = findTextInChildren(obj.children()[idx], name);
+    if (btn) {
+      return btn;
+    }
+  }
+}
+
+//  导出函数（供其他脚本调用）
+module.exports = {
+  run,
+};
