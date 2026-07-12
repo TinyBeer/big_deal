@@ -35,6 +35,7 @@ ui.layout(
     <horizontal gravity="left">
       <button id="igrun" text="互动游戏-运行" margin="5" />
       <checkbox id="igtimer" text="定时"></checkbox>
+      <checkbox id="igtest" text="测试"></checkbox>
     </horizontal>
     <button id="panda" text="熊猫乐园" margin="5" />
     <button id="exit" text="退出" margin="5" />
@@ -65,7 +66,7 @@ ui.igrun.click(() => {
       ut.preciseSleep(waitTime, true);
     }
 
-    ig.run();
+    ig.run(ui.igtest.checked);
   });
 });
 

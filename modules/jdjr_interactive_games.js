@@ -61,20 +61,24 @@ const igtasks = [
   { name: "最强螺丝王", dur_m: 15 },
 ];
 
-function run() {
-  // let screen = getScreenSize();
-  // launch app
+function run(isTest) {
   app.launchApp("京东金融");
   longWait();
 
   // enter interactive games
-  enterInteractiveGames();
-  shortWait();
-  doubleBackN(1);
-  shortWait();
-  enterInteractiveGames();
+  let entered = enterInteractiveGames();
+  if (!entered) {
+    console.log("failed to enter interactive games, retrying...");
+    backN(2);
+    shortWait();
+    entered = enterInteractiveGames();
+    if (!entered) {
+      console.log("still cannot enter interactive games, exit");
+      return;
+    }
+  }
 
-  workWithName(igtasks, true);
+  workWithName(igtasks, isTest);
 
   backN(2);
   doubleBackN(1);
@@ -94,7 +98,9 @@ function workWithName(objList, isTest) {
       console.log(`can not found [${e.name}], skip`);
       continue;
     }
-    while (tmp.center().y > 2200 || tmp.center().y < 200) {
+    let scrollAttempts = 0;
+    const maxScrollAttempts = 20;
+    while (tmp && (tmp.center().y > 2200 || tmp.center().y < 200) && scrollAttempts < maxScrollAttempts) {
       if (tmp.center().y > 2200) {
         scrollDown();
       } else {
@@ -102,6 +108,11 @@ function workWithName(objList, isTest) {
       }
       shortWait();
       tmp = textContains(e.name).findOne(1000);
+      scrollAttempts++;
+    }
+    if (!tmp) {
+      console.log(`can not found [${e.name}] after scroll, skip`);
+      continue;
     }
 
     if (isTest) {
@@ -150,8 +161,18 @@ function enterInteractiveGames() {
   let sign = text("签到").findOne(1000);
   let taskCenter = text("任务中心").findOne(1000);
 
-  if (!interactiveGame && sign && !taskCenter) {
-    // home page
+  // Already on interactive games page
+  if (interactiveGame) {
+    // If on sub-page (no sign, no taskCenter), go back to main list
+    if (!sign && !taskCenter) {
+      click(interactiveGame.center());
+      sleep(3000);
+    }
+    return true;
+  }
+
+  // On home page (has sign button)
+  if (sign && !taskCenter) {
     click(900, 2250);
     sleep(2000);
 
@@ -162,30 +183,32 @@ function enterInteractiveGames() {
 
     let enter = text("互动游戏").findOne(1000);
     if (!enter) {
+      console.log("cannot find 互动游戏 entry");
       return false;
     }
     click(enter.center());
     sleep(5000);
-  } else if (interactiveGame && !sign && !taskCenter) {
-    click(interactiveGame.center());
-    sleep(5000);
+    return true;
   }
 
-  // let pean = textContains("京豆+").findOne(3000);
-  // if (pean) {
-  //   // first enter
-  //   click(400, 1300);
-  //   sleep(2000);
-  // }
+  // On task center or other page, try back to find entry
+  backN(2);
+  sleep(2000);
+  let enter = text("互动游戏").findOne(1000);
+  if (enter) {
+    click(enter.center());
+    sleep(5000);
+    return true;
+  }
+
+  console.log("cannot determine current state, skip");
+  return false;
 }
 
 function jdjriFindPlayButton(obj) {
   let ppp = obj.parent().parent().parent();
-  // if (ppp.childCount() !== 3) {
-  //   return;
-  // }
   let btn = findTextInChildren(ppp, "去玩");
-  if (btn && btn.depth() === 23) {
+  if (btn) {
     return btn;
   }
 }
