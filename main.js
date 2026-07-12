@@ -13,6 +13,17 @@ function startTask(taskFn) {
   });
 }
 
+function getSelectedSections() {
+  let sections = [];
+  if (ui.igHot.isChecked()) sections.push("热门游戏");
+  if (ui.igDaily.isChecked()) sections.push("每日必玩");
+  if (ui.igRecommend.isChecked()) sections.push("好游推荐");
+  if (ui.igGuess.isChecked()) sections.push("猜你喜欢");
+  if (ui.igDiscover.isChecked()) sections.push("发现更多");
+  if (ui.igNew.isChecked()) sections.push("游戏尝鲜");
+  return sections.length > 0 ? sections : null;
+}
+
 ui.layout(
   <vertical gravity="center_vertical">
     <button id="sign" text="签到任务" margin="5" />
@@ -32,11 +43,32 @@ ui.layout(
       <button id="ddep" text="天天赚京豆" margin="5" />
       <button id="save" text="省钱中心" margin="5" />
     </horizontal>
-    <horizontal gravity="left">
-      <button id="igrun" text="互动游戏-运行" margin="5" />
-      <checkbox id="igtimer" text="定时"></checkbox>
-      <checkbox id="igtest" text="测试"></checkbox>
-    </horizontal>
+
+    {/* 互动游戏控制区域 */}
+    <card margin="5" cardCornerRadius="8" cardElevation="2">
+      <vertical padding="10">
+        <text text="互动游戏" textSize="16sp" textStyle="bold" marginBottom="5" />
+        <text text="执行分区:" textSize="14sp" marginBottom="5" />
+        <horizontal gravity="center_vertical" wrap="wrap">
+          <checkbox id="igHot" text="热门游戏" />
+          <checkbox id="igDaily" text="每日必玩" marginLeft="10" />
+        </horizontal>
+        <horizontal gravity="center_vertical" wrap="wrap">
+          <checkbox id="igRecommend" text="好游推荐" />
+          <checkbox id="igGuess" text="猜你喜欢" marginLeft="10" />
+        </horizontal>
+        <horizontal gravity="center_vertical" wrap="wrap">
+          <checkbox id="igDiscover" text="发现更多" />
+          <checkbox id="igNew" text="游戏尝鲜" marginLeft="10" />
+        </horizontal>
+        <horizontal gravity="center_vertical" marginTop="5">
+          <checkbox id="igtest" text="测试模式" />
+          <checkbox id="igtimer" text="定时执行" marginLeft="20" />
+        </horizontal>
+        <button id="igrun" text="运行互动游戏" margin="0 5 0 0" />
+      </vertical>
+    </card>
+
     <button id="panda" text="熊猫乐园" margin="5" />
     <button id="exit" text="退出" margin="5" />
   </vertical>,
@@ -59,14 +91,20 @@ ui.igrun.click(() => {
   startTask(() => {
     const ut = require("./modules/utils");
     const ig = require("./modules/jdjr_interactive_games");
-    const { interactive_games: igConfig } = require("./modules/config");
 
-    const waitTime = ut.getTimeToTarget(igConfig.hour, igConfig.minute);
+    // 获取选中的分区
+    let selectedSections = getSelectedSections();
+    console.log(`selected sections: ${selectedSections || "全部分区"}`);
+
+    // 定时执行
     if (ui.igtimer.checked) {
+      const { interactive_games: igConfig } = require("./modules/config");
+      const waitTime = ut.getTimeToTarget(igConfig.hour, igConfig.minute);
       ut.preciseSleep(waitTime, true);
     }
 
-    ig.run(ui.igtest.checked);
+    // 执行游戏
+    ig.run(ui.igtest.checked, selectedSections);
   });
 });
 
