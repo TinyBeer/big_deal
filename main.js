@@ -3,6 +3,16 @@
 // 声明使用UI
 auto();
 
+function startTask(taskFn) {
+  threads.start(() => {
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+    taskFn();
+    device.cancelKeepingAwake();
+    console.log("已关闭屏幕常亮");
+  });
+}
+
 ui.layout(
   <vertical gravity="center_vertical">
     <button id="sign" text="签到任务" margin="5" />
@@ -26,230 +36,37 @@ ui.layout(
       <button id="igrun" text="互动游戏-运行" margin="5" />
       <checkbox id="igtimer" text="定时"></checkbox>
     </horizontal>
-    <horizontal gravity="left">
-      <button id="igrun_obj" text="互动游戏-运行-对象" margin="5" />
-    </horizontal>
     <button id="panda" text="熊猫乐园" margin="5" />
     <button id="exit" text="退出" margin="5" />
   </vertical>,
 );
 
-ui.sign.click(() => {
-  threads.start(() => {
-    const sign = require("./modules/sign");
-    // const smzdm = require("./modules/smzdm");
-    // const ctcp = require("./modules/china_telecom_cloud_pan");
-    // const sgo = require("./modules/state_grid_online");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    sign.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
+ui.sign.click(() => startTask(require("./modules/sign").run));
+ui.jd.click(() => startTask(require("./modules/jd").run));
+ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run));
+ui.jddddb.click(() => startTask(require("./modules/jd_day_day_benefit").run));
+ui.jd121.click(() => startTask(require("./modules/jd_121pea").run));
+ui.jdst.click(() => startTask(require("./modules/jd_scratch_task").run));
+ui.jdss.click(() => startTask(require("./modules/jd_super_star").run));
+ui.jdig.click(() => startTask(require("./modules/jd_interactive_games").run));
+ui.ddep.click(() => startTask(require("./modules/jdjr_earn_pea").run));
+ui.save.click(() => startTask(require("./modules/jdjr_save_center").run));
+ui.jdjrm.click(() => startTask(require("./modules/jdjr_manual").run));
+ui.panda.click(() => startTask(require("./modules/china_mobile").run));
 
 ui.igrun.click(() => {
-  threads.start(() => {
+  startTask(() => {
     const ut = require("./modules/utils");
     const ig = require("./modules/jdjr_interactive_games");
     const { interactive_games: igConfig } = require("./modules/config");
 
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    /* waiting until specific time */
-    const waitTime = ut.getTimeToTarget(igConfig.houre, igConfig.minute);
+    const waitTime = ut.getTimeToTarget(igConfig.hour, igConfig.minute);
     if (ui.igtimer.checked) {
       ut.preciseSleep(waitTime, true);
     }
 
     ig.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
   });
 });
 
-
-ui.igrun_obj.click(() => {
-  threads.start(() => {
-    const ig = require("./modules/jdjr_interactive_game_obj");
-    
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    ig.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-
-ui.jd.click(() => {
-  threads.start(() => {
-    const jd = require("./modules/jd");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jd.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jdig.click(() => {
-  threads.start(() => {
-    const jdig = require("./modules/jd_interactive_games");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdig.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.ddep.click(() => {
-  threads.start(() => {
-    const jdjr_ep = require("./modules/jdjr_earn_pea");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdjr_ep.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.save.click(() => {
-  threads.start(() => {
-    const jdjr_sc = require("./modules/jdjr_save_center");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdjr_sc.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jdjrm.click(() => {
-  threads.start(() => {
-    const jdjrm = require("./modules/jdjr_manual");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdjrm.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.panda.click(() => {
-  threads.start(() => {
-    const panda = require("./modules/china_mobile");
-
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    panda.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jdbb.click(() => {
-  threads.start(() => {
-    const jdbb = require("./modules/jd_bline_box");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdbb.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jddddb.click(() => {
-  threads.start(() => {
-    const jddddb = require("./modules/jd_day_day_benefit");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jddddb.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jdss.click(() => {
-  threads.start(() => {
-    const jdss = require("./modules/jd_super_star");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdss.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jd121.click(() => {
-  threads.start(() => {
-    const jd121 = require("./modules/jd_121pea");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jd121.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.jdst.click(() => {
-  threads.start(() => {
-    const jdst = require("./modules/jd_scratch_task");
-    /* keep screen on */
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-
-    jdst.run();
-
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
-  });
-});
-
-ui.exit.click(() => {
-  exit();
-});
+ui.exit.click(() => exit());

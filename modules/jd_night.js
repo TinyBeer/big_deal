@@ -1,5 +1,6 @@
 /* import */
 
+const { search } = require("./jd_utils");
 const {
   backN,
   shortWait,
@@ -18,7 +19,7 @@ function run() {
   longWait();
 
   /* run task */
-  hardwar_city();
+  hardwareCity();
   ecard();
 
   backN(2);
@@ -67,7 +68,7 @@ function ecard() {
   return false;
 }
 
-function hardwar_city() {
+function hardwareCity() {
   console.log("五金城");
   let backCnt = 0;
   search("五金城", 8000);
@@ -100,29 +101,6 @@ function hardwar_city() {
 
   backN(backCnt);
   return true;
-}
-
-function search(content, waitTime) {
-  let searchBar = desc("搜索栏").findOne(1000);
-  if (!searchBar) {
-    console.log("missing search bar, skip");
-    return false;
-  }
-  searchBar.click();
-  sleep(500);
-  setText(content);
-  sleep(500);
-
-  let searchBtn = text("搜索").findOne(1000);
-  if (!searchBtn) {
-    console.log("missing search button, skip");
-    back();
-    sleep(2000);
-    return false;
-  }
-
-  searchBtn.click();
-  sleep(waitTime);
 }
 
 //  导出函数（供其他脚本调用）

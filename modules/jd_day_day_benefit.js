@@ -17,13 +17,13 @@ function run() {
   longWait();
 
   /* run task */
-  day_day_draw_benefit();
+  dayDayDrawBenefit();
 
   doubleBackN(1);
 }
 
 /* tasks */
-function day_day_draw_benefit() {
+function dayDayDrawBenefit() {
   console.log("国补任务 ...");
   let entry = text("补贴价").findOne(500);
   if (!entry) {
@@ -52,7 +52,7 @@ function day_day_draw_benefit() {
   while (true) {
     let order = text("去下单").findOne(100);
     if (order) {
-      obj
+      order
         .parent()
         .children()
         .forEach((element) => {

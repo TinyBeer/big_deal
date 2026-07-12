@@ -17,14 +17,14 @@ function run() {
   longWait();
 
   /* run task */
-  interactive_game(screen);
+  interactiveGame(screen);
 
   doubleBackN(1);
 }
 
 /* tasks */
 
-function interactive_game(screen) {
+function interactiveGame(screen) {
   console.log("互动游戏...");
 
   let backCnt = 0;
@@ -46,12 +46,12 @@ function interactive_game(screen) {
   longWait();
   backCnt++;
 
-  view_task();
+  viewTask();
 }
 
-const task_tag = "浏览10s";
+const taskTag = "浏览10s";
 
-function view_task() {
+function viewTask() {
   let singleBackTasks = [
     "种豆得豆",
     "东东农场",
@@ -119,7 +119,7 @@ function getViewTaskName(obj) {
 
   for (let idx = 0; idx < obj.children().length; idx++) {
     let child = obj.children()[idx];
-    if (child.text() !== "" && child.text() !== task_tag) {
+    if (child.text() !== "" && child.text() !== taskTag) {
       return child.text();
     }
   }
@@ -128,7 +128,7 @@ function getViewTaskName(obj) {
 }
 
 function getOneViewTask() {
-  let obj = text(task_tag).findOne(500);
+  let obj = text(taskTag).findOne(500);
   return obj.parent();
 }
 

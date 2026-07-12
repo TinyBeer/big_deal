@@ -6,15 +6,15 @@ function run(screen) {
   app.launchApp("京东金融");
   utils.longWait();
 
-  double_sign();
-  claim_pea();
+  doubleSign();
+  claimPea();
 
   utils.backN(2);
   back();
   utils.backN(1);
 }
 
-function claim_pea() {
+function claimPea() {
   console.log("京东金融 赚钱更多京豆 ...");
   let backCnt = 0;
   let signEntry = text("签到").findOne(1000);
@@ -48,7 +48,7 @@ function claim_pea() {
   return true;
 }
 
-function double_sign() {
+function doubleSign() {
   console.log("京东金融 双签 ...");
   let backCnt = 0;
   let signEntry = text("签到").findOne(1000);

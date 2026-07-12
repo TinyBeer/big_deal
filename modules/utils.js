@@ -168,8 +168,6 @@ function displayRemainTime(waitTime) {
   // console.log(`下次执行时间：${new Date(Date.now() + waitTime).toLocaleString()}`);
 }
 
-/* 区域判断 */
-
 /**
  * 判断点是否在区域内部
  * @param {object} point -  point: {x,y}
@@ -184,57 +182,50 @@ function isPointInBounds(point, bounds) {
   );
 }
 
-function switchTag(name) {
-  let tag = className("android.widget.TextView")
-    .depth(12)
-    .text(name)
-    .findOne(1000);
-  if (!tag) {
-    return false;
+/* 图片匹配 */
+
+/**
+ * 在指定区域内匹配模板图片
+ * @param {Image} screenImg - 屏幕截图
+ * @param {string} templatePath - 模板图片路径（相对路径）
+ * @param {Array} region - [x1, y1, x2, y2]
+ * @param {number} threshold - 匹配阈值 0-1，默认 0.7
+ * @returns {Object|null} 匹配结果 {x, y, similarity}
+ */
+function matchImage(screenImg, templatePath, region, threshold) {
+  threshold = threshold || 0.7;
+  var tpl = images.read(templatePath);
+  if (!tpl) {
+    log("模板加载失败: " + templatePath);
+    return null;
   }
 
-  click(tag.center());
-  sleep(5000);
+  var findRegion = [region[0], region[1], region[2] - region[0], region[3] - region[1]];
+  var result = images.findImage(screenImg, tpl, {
+    region: findRegion,
+    threshold: threshold
+  });
+
+  tpl.recycle();
+  return result;
 }
 
-function getJDHomePageEntry(name) {
-  console.log("enter", name);
-  // swipe left
-  let y = 528;
-  let sx = 400;
-  let ex = 900;
-  let dur = 500;
-
-  swipe(sx, y, ex, y, dur);
-  shortWait();
-  let enter = className("android.widget.TextView")
-    .text(name)
-    .depth(23)
-    .findOne(200);
-
-  let screen = getScreenSize();
-  if (
-    enter &&
-    enter.center().x > 0 &&
-    enter.center().x < screen.width
-    // enter &&
-    // isPointInBounds(enter.center(), [
-    //   0,
-    //   entryBar.bounds().top,
-    //   1080,
-    //   entryBar.bounds().bottom,
-    // ])
-  ) {
-    return enter;
+/**
+ * 截屏并检测区域内是否有指定模板图片
+ * @param {string} templatePath - 模板图片路径（相对路径）
+ * @param {Array} region - [x1, y1, x2, y2]
+ * @param {number} threshold - 匹配阈值 0-1，默认 0.7
+ * @returns {Object|null} 匹配结果 {x, y, similarity}
+ */
+function captureAndMatch(templatePath, region, threshold) {
+  var screenImg = images.captureScreen();
+  if (!screenImg) {
+    log("截图失败");
+    return null;
   }
-  swipe(ex, y, sx, y, dur);
-  shortWait();
-  enter = className("android.widget.TextView")
-    .text(name)
-    .depth(23)
-    .findOne(200);
-
-  return enter;
+  var result = matchImage(screenImg, templatePath, region, threshold);
+  screenImg.recycle();
+  return result;
 }
 
 // 导出函数（供其他脚本调用）
@@ -251,10 +242,10 @@ module.exports = {
   backN,
   doubleBackN,
   isPointInBounds,
-  switchTag,
   info,
   storeConfig,
   loadConfig,
   findElementByText,
-  getJDHomePageEntry,
+  matchImage,
+  captureAndMatch,
 };

@@ -1,22 +1,17 @@
+const { findEntry } = require("./jdjr_utils");
 const {
   longWait,
   backN,
   mediumWait,
   shortWait,
-  tinyWait,
   doubleBackN,
-  getScreenSize,
   miniWait,
 } = require("./utils");
 
-let sc = null;
-
-function run(screen) {
-  let screen = getScreenSize();
+function run() {
   // launch app
   app.launchApp("京东金融");
   longWait();
-  sc = screen;
   saveMore();
 
   backN(2);
@@ -51,14 +46,14 @@ function saveMore() {
   click(saveMoreEntry.center());
   mediumWait();
 
-  goto_tasklist();
+  gotoTaskList();
 
   longWait();
   backN(backCnt);
   return true;
 }
 
-function goto_tasklist() {
+function gotoTaskList() {
   let taskList = [
     { name: "浏览低价好物", jd: false },
     { name: "浏览热销爆品", jd: false },
@@ -123,7 +118,7 @@ function goto_tasklist() {
       if (obj.text().includes(task.name)) {
         find = true;
         console.log(task.name, "...");
-        let entry = find_entry(task.name);
+        let entry = findEntry(task.name, { partial: true, depth: 3, timeout: 50 });
         click(entry.center());
         shortWait();
         if (task.delay && task.delay !== 0) {
@@ -157,41 +152,6 @@ function isInSaveMoney() {
     return true;
   }
   return false;
-}
-
-function find_entry(name) {
-  let obj = textContains(name).findOne(50);
-  if (!obj || !obj.parent() || !obj.parent().parent()) {
-    return;
-  }
-  let root = obj.parent().parent().parent();
-  let entry = find_goto_button(root);
-  if (
-    !entry ||
-    entry.center().x < 0 ||
-    entry.center().x > sc.width ||
-    entry.center().y < 0 ||
-    entry.center().y > sc.height
-  ) {
-    return;
-  }
-  return entry;
-}
-
-function find_goto_button(parent) {
-  for (let idx = 0; idx < parent.children().length; idx++) {
-    let child = parent.children()[idx];
-    if (child.text() === "去完成" || child.text() == "继续完成") {
-      return child;
-    }
-    if (child.childCount != 0) {
-      let ch = find_goto_button(child);
-      if (ch) {
-        return ch;
-      }
-    }
-  }
-  return;
 }
 
 module.exports = {

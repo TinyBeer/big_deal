@@ -1,5 +1,6 @@
 /* import */
 
+const { getEntryBar, homePageGetEnter, search } = require("./jd_utils");
 const {
   backN,
   shortWait,
@@ -10,16 +11,12 @@ const {
   miniWait,
 } = require("./utils");
 
-/* conf data */
-
-let entryBar = null;
-
 function run() {
   /* launch app */
   app.launchApp("京东");
   longWait();
 
-  entryBar = getEntryBar();
+  let entryBar = getEntryBar();
   if (!entryBar) {
     console.log("missing entery bar, skip");
     doubleBackN(1);
@@ -27,16 +24,16 @@ function run() {
   }
 
   /* run task */
-  flash_sale();
-  interactive_game();
-  daily_claim_pean();
-  global_shopping();
+  flashSale();
+  interactiveGame();
+  dailyClaimPea();
+  globalShopping();
 
   doubleBackN(1);
 }
 
 /* tasks */
-function daily_claim_pean() {
+function dailyClaimPea() {
   console.log("天天领豆");
   let backCnt = 0;
   let searchBar = desc("搜索栏").findOne(1000);
@@ -123,7 +120,7 @@ function daily_claim_pean() {
   return true;
 }
 
-function global_shopping() {
+function globalShopping() {
   let backCnt = 0;
   let gs = homePageGetEnter("全球购");
   if (!gs) {
@@ -170,7 +167,7 @@ function global_shopping() {
   return true;
 }
 
-function flash_sale() {
+function flashSale() {
   let enter = homePageGetEnter("秒杀");
   if (!enter) {
     return false;
@@ -197,7 +194,7 @@ function flash_sale() {
   shortWait();
 }
 
-function interactive_game() {
+function interactiveGame() {
   console.log("互动游戏...");
   let backCnt = 0;
   let enter = text("我的").findOne(1000);
@@ -226,109 +223,6 @@ function interactive_game() {
     console.log("missing sign button, skip...");
   }
   backN(backCnt);
-}
-
-function getEntryBar() {
-  let list = className("android.view.ViewGroup")
-    .depth(19)
-    .childCount(5)
-    .indexInParent(0)
-    .find(500);
-  for (let idx = 0; idx < list.length; idx++) {
-    let e = list[idx];
-    if (e.center().x < 800) {
-      return e;
-    }
-  }
-  return;
-}
-
-function homePageGetEnter(name) {
-  console.log("enter", name);
-  // swipe left
-  let y = entryBar.center().y;
-  let sx = 400;
-  let ex = 900;
-  let dur = 500;
-
-  swipe(sx, y, ex, y, dur);
-  shortWait();
-  let enter = className("android.widget.TextView")
-    .text(name)
-    .depth(23)
-    .findOne(1000);
-
-  if (
-    enter &&
-    isPointInBounds(enter.center(), [
-      0,
-      entryBar.bounds().top,
-      1080,
-      entryBar.bounds().bottom,
-    ])
-  ) {
-    return enter;
-  }
-  swipe(ex, y, sx, y, dur);
-  shortWait();
-  enter = className("android.widget.TextView")
-    .text(name)
-    .depth(23)
-    .findOne(1000);
-
-  return enter;
-}
-
-function extractNumbersWithDecimal(str) {
-  var numbers = [];
-  var currentNumber = "";
-  var hasDecimal = false; // 标记是否已经有小数点
-
-  for (var i = 0; i < str.length; i++) {
-    var char = str.charAt(i);
-    // 允许数字和一个小数点
-    if (!isNaN(char) && char !== " ") {
-      currentNumber += char;
-    } else if (char === "." && !hasDecimal) {
-      currentNumber += char;
-      hasDecimal = true;
-    } else {
-      if (currentNumber !== "") {
-        numbers.push(currentNumber);
-        currentNumber = "";
-        hasDecimal = false;
-      }
-    }
-  }
-
-  if (currentNumber !== "") {
-    numbers.push(currentNumber);
-  }
-
-  return numbers;
-}
-
-function search(content, waitTime) {
-  let searchBar = desc("搜索栏").findOne(1000);
-  if (!searchBar) {
-    console.log("missing search bar, skip");
-    return false;
-  }
-  searchBar.click();
-  sleep(500);
-  setText(content);
-  sleep(500);
-
-  let searchBtn = text("搜索").findOne(1000);
-  if (!searchBtn) {
-    console.log("missing search button, skip");
-    back();
-    sleep(2000);
-    return false;
-  }
-
-  searchBtn.click();
-  sleep(waitTime);
 }
 
 //  导出函数（供其他脚本调用）

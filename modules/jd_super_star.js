@@ -1,5 +1,5 @@
+const { switchTag } = require("./jd_utils");
 const {
-  switchTag,
   shortWait,
   longWait,
   backN,
@@ -34,7 +34,7 @@ function run(screen) {
   let et = null;
   let loopCnt = 8;
   for (let i = 0; i < loopCnt; i++) {
-    jd_star_scroll(true);
+    jdStarScroll(true);
     drawBtnList = getSuperStar();
     for (let idx = 0; idx < drawBtnList.length; idx++) {
       btn = drawBtnList[idx];
@@ -76,7 +76,7 @@ function run(screen) {
   }
 
   for (let i = 0; i < loopCnt; i++) {
-    jd_star_scroll(false);
+    jdStarScroll(false);
   }
 
   switchTag("首页");
@@ -95,77 +95,7 @@ function superStarSleep(seconds) {
   return;
 }
 
-// function run(screen) {
-//   /* launch app */
-//   app.launchApp("京东");
-//   longWait();
-
-//   console.log("超级明星...");
-
-//   switchTag("新品");
-
-//   let superStar = id("ea2").text("超级明星").findOne(1000);
-//   if (!superStar) {
-//     console.log("missing 超级明星 entry, skip");
-//     switchTag("首页");
-//     return false;
-//   }
-
-//   click(superStar.center());
-//   longWait();
-
-//   let resultList = null;
-//   let drawBtnList = null;
-//   let btn = null;
-//   let et = null;
-//   let loopCnt = 3;
-//   for (let i = 0; i < loopCnt; i++) {
-//     jd_star_scroll(true);
-//     drawBtnList = getDrawButtons();
-//     for (let idx = 0; idx < drawBtnList.length; idx++) {
-//       btn = drawBtnList[idx];
-//       click(btn.center());
-//       shortWait();
-//       let find = true;
-//       while (find) {
-//         find = false;
-//         resultList = ocr.rapid.detect([0, 1140, 1080, 1080]);
-//         for (let index = resultList.length - 1; index >= 0; index--) {
-//           et = resultList[index];
-//           let bs = et.bounds;
-//           let x = (bs.left + bs.right) / 2;
-//           let y = (bs.top + bs.bottom) / 2;
-//           if (et.label === "逛一逛") {
-//             click(x, y);
-//             longWait();
-//             mediumWait();
-//             backN(1);
-//             find = true;
-//             break;
-//           } else if (et.label === "去抽奖") {
-//             click(x, y);
-//             shortWait();
-//             find = true;
-//             break;
-//           }
-//         }
-//       }
-
-//       click(1031, 886);
-//       miniWait();
-//     }
-//   }
-
-//   for (let i = 0; i < loopCnt; i++) {
-//     jd_star_scroll(false);
-//   }
-
-//   switchTag("首页");
-
-//   doubleBackN(1);
-// }
-
-function jd_star_scroll(up) {
+function jdStarScroll(up) {
   let x = 500;
   let sy = 2000;
   let ey = 1000;

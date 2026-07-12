@@ -1,10 +1,10 @@
 /* import */
 
+const { switchTag, homePageGetEnter } = require("./jd_utils");
 const {
   doubleBackN,
   mediumWait,
   longWait,
-  getJDHomePageEntry,
 } = require("./utils");
 
 function run() {
@@ -13,15 +13,15 @@ function run() {
   longWait();
 
   /* run task */
-  blind_box();
+  blindBox();
   doubleBackN(1);
 }
 
 /* tasks */
-function blind_box() {
+function blindBox() {
   console.log("抽盲盒");
 
-  let newGoodsShop = getJDHomePageEntry("新奇集市");
+  let newGoodsShop = homePageGetEnter("新奇集市");
   if (!newGoodsShop) {
     console.log("missing entry, skip");
     return false;
@@ -41,7 +41,7 @@ function blind_box() {
   for (let i = 0; i < 3; i++) {
     click(entry.center());
     sleep(4000);
-    taskInfo = get_jdblindboxtask();
+    taskInfo = getJdBlindBoxTask();
     if (taskInfo) {
       break;
     }
@@ -71,7 +71,7 @@ function blind_box() {
       console.log("mission complete, back");
       break;
     }
-    taskInfo = get_jdblindboxtask();
+    taskInfo = getJdBlindBoxTask();
   }
 
   click(1031, 1091);
@@ -96,20 +96,7 @@ function blineBoxSleep(seconds) {
   return;
 }
 
-function switchTag(name) {
-  let tag = className("android.widget.TextView")
-    .depth(12)
-    .text(name)
-    .findOne(1000);
-  if (!tag) {
-    return false;
-  }
-
-  click(tag.center());
-  sleep(5000);
-}
-
-function get_jdblindboxtask() {
+function getJdBlindBoxTask() {
   let btn = textMatch("(去逛逛|拆盲盒)").findOne(200);
   if (!btn) {
     return;
