@@ -131,17 +131,14 @@ function run(isTest, sections) {
   longWait();
 
   // enter interactive games
+  enterInteractiveGames();
+  doubleBackN(1);
   let entered = enterInteractiveGames();
   if (!entered) {
-    console.log("failed to enter interactive games, retrying...");
-    backN(2);
-    shortWait();
-    entered = enterInteractiveGames();
-    if (!entered) {
-      console.log("still cannot enter interactive games, exit");
-      return;
-    }
+    console.log("failed to enter interactive games, skip");
+    return false
   }
+
 
   // 根据分区筛选任务
   let tasksToRun = filterTasksBySection(sections);
@@ -337,52 +334,31 @@ function workWithName(objList, isTest) {
 
 /* enter interactive games */
 function enterInteractiveGames() {
-  let interactiveGame = text("互动游戏").findOne(1000);
-  let sign = text("签到").findOne(1000);
-  let taskCenter = text("任务中心").findOne(1000);
+  let interactiveGame = text("互动游戏").findOne(200);
+  let sign = text("签到").findOne(200);
 
-  // Already on interactive games page
-  if (interactiveGame) {
-    // If on sub-page (no sign, no taskCenter), go back to main list
-    if (!sign && !taskCenter) {
-      click(interactiveGame.center());
-      sleep(3000);
-    }
-    return true;
+  // Home
+  if (interactiveGame && sign) {
+    console.log("enter mine...");
+    click(950, 2250);
+    shortWait();
+
+    interactiveGame = text("互动游戏").findOne(200);
+    sign = false;
   }
 
-  // On home page (has sign button)
-  if (sign && !taskCenter) {
-    click(900, 2250);
-    sleep(2000);
-
-    let update = text("立即查看").findOne(1000);
-    if (update) {
-      backN(1);
-    }
-
-    let enter = text("互动游戏").findOne(1000);
-    if (!enter) {
-      console.log("cannot find 互动游戏 entry");
-      return false;
-    }
-    click(enter.center());
-    sleep(5000);
-    return true;
+  // Mine
+  if (interactiveGame && !sign) {
+    console.log("enter interactive games...");
+    click(interactiveGame.center());
+    longWait();
   }
 
-  // On task center or other page, try back to find entry
-  backN(2);
-  sleep(2000);
-  let enter = text("互动游戏").findOne(1000);
-  if (enter) {
-    click(enter.center());
-    sleep(5000);
-    return true;
+  let hotGame = text("热门游戏").findOne(200);
+  if (!hotGame) {
+    console.log("failed to enter interactive games");
   }
-
-  console.log("cannot determine current state, skip");
-  return false;
+  return true;
 }
 
 function jdjriFindPlayButton(obj) {

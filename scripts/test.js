@@ -1,7 +1,16 @@
-let name = "淘沙大师"
-let root = text(name).findOne(100);
-console.log(root);
-displayArchitecture(root.parent().parent().parent().parent(), 0)
+let interactiveGame = text("互动游戏").findOne(200);
+let sign = text("签到").findOne(200);
+let hotGame = text("热门游戏").findOne(200);
+
+console.log(interactiveGame !==null);
+console.log(sign !==null);
+console.log(hotGame !==null);
+
+
+// let name = "淘沙大师"
+// let root = text(name).findOne(100);
+// console.log(root);
+// displayArchitecture(root.parent().parent().parent().parent(), 0)
 // function Person(name) {
 //     this.name = name;
 // }
