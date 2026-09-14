@@ -34,6 +34,8 @@ function saveMore() {
 
   swipe(800, 1961, 300, 1961, 500);
   miniWait();
+  swipe(800, 1961, 300, 1961, 500);
+  miniWait();
 
   let saveMoreEntry = text("每日省更多").findOne(1000);
   if (!saveMoreEntry) {
@@ -113,35 +115,43 @@ function gotoTaskList() {
     }
     console.log("found", obj.text());
 
+    let task = null;
     for (let idx = 0; idx < taskList.length; idx++) {
-      let task = taskList[idx];
-      if (obj.text().includes(task.name)) {
-        find = true;
-        console.log(task.name, "...");
-        let entry = findEntry(task.name, { partial: true, depth: 3, timeout: 50 });
-        click(entry.center());
-        shortWait();
-        if (task.delay && task.delay !== 0) {
-          sleep(task.delay * 1000);
-        } else {
-          mediumWait();
-        }
-
-        doubleBackN(4, function () {
-          if (isInSaveMoney()) {
-            return true;
-          }
-          let entry = text("每日省更多").findOne(200);
-          if (entry) {
-            click(entry.center());
-            shortWait();
-            return true;
-          }
-          return false;
-        });
-        mediumWait();
+      if (obj.text().includes(taskList[idx].name)) {
+        task = taskList[idx];
+        break;
       }
     }
+
+    if (!task) {
+      console.log("task not in list, use default config:", obj.text());
+      task = { name: obj.text(), jd: false, delay: 15 };
+    }
+
+    find = true;
+    console.log(task.name, "...");
+    let entry = findEntry(task.name, { partial: true, depth: 3, timeout: 50 });
+    click(entry.center());
+    shortWait();
+    if (task.delay && task.delay !== 0) {
+      sleep(task.delay * 1000);
+    } else {
+      mediumWait();
+    }
+
+    doubleBackN(4, function () {
+      if (isInSaveMoney()) {
+        return true;
+      }
+      let entry = text("每日省更多").findOne(200);
+      if (entry) {
+        click(entry.center());
+        shortWait();
+        return true;
+      }
+      return false;
+    });
+    mediumWait();
   }
 }
 
