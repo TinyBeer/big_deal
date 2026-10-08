@@ -45,12 +45,14 @@ const tasksBySection = {
   ],
 
   [SECTIONS.RECOMMEND]: [
-    { name: "百炼飞仙", dur_m: 20 },
+    { name: "百炼飞仙", dur_m: 15 },
     { name: "喵喵英雄", dur_m: 15 },
+    { name: "蚂蚁搬砖", dur_m: 15 },
+    { name: "积木拆拆", dur_m: 15 },
     { name: "麻将凑十", dur_m: 30 },
     { name: "点点2048", dur_m: 30 },
-    { name: "毛线大师", dur_m: 30 },
-    { name: "停车大挪移", dur_m: 15 },
+    // { name: "毛线大师", dur_m: 30 },
+    // { name: "停车大挪移", dur_m: 15 },
     { name: "螺丝大师", dur_m: 15 },
   ],
 
