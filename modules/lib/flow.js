@@ -5,7 +5,7 @@
  * 判断依据一律由调用方的 isHere / untilFunc 提供。
  */
 
-const wait = require("./wait");
+const flowWait = require("./wait");
 
 /**
  * 条件等待
@@ -40,7 +40,7 @@ function waitUntil(ms, uf) {
 function backN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
     back();
-    wait.shortWait();
+    flowWait.shortWait();
     if (untilFunc && untilFunc()) {
       break;
     }
@@ -56,7 +56,7 @@ function doubleBackN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
     back();
     back();
-    wait.shortWait();
+    flowWait.shortWait();
     if (untilFunc && untilFunc()) {
       break;
     }

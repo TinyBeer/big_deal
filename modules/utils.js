@@ -3,52 +3,51 @@
  *
  * 所有实现均已迁入 lib/，此处只做旧名称转发。
  * 老代码 require("./utils") 无需任何改动；新代码建议直接引用具体模块：
- *   const flow = require("./lib/flow");
- *   const ui   = require("./lib/ui");
+ *   const flowLib = require("./lib/flow");
  *
  * 显式逐个 require 而非 require("./lib")：不依赖模块加载器的目录 index 解析行为。
  */
 
-const screen = require("./lib/screen");
-const wait = require("./lib/wait");
-const ui = require("./lib/ui");
-const flow = require("./lib/flow");
-const logger = require("./lib/logger");
-const storage = require("./lib/storage");
+const screenLib = require("./lib/screen");
+const waitLib = require("./lib/wait");
+const uiLib = require("./lib/ui");
+const flowLib = require("./lib/flow");
+const loggerLib = require("./lib/logger");
+const storageLib = require("./lib/storage");
 
 module.exports = {
   /* wait */
-  displayRemainTime: wait.displayRemainTime,
-  getTimeToTarget: wait.getTimeToTarget,
-  preciseSleep: wait.preciseSleep,
-  miniWait: wait.miniWait,
-  shortWait: wait.shortWait,
-  mediumWait: wait.mediumWait,
-  longWait: wait.longWait,
-  sleepTier: wait.sleepTier,
+  displayRemainTime: waitLib.displayRemainTime,
+  getTimeToTarget: waitLib.getTimeToTarget,
+  preciseSleep: waitLib.preciseSleep,
+  miniWait: waitLib.miniWait,
+  shortWait: waitLib.shortWait,
+  mediumWait: waitLib.mediumWait,
+  longWait: waitLib.longWait,
+  sleepTier: waitLib.sleepTier,
   /* flow */
-  waitUntil: flow.waitUntil,
-  backN: flow.backN,
-  doubleBackN: flow.doubleBackN,
-  backUntil: flow.backUntil,
-  runTask: flow.runTask,
+  waitUntil: flowLib.waitUntil,
+  backN: flowLib.backN,
+  doubleBackN: flowLib.doubleBackN,
+  backUntil: flowLib.backUntil,
+  runTask: flowLib.runTask,
   /* screen */
-  getScreenSize: screen.size,
-  isPointInBounds: screen.inBounds,
+  getScreenSize: screenLib.size,
+  isPointInBounds: screenLib.inBounds,
   /* logger */
-  info: logger.info,
-  debug: logger.debug,
+  info: loggerLib.info,
+  debug: loggerLib.debug,
   /* storage */
-  storeConfig: storage.storeConfig,
-  loadConfig: storage.loadConfig,
-  removeConfig: storage.removeConfig,
+  storeConfig: storageLib.storeConfig,
+  loadConfig: storageLib.loadConfig,
+  removeConfig: storageLib.removeConfig,
   /* ui */
-  findElementByText: ui.findElementByText,
-  findText: ui.findText,
-  tap: ui.tap,
-  tapText: ui.tapText,
-  waitForText: ui.waitForText,
-  drag: ui.drag,
-  matchImage: ui.matchImage,
-  captureAndMatch: ui.captureAndMatch,
+  findElementByText: uiLib.findElementByText,
+  findText: uiLib.findText,
+  tap: uiLib.tap,
+  tapText: uiLib.tapText,
+  waitForText: uiLib.waitForText,
+  drag: uiLib.drag,
+  matchImage: uiLib.matchImage,
+  captureAndMatch: uiLib.captureAndMatch,
 };

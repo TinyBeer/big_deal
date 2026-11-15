@@ -8,7 +8,7 @@
 /** 默认查找超时（毫秒），沿用旧实现的 500 */
 const DEFAULT_TIMEOUT = 500;
 
-const wait = require("./wait");
+const uiWait = require("./wait");
 
 /* ------------- 文本查找 ------------- */
 
@@ -134,7 +134,7 @@ function waitForText(tx, opts) {
     if (opts.click) {
       tap(obj);
       if (opts.afterClick) {
-        wait.sleepTier(opts.afterClick);
+        uiWait.sleepTier(opts.afterClick);
       }
     }
     return true;
@@ -164,7 +164,7 @@ function drag(from, to, opts) {
   const duration = typeof opts.duration === "number" ? opts.duration : 500;
   swipe(from.x, from.y, to.x, to.y, duration);
   if (opts.wait) {
-    wait.sleepTier(opts.wait);
+    uiWait.sleepTier(opts.wait);
   }
   return true;
 }
