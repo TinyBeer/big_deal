@@ -5,7 +5,6 @@ const {
   mediumWait,
   shortWait,
   doubleBackN,
-  miniWait,
   drag,
 } = require("./utils");
 
