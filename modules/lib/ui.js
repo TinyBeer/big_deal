@@ -58,6 +58,61 @@
     return text(tx).findOne(d);
   }
 
+  /* ------------- 几何 ------------- */
+
+  /**
+   * 取控件的中心点与尺寸
+   *
+   * 注意 AutoJs 的两个对象不一样：UiObject 有 center()，而 bounds() 返回的 Rect 没有，
+   * Rect 只有 left/top/right/bottom（属性）和 width()/height()（方法）。
+   * 这里统一成 {x, y, width, height}，调用方不用再关心是哪种对象。
+   *
+   * @param {object|null} obj - UiObject 或 Rect
+   * @returns {{x:number,y:number,width:number,height:number}|null}
+   */
+  function rectInfo(obj) {
+    if (!obj) {
+      return null;
+    }
+
+    // UiObject 自带的 center() 优先；Rect 走到了会抛错，兜住
+    let c = null;
+    if (typeof obj.center === "function") {
+      try {
+        c = obj.center();
+      } catch (e) {
+        c = null;
+      }
+    }
+
+    const b = typeof obj.bounds === "function" ? obj.bounds() : obj;
+    if (!b) {
+      return null;
+    }
+
+    const read = (name) => {
+      if (typeof b[name] === "function") {
+        return b[name]();
+      }
+      return typeof b[name] === "number" ? b[name] : null;
+    };
+
+    const left = read("left");
+    const top = read("top");
+    const right = read("right");
+    const bottom = read("bottom");
+    if (left === null || top === null || right === null || bottom === null) {
+      return null;
+    }
+
+    return {
+      x: c ? c.x : Math.round((left + right) / 2),
+      y: c ? c.y : Math.round((top + bottom) / 2),
+      width: right - left,
+      height: bottom - top,
+    };
+  }
+
   /* ------------- 点击 ------------- */
 
   /**
@@ -80,12 +135,13 @@
       return false;
     }
 
-    const b = target.bounds();
-    if (!b || b.width() <= 0 || b.height() <= 0) {
+    const info = rectInfo(target);
+    // 找不到元素时常常返回 bounds 全 0 的壳，点了会落到屏幕左上角
+    if (!info || !(info.width > 0) || !(info.height > 0)) {
       return false;
     }
 
-    click(b.center());
+    click(info.x, info.y);
     return true;
   }
 
@@ -208,16 +264,17 @@
       } catch (e) {
         return null;
       }
-      if (!obj || typeof obj.bounds !== "function") {
+      if (!obj) {
         return null;
       }
-      const b = obj.bounds();
-      if (!b || b.width() <= 0 || b.height() <= 0) {
+      const info = rectInfo(obj);
+      // 全 0 / 取不到尺寸的壳一律当不可见
+      if (!info || !(info.width > 0) || !(info.height > 0)) {
         return null;
       }
       const s = uiScreen.size();
       const area = opts.region || [0, 0, s.width, s.height];
-      return uiScreen.inBounds(b.center(), area) ? obj : null;
+      return uiScreen.inBounds(info, area) ? obj : null;
     }
 
     let obj = visible();
