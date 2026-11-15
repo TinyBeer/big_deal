@@ -93,9 +93,43 @@ function backUntil(isHere, opts) {
   return reached;
 }
 
+/**
+ * 任务包装器：屏幕常亮 + 异常兜底 + 一定收尾
+ *
+ * 不负责启动 App（各任务自己在 run 里 launchApp），只管「跑起来之后别把屏幕亮着忘了关」。
+ *
+ * @param {function} fn - 任务主体
+ * @param {object} [opts]
+ * @param {string} [opts.label] - 出错时日志里的任务名，默认 "task"
+ * @param {boolean} [opts.keepAwake] - 是否管理屏幕常亮，默认 true
+ * @returns {*} fn 的返回值；抛错时返回 undefined
+ */
+function runTask(fn, opts) {
+  opts = opts || {};
+  const label = opts.label || "task";
+  const keepAwake = opts.keepAwake !== false;
+
+  if (keepAwake) {
+    device.keepScreenOn();
+    console.log("已开启屏幕常亮");
+  }
+
+  try {
+    return fn();
+  } catch (e) {
+    console.log(label + " failed: " + e);
+  } finally {
+    if (keepAwake) {
+      device.cancelKeepingAwake();
+      console.log("已关闭屏幕常亮");
+    }
+  }
+}
+
 module.exports = {
   waitUntil,
   backN,
   doubleBackN,
   backUntil,
+  runTask,
 };

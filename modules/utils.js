@@ -31,6 +31,7 @@ module.exports = {
   backN: flow.backN,
   doubleBackN: flow.doubleBackN,
   backUntil: flow.backUntil,
+  runTask: flow.runTask,
   /* screen */
   getScreenSize: screen.size,
   isPointInBounds: screen.inBounds,
