@@ -56,6 +56,7 @@
     tapText: uiLib.tapText,
     waitForText: uiLib.waitForText,
     drag: uiLib.drag,
+    dragUntilVisible: uiLib.dragUntilVisible,
     matchImage: uiLib.matchImage,
     captureAndMatch: uiLib.captureAndMatch,
   };

@@ -17,6 +17,7 @@
   const DEFAULT_TIMEOUT = 500;
 
   const uiWait = require("./wait");
+  const uiScreen = require("./screen");
 
   /* ------------- 文本查找 ------------- */
 
@@ -177,6 +178,65 @@
     return true;
   }
 
+  /**
+   * 反复滑动，直到目标控件真正出现在屏幕（或指定区域）上
+   *
+   * 和 drag 的区别：drag 是盲滑固定次数；这里每次滑完都重新探测，
+   * 已经在可见区就一次都不滑，滑进来就立刻停 —— 屏幕宽窄、轮播位置不同都不会滑过头或滑不够。
+   *
+   * 「可见」的判定是：probe() 拿到控件，且控件中心落在 region 内。
+   * 已存在但在屏幕外的控件（横向轮播里很常见）会被视为不可见，继续滑。
+   *
+   * @param {function(): object|null} probe - 探测函数，返回 UiObject 或 null
+   * @param {object} opts
+   * @param {{x:number,y:number}} opts.from - 滑动起点
+   * @param {{x:number,y:number}} opts.to - 滑动终点
+   * @param {number} [opts.max=3] - 最多滑几次
+   * @param {number} [opts.duration=500] - 单次滑动耗时
+   * @param {string} [opts.wait="mini"] - 每次滑动后的等待档位
+   * @param {number[]} [opts.region] - [left, top, right, bottom]，默认整屏
+   * @returns {object|null} 可见的控件；滑完仍不可见返回 null
+   */
+  function dragUntilVisible(probe, opts) {
+    opts = opts || {};
+    const max = typeof opts.max === "number" ? opts.max : 3;
+
+    function visible() {
+      let obj;
+      try {
+        obj = probe();
+      } catch (e) {
+        return null;
+      }
+      if (!obj || typeof obj.bounds !== "function") {
+        return null;
+      }
+      const b = obj.bounds();
+      if (!b || b.width() <= 0 || b.height() <= 0) {
+        return null;
+      }
+      const s = uiScreen.size();
+      const area = opts.region || [0, 0, s.width, s.height];
+      return uiScreen.inBounds(b.center(), area) ? obj : null;
+    }
+
+    let obj = visible();
+    if (obj) {
+      return obj;
+    }
+    for (let i = 0; i < max; i++) {
+      drag(opts.from, opts.to, {
+        duration: opts.duration,
+        wait: opts.wait === undefined ? "mini" : opts.wait,
+      });
+      obj = visible();
+      if (obj) {
+        return obj;
+      }
+    }
+    return null;
+  }
+
   /* ------------- 图像匹配 ------------- */
   /**
    * 在指定区域内匹配模板图片
@@ -229,6 +289,7 @@
     tapText,
     waitForText,
     drag,
+    dragUntilVisible,
     matchImage,
     captureAndMatch,
   };
