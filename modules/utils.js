@@ -1,6 +1,7 @@
 /* import */
 
 const screen = require("./lib/screen");
+const wait = require("./lib/wait");
 
 /* element */
 const defaultDuration = 500;
@@ -31,22 +32,6 @@ function info(mes) {
 }
 
 /* delay */
-function miniWait() {
-  sleep(500);
-}
-
-function shortWait() {
-  sleep(3000);
-}
-
-function mediumWait() {
-  sleep(5000);
-}
-
-function longWait() {
-  sleep(8000);
-}
-
 /**
  * 条件等待
  * @param {number} ms - longest waiting ms
@@ -75,7 +60,7 @@ function waitUntil(ms, uf) {
 function backN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
     back();
-    shortWait();
+    wait.shortWait();
     if (untilFunc && untilFunc()) {
       break;
     }
@@ -86,73 +71,11 @@ function doubleBackN(cnt, untilFunc) {
   for (let i = 0; i < cnt; i++) {
     back();
     back();
-    shortWait();
+    wait.shortWait();
     if (untilFunc && untilFunc()) {
       break;
     }
   }
-}
-
-/**
- * 高精度延迟函数
- * @param {number} ms - 期望延迟的毫秒数
- * @param {boolean} showLog - display remaining sleep time
- */
-function preciseSleep(ms, showLog) {
-  const start = new Date().getTime();
-  let remaining = ms;
-
-  // 循环检查，补偿误差
-  while (remaining > 0) {
-    // 每次最多休眠remaining，避免过度休眠
-    sleep(Math.min(remaining, 5000)); // 每次最多休眠5000ms，平衡精度和性能
-    var now = new Date().getTime();
-    remaining = ms - (now - start);
-    if (showLog) {
-      displayRemainTime(remaining);
-    }
-  }
-}
-
-/**
- * get escape to specific time
- * @param {number} hour
- * @param {number} minute
- */
-function getTimeToTarget(hour, minute) {
-  const now = new Date(); // 当前时间
-  const target = new Date(now); // 初始化目标时间为当前日期
-
-  // 设置目标时间为“当天的 hour:minute:00.000”
-  target.setHours(hour, minute, 0, 0);
-
-  // 若当前时间已过当天的目标时间，则将目标时间设为“次日的 hour:minute”
-  if (target <= now) {
-    target.setDate(now.getDate() + 1); // 日期 +1（到次日）
-  }
-
-  // 返回时间差（毫秒）：目标时间 - 当前时间
-  return target - now;
-}
-/**
- * 高精度延迟函数
- * @param {number} waitTime - remaining time(ms)
- */
-function displayRemainTime(waitTime) {
-  // 转换等待时间为“小时+分钟”，便于日志查看
-  const waitHours = Math.floor(waitTime / 3600000);
-  const waitMinutes = Math.floor((waitTime % 3600000) / 60000);
-  const waitSeconds = Math.floor((waitTime % 60000) / 1000);
-
-  // 打印定时日志
-  // console.log(`\n=== 已设置下次定时 ===`);
-  // console.log(`当前时间：${new Date().toLocaleString()}`);
-  console.log(
-    `before ${new Date(
-      Date.now() + waitTime,
-    ).toLocaleString()} 还有：${waitHours} 小时 ${waitMinutes} 分钟 ${waitSeconds} s`,
-  );
-  // console.log(`下次执行时间：${new Date(Date.now() + waitTime).toLocaleString()}`);
 }
 
 /* 图片匹配 */
@@ -204,14 +127,15 @@ function captureAndMatch(templatePath, region, threshold) {
 // 导出函数（供其他脚本调用）
 // 由 lib/ 逐步接管，此处保留旧名称做兼容转发
 module.exports = {
-  displayRemainTime,
-  getTimeToTarget,
-  preciseSleep,
+  displayRemainTime: wait.displayRemainTime,
+  getTimeToTarget: wait.getTimeToTarget,
+  preciseSleep: wait.preciseSleep,
   getScreenSize: screen.size,
-  miniWait,
-  shortWait,
-  mediumWait,
-  longWait,
+  miniWait: wait.miniWait,
+  shortWait: wait.shortWait,
+  mediumWait: wait.mediumWait,
+  longWait: wait.longWait,
+  sleepTier: wait.sleepTier,
   waitUntil,
   backN,
   doubleBackN,
