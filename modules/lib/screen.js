@@ -1,57 +1,66 @@
-/**
- * 公共库 · 屏幕与坐标
+/*
+ * 整个模块体包在 IIFE 里。
  *
- * 只提供"怎么算"，不关心"算什么"：
- * 不出现任何 App 名、控件文案、具体坐标常量。
+ * AutoJs6 的 jvm-npm 会把模块代码求值到「调用方作用域」，模块顶层的 const / function
+ * 会漏进调用方作用域（main.js 的 "ui"; 还会在此处声明全局 var ui），一旦重名就会报
+ * 「变量 xxx 重复声明」，整个 require 链失败。包一层后内部命名完全封闭，导出照旧走 module.exports。
  */
+(function () {
+  /**
+   * 公共库 · 屏幕与坐标
+   *
+   * 只提供"怎么算"，不关心"算什么"：
+   * 不出现任何 App 名、控件文案、具体坐标常量。
+   */
 
-let cached = null;
+  let cached = null;
 
-/**
- * 屏幕尺寸（首次读取后缓存）
- * @param {boolean} refresh - 强制重新读取，默认 false
- * @returns {{width: number, height: number}} 每次返回新对象，避免调用方互相污染
- */
-function size(refresh) {
-  if (!cached || refresh) {
-    var dm = context.getResources().getDisplayMetrics();
-    cached = { width: dm.widthPixels, height: dm.heightPixels };
+  /**
+   * 屏幕尺寸（首次读取后缓存）
+   * @param {boolean} refresh - 强制重新读取，默认 false
+   * @returns {{width: number, height: number}} 每次返回新对象，避免调用方互相污染
+   */
+  function size(refresh) {
+    if (!cached || refresh) {
+      var dm = context.getResources().getDisplayMetrics();
+      cached = { width: dm.widthPixels, height: dm.heightPixels };
+    }
+    return { width: cached.width, height: cached.height };
   }
-  return { width: cached.width, height: cached.height };
-}
 
-/**
- * 按屏幕比例取像素点，用于替代硬编码坐标
- * @param {number} ratioX - 横向比例 0~1
- * @param {number} ratioY - 纵向比例 0~1
- * @returns {{x: number, y: number}} 可直接传给 click()
- * @example px(0.5, 0.9) // 屏幕水平居中、纵向 90% 处
- */
-function px(ratioX, ratioY) {
-  var s = size(false);
-  return {
-    x: Math.round(s.width * ratioX),
-    y: Math.round(s.height * ratioY),
+  /**
+   * 按屏幕比例取像素点，用于替代硬编码坐标
+   * @param {number} ratioX - 横向比例 0~1
+   * @param {number} ratioY - 纵向比例 0~1
+   * @returns {{x: number, y: number}} 可直接传给 click()
+   * @example px(0.5, 0.9) // 屏幕水平居中、纵向 90% 处
+   */
+  function px(ratioX, ratioY) {
+    var s = size(false);
+    return {
+      x: Math.round(s.width * ratioX),
+      y: Math.round(s.height * ratioY),
+    };
+  }
+
+  /**
+   * 判断点是否落在矩形区域内
+   * @param {{x: number, y: number}} point
+   * @param {number[]} bounds - [left, top, right, bottom]
+   * @returns {boolean}
+   */
+  function inBounds(point, bounds) {
+    return (
+      point.x > bounds[0] &&
+      point.x < bounds[2] &&
+      point.y > bounds[1] &&
+      point.y < bounds[3]
+    );
+  }
+
+  module.exports = {
+    size,
+    px,
+    inBounds,
   };
-}
-
-/**
- * 判断点是否落在矩形区域内
- * @param {{x: number, y: number}} point
- * @param {number[]} bounds - [left, top, right, bottom]
- * @returns {boolean}
- */
-function inBounds(point, bounds) {
-  return (
-    point.x > bounds[0] &&
-    point.x < bounds[2] &&
-    point.y > bounds[1] &&
-    point.y < bounds[3]
-  );
-}
-
-module.exports = {
-  size,
-  px,
-  inBounds,
-};
+})();
