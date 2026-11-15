@@ -2,16 +2,7 @@
 
 const screen = require("./lib/screen");
 const wait = require("./lib/wait");
-
-/* element */
-const defaultDuration = 500;
-function findElementByText(tx, dur) {
-  let d = defaultDuration;
-  if (dur) {
-    d = dur;
-  }
-  return text(tx).findOne(d);
-}
+const ui = require("./lib/ui");
 
 /* storage */
 const storageName = "autojs";
@@ -78,52 +69,6 @@ function doubleBackN(cnt, untilFunc) {
   }
 }
 
-/* 图片匹配 */
-
-/**
- * 在指定区域内匹配模板图片
- * @param {Image} screenImg - 屏幕截图
- * @param {string} templatePath - 模板图片路径（相对路径）
- * @param {Array} region - [x1, y1, x2, y2]
- * @param {number} threshold - 匹配阈值 0-1，默认 0.7
- * @returns {Object|null} 匹配结果 {x, y, similarity}
- */
-function matchImage(screenImg, templatePath, region, threshold) {
-  threshold = threshold || 0.7;
-  var tpl = images.read(templatePath);
-  if (!tpl) {
-    log("模板加载失败: " + templatePath);
-    return null;
-  }
-
-  var findRegion = [region[0], region[1], region[2] - region[0], region[3] - region[1]];
-  var result = images.findImage(screenImg, tpl, {
-    region: findRegion,
-    threshold: threshold
-  });
-
-  tpl.recycle();
-  return result;
-}
-
-/**
- * 截屏并检测区域内是否有指定模板图片
- * @param {string} templatePath - 模板图片路径（相对路径）
- * @param {Array} region - [x1, y1, x2, y2]
- * @param {number} threshold - 匹配阈值 0-1，默认 0.7
- * @returns {Object|null} 匹配结果 {x, y, similarity}
- */
-function captureAndMatch(templatePath, region, threshold) {
-  var screenImg = images.captureScreen();
-  if (!screenImg) {
-    log("截图失败");
-    return null;
-  }
-  var result = matchImage(screenImg, templatePath, region, threshold);
-  screenImg.recycle();
-  return result;
-}
-
 // 导出函数（供其他脚本调用）
 // 由 lib/ 逐步接管，此处保留旧名称做兼容转发
 module.exports = {
@@ -143,7 +88,10 @@ module.exports = {
   info,
   storeConfig,
   loadConfig,
-  findElementByText,
-  matchImage,
-  captureAndMatch,
+  findElementByText: ui.findElementByText,
+  matchImage: ui.matchImage,
+  captureAndMatch: ui.captureAndMatch,
+  findText: ui.findText,
+  tap: ui.tap,
+  tapText: ui.tapText,
 };
