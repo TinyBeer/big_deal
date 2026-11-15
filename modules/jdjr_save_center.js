@@ -36,6 +36,8 @@ function saveMore() {
   miniWait();
   swipe(800, 1961, 300, 1961, 500);
   miniWait();
+  swipe(800, 1961, 300, 1961, 500);
+  miniWait();
 
   let saveMoreEntry = text("每日省更多").findOne(1000);
   if (!saveMoreEntry) {
