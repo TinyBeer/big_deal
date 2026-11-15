@@ -26,7 +26,6 @@ function getSelectedSections() {
 
 ui.layout(
   <vertical gravity="center_vertical">
-    <button id="sign" text="签到任务" margin="5" />
     <horizontal gravity="left">
       <button id="jd" text="京东" margin="5" />
       <button id="jdbb" text="京东-抽盲盒" margin="5" />
@@ -74,7 +73,6 @@ ui.layout(
   </vertical>,
 );
 
-ui.sign.click(() => startTask(require("./modules/sign").run));
 ui.jd.click(() => startTask(require("./modules/jd").run));
 ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run));
 ui.jddddb.click(() => startTask(require("./modules/jd_day_day_benefit").run));
