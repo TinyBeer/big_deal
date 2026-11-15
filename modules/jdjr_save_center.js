@@ -5,7 +5,8 @@ const {
   mediumWait,
   shortWait,
   doubleBackN,
-  drag,
+  dragUntilVisible,
+  getScreenSize,
 } = require("./utils");
 
 function run() {
@@ -32,14 +33,20 @@ function saveMore() {
   longWait();
   backCnt++;
 
-  // 左滑三次，把「每日省更多」入口拉到可见区
-  const swipeFrom = { x: 800, y: 1961 };
-  const swipeTo = { x: 300, y: 1961 };
-  for (let i = 0; i < 3; i++) {
-    drag(swipeFrom, swipeTo, { duration: 500, wait: "mini" });
-  }
+  // 左滑，直到「每日省更多」入口滑进可见区：
+  // 先看当前是否已露出（露出就不滑），没露才滑，露出来立刻停。
+  // 原来固定滑三次，屏幕宽度/轮播位置不同会滑不够或多滑，入口甚至可能被滑出左侧。
+  const barY = 1961;
+  const screenSize = getScreenSize();
+  let saveMoreEntry = dragUntilVisible(() => text("每日省更多").findOne(300), {
+    from: { x: 800, y: barY },
+    to: { x: 300, y: barY },
+    region: [0, barY - 250, screenSize.width, barY + 250],
+    max: 4,
+    duration: 500,
+    wait: "mini",
+  });
 
-  let saveMoreEntry = text("每日省更多").findOne(1000);
   if (!saveMoreEntry) {
     console.log("missing save more entery, skip...");
     backN(backCnt);
