@@ -8,6 +8,7 @@ const {
   getScreenSize,
   backN,
   mediumWait,
+  waitForText,
 } = require("./utils");
 
 function run() {
@@ -79,7 +80,14 @@ function viewTask() {
     console.log(`view task[${taskName}]`);
     click(task.center());
 
-    if (!viewTaskSleep(18)) {
+    if (
+      !waitForText("点击立即返回", {
+        seconds: 18,
+        click: true,
+        afterClick: "short",
+        log: "立即返回",
+      })
+    ) {
       if (doubleBack) {
         doubleBackN(3, function () {
           return text("热门推荐").findOne(300);
@@ -92,20 +100,6 @@ function viewTask() {
       mediumWait();
     }
   }
-}
-
-function viewTaskSleep(seconds) {
-  for (let sec = 0; sec < seconds; sec++) {
-    sleep(1000);
-    let fin = text("点击立即返回").findOne(100);
-    if (fin) {
-      console.log("立即返回");
-      click(fin.center());
-      shortWait();
-      return true;
-    }
-  }
-  return false;
 }
 
 function getViewTaskName(obj) {
