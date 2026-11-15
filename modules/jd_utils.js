@@ -1,6 +1,6 @@
 /* import */
 
-const { backN, shortWait, isPointInBounds } = require("./utils");
+const { backN, shortWait, isPointInBounds, drag } = require("./utils");
 
 function getTag(name) {
   return className("android.widget.TextView")
@@ -69,8 +69,7 @@ function homePageGetEnter(name) {
   let ex = 900;
   let dur = 500;
 
-  swipe(sx, y, ex, y, dur);
-  shortWait();
+  drag({ x: sx, y: y }, { x: ex, y: y }, { duration: dur, wait: "short" });
   let enter = className("android.widget.TextView")
     .text(name)
     .depth(23)
@@ -87,8 +86,7 @@ function homePageGetEnter(name) {
   ) {
     return enter;
   }
-  swipe(ex, y, sx, y, dur);
-  shortWait();
+  drag({ x: ex, y: y }, { x: sx, y: y }, { duration: dur, wait: "short" });
   enter = className("android.widget.TextView")
     .text(name)
     .depth(23)
