@@ -5,6 +5,7 @@ const {
   doubleBackN,
   mediumWait,
   longWait,
+  waitForText,
 } = require("./utils");
 
 function run() {
@@ -59,7 +60,7 @@ function blindBox() {
     if (taskInfo.btnName === "去逛逛") {
       console.log("goto ");
       click(taskInfo.entry);
-      blineBoxSleep(15);
+      waitForText("点击立即返回", { seconds: 15 });
       doubleBackN(4, function () {
         return id("novelBlindBoxEntry").findOne(1000);
       });
@@ -83,17 +84,6 @@ function blindBox() {
 
 function blineBoxGetTask() {
   return className("android.view.View").textContains("抽盲盒机会").findOne(100);
-}
-
-function blineBoxSleep(seconds) {
-  for (let sec = 0; sec < seconds; sec++) {
-    sleep(1000);
-    let fin = text("点击立即返回").findOne(100);
-    if (fin) {
-      break;
-    }
-  }
-  return;
 }
 
 function getJdBlindBoxTask() {
