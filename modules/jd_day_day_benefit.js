@@ -6,7 +6,7 @@ const {
   mediumWait,
   backN,
   miniWait,
-  waitUntil,
+  waitForText,
   info,
   shortWait,
 } = require("./utils");
@@ -84,15 +84,12 @@ function dayDayDrawBenefit() {
     }
     click(task.center());
 
-    let res = waitUntil(18000, function () {
-      let fin = text("点击立即返回").findOne(100);
-      if (fin) {
-        console.log("立即返回");
-        click(fin.center());
-        shortWait();
-        return true;
-      }
-      return false;
+    let res = waitForText("点击立即返回", {
+      seconds: 18,
+      intervalMs: 500,
+      click: true,
+      afterClick: "short",
+      log: "立即返回",
     });
     if (!res) {
       backN(3, function () {
