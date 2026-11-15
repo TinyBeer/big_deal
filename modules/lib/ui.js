@@ -142,6 +142,33 @@ function waitForText(tx, opts) {
   return false;
 }
 
+/* ------------- 手势 ------------- */
+
+/**
+ * 拖拽/滑动，并保证滑完该等的那一下不会漏
+ *
+ * 起止点由调用方给（各页面锚点不同，不进库），等待档位也可选。
+ *
+ * @param {{x:number,y:number}} from - 起点
+ * @param {{x:number,y:number}} to - 终点
+ * @param {object} [opts]
+ * @param {number} [opts.duration] - 滑动耗时，默认 500
+ * @param {string} [opts.wait] - 滑动后等待的档位（"mini"/"short"/…），不传则不等
+ * @returns {boolean} 是否执行了滑动
+ */
+function drag(from, to, opts) {
+  opts = opts || {};
+  if (!from || !to) {
+    return false;
+  }
+  const duration = typeof opts.duration === "number" ? opts.duration : 500;
+  swipe(from.x, from.y, to.x, to.y, duration);
+  if (opts.wait) {
+    wait.sleepTier(opts.wait);
+  }
+  return true;
+}
+
 /* ------------- 图像匹配 ------------- */
 /**
  * 在指定区域内匹配模板图片
@@ -193,6 +220,7 @@ module.exports = {
   tap,
   tapText,
   waitForText,
+  drag,
   matchImage,
   captureAndMatch,
 };

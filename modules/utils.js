@@ -47,6 +47,7 @@ module.exports = {
   tap: ui.tap,
   tapText: ui.tapText,
   waitForText: ui.waitForText,
+  drag: ui.drag,
   matchImage: ui.matchImage,
   captureAndMatch: ui.captureAndMatch,
 };
