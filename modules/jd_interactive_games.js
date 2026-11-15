@@ -107,8 +107,8 @@ function getViewTaskName(obj) {
     return;
   }
 
-  if (obj.text().length != 0 && obj.text() !== txt) {
-    return obj;
+  if (obj.text().length != 0 && obj.text() !== taskTag) {
+    return obj.text();
   }
 
   for (let idx = 0; idx < obj.children().length; idx++) {
