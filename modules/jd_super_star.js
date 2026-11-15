@@ -8,6 +8,7 @@ const {
   miniWait,
   doubleBackN,
   waitForText,
+  drag,
 } = require("./utils");
 
 function run(screen) {
@@ -86,16 +87,9 @@ function run(screen) {
 }
 
 function jdStarScroll(up) {
-  let x = 500;
-  let sy = 2000;
-  let ey = 1000;
-  let dur = 500;
-  if (up) {
-    swipe(x, sy, x, ey, dur);
-  } else {
-    swipe(x, ey, x, sy, dur);
-  }
-  shortWait();
+  const from = { x: 500, y: up ? 2000 : 1000 };
+  const to = { x: 500, y: up ? 1000 : 2000 };
+  drag(from, to, { duration: 500, wait: "short" });
 }
 
 function getSuperStar() {
