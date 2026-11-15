@@ -7,6 +7,7 @@ const {
   mediumWait,
   miniWait,
   doubleBackN,
+  waitForText,
 } = require("./utils");
 
 function run(screen) {
@@ -51,7 +52,7 @@ function run(screen) {
           let y = (bs.top + bs.bottom) / 2;
           if (et.label === "逛一逛") {
             click(x, y);
-            superStarSleep(19);
+            waitForText("点击立即返回", { seconds: 19 });
             doubleBackN(2, isSuperStarPage);
             find = true;
             break;
@@ -82,17 +83,6 @@ function run(screen) {
   switchTag("首页");
 
   doubleBackN(1);
-}
-
-function superStarSleep(seconds) {
-  for (let sec = 0; sec < seconds; sec++) {
-    sleep(1000);
-    let fin = text("点击立即返回").findOne(100);
-    if (fin) {
-      break;
-    }
-  }
-  return;
 }
 
 function jdStarScroll(up) {
