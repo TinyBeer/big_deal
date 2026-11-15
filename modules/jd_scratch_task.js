@@ -3,9 +3,9 @@ const {
   longWait,
   shortWait,
   doubleBackN,
-  miniWait,
   mediumWait,
   info,
+  drag,
 } = require("./utils");
 
 function run() {
@@ -84,8 +84,7 @@ function scratchTask() {
       }
     }
     const y = 740;
-    swipe(sx, y, ex, y, dur);
-    miniWait();
+    drag({ x: sx, y: y }, { x: ex, y: y }, { duration: dur, wait: "mini" });
   }
   backHomePage(backCnt);
   return true;
