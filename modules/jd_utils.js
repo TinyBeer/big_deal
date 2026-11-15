@@ -55,6 +55,10 @@ function getEntryBar() {
       break
     }
   }
+  if (!entryBar) {
+    console.log("missing entry bar");
+    return null;
+  }
   console.log("entry bar bounds", entryBar.bounds());
 
   return entryBar;
@@ -64,6 +68,9 @@ function homePageGetEnter(name) {
   console.log("enter", name);
   // swipe left
   let eb = getEntryBar()
+  if (!eb) {
+    return;
+  }
   let y = eb.center().y;
   let sx = 400;
   let ex = 900;
