@@ -360,7 +360,7 @@ function enterInteractiveGames() {
   if (!hotGame) {
     console.log("failed to enter interactive games");
   }
-  return true;
+  return !!hotGame;
 }
 
 function jdjriFindPlayButton(obj) {
