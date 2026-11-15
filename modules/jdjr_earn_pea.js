@@ -77,6 +77,13 @@ function gotoBrowseTask(task) {
 function gotoCustomTask(task) {
   console.log(task.name, "...");
   let entry = findEntry(task.name);
+  if (!entry) {
+    console.log("missing entry, skip");
+    return false;
+  }
+  click(entry.center());
+
+  switch (task.custom) {
     case "headlineFast":
       utils.longWait();
       handleHeadlineFastClaim();
