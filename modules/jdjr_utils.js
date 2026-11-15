@@ -54,7 +54,7 @@ function findGotoButton(parent) {
     if (child.text() === "去完成" || child.text() == "继续完成") {
       return child;
     }
-    if (child.childCount != 0) {
+    if (child.childCount() != 0) {
       let ch = findGotoButton(child);
       if (ch) {
         return ch;
