@@ -7,6 +7,7 @@ const {
   backN,
   miniWait,
   waitForText,
+  drag,
   info,
   shortWait,
 } = require("./utils");
@@ -42,12 +43,8 @@ function dayDayDrawBenefit() {
   click(btn.center());
   mediumWait();
 
-  let x = 500;
-  let sy = 2100;
-  let ey = 1500;
-  let dur = 1000;
-  swipe(x, sy, x, ey, dur);
-  shortWait();
+  // 向上滑一屏，让任务列表露出来
+  drag({ x: 500, y: 2100 }, { x: 500, y: 1500 }, { duration: 1000, wait: "short" });
 
   while (true) {
     let order = text("去下单").findOne(100);
