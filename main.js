@@ -19,7 +19,7 @@ function getSelectedSections() {
   if (ui.igGuess.isChecked()) sections.push("猜你喜欢");
   if (ui.igDiscover.isChecked()) sections.push("发现更多");
   if (ui.igNew.isChecked()) sections.push("游戏尝鲜");
-  return sections.length > 0 ? sections : null;
+  return sections;
 }
 
 ui.layout(
@@ -104,7 +104,11 @@ ui.igrun.click(() => {
 
     // 获取选中的分区
     let selectedSections = getSelectedSections();
-    console.log(`selected sections: ${selectedSections || "全部分区"}`);
+    if (selectedSections.length === 0) {
+      ut.info("未选择分区，已取消");
+      return;
+    }
+    console.log(`selected sections: ${selectedSections.join("、")}`);
 
     // 定时执行
     if (ui.igtimer.checked) {
