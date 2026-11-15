@@ -3,13 +3,11 @@
 // 声明使用UI
 auto();
 
-function startTask(taskFn) {
+const { runTask } = require("./modules/utils");
+
+function startTask(taskFn, label) {
   threads.start(() => {
-    device.keepScreenOn();
-    console.log("已开启屏幕常亮");
-    taskFn();
-    device.cancelKeepingAwake();
-    console.log("已关闭屏幕常亮");
+    runTask(taskFn, { label: label || "task" });
   });
 }
 
@@ -73,17 +71,31 @@ ui.layout(
   </vertical>,
 );
 
-ui.jd.click(() => startTask(require("./modules/jd").run));
-ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run));
-ui.jddddb.click(() => startTask(require("./modules/jd_day_day_benefit").run));
-ui.jd121.click(() => startTask(require("./modules/jd_121pea").run));
-ui.jdst.click(() => startTask(require("./modules/jd_scratch_task").run));
-ui.jdss.click(() => startTask(require("./modules/jd_super_star").run));
-ui.jdig.click(() => startTask(require("./modules/jd_interactive_games").run));
-ui.ddep.click(() => startTask(require("./modules/jdjr_earn_pea").run));
-ui.save.click(() => startTask(require("./modules/jdjr_save_center").run));
-ui.jdjrm.click(() => startTask(require("./modules/jdjr_manual").run));
-ui.panda.click(() => startTask(require("./modules/china_mobile").run));
+ui.jd.click(() => startTask(require("./modules/jd").run, "京东"));
+ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run, "抽盲盒"));
+ui.jddddb.click(() =>
+  startTask(require("./modules/jd_day_day_benefit").run, "国补"),
+);
+ui.jd121.click(() => startTask(require("./modules/jd_121pea").run, "121京豆"));
+ui.jdst.click(() =>
+  startTask(require("./modules/jd_scratch_task").run, "刮卡任务"),
+);
+ui.jdss.click(() =>
+  startTask(require("./modules/jd_super_star").run, "超级明星"),
+);
+ui.jdig.click(() =>
+  startTask(require("./modules/jd_interactive_games").run, "互动游戏"),
+);
+ui.ddep.click(() =>
+  startTask(require("./modules/jdjr_earn_pea").run, "天天赚京豆"),
+);
+ui.save.click(() => startTask(require("./modules/jdjr_save_center").run, "省钱中心"));
+ui.jdjrm.click(() =>
+  startTask(require("./modules/jdjr_manual").run, "金融手动"),
+);
+ui.panda.click(() =>
+  startTask(require("./modules/china_mobile").run, "熊猫乐园"),
+);
 
 ui.igrun.click(() => {
   startTask(() => {
