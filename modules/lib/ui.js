@@ -8,6 +8,8 @@
 /** 默认查找超时（毫秒），沿用旧实现的 500 */
 const DEFAULT_TIMEOUT = 500;
 
+const wait = require("./wait");
+
 /* ------------- 文本查找 ------------- */
 
 /**
@@ -95,8 +97,52 @@ function tapText(tx, opts) {
   return tap(obj);
 }
 
-/* ------------- 图像匹配 ------------- */
+/* ------------- 轮询等待 ------------- */
 
+/**
+ * 边等边找：按固定步进反复查找某个文本，可配置找到后是否点击
+ *
+ * 覆盖的典型场景是「限时浏览页 → 等『立即返回』按钮出现 → 点掉再继续」，
+ * 但文案、步进、点不点、点完等多久全部由调用方决定。
+ *
+ * @param {string|RegExp} tx - 要等的文本
+ * @param {object} [opts]
+ * @param {number} [opts.seconds] - 最多等多少秒，默认 10
+ * @param {number} [opts.intervalMs] - 每次步进毫秒数，默认 1000（先睡再找）
+ * @param {number} [opts.findTimeout] - 单次查找超时，默认 100
+ * @param {boolean} [opts.click] - 找到后是否点击，默认 false
+ * @param {string} [opts.afterClick] - 点击后额外等待的档位，如 "short"；不传则不等
+ * @param {string} [opts.log] - 找到时打印的文案，不传则不打印
+ * @returns {boolean} 是否等到了
+ */
+function waitForText(tx, opts) {
+  opts = opts || {};
+  const seconds = typeof opts.seconds === "number" ? opts.seconds : 10;
+  const intervalMs = typeof opts.intervalMs === "number" ? opts.intervalMs : 1000;
+  const findTimeout = typeof opts.findTimeout === "number" ? opts.findTimeout : 100;
+  const rounds = Math.max(1, Math.round((seconds * 1000) / intervalMs));
+
+  for (let i = 0; i < rounds; i++) {
+    sleep(intervalMs);
+    const obj = findText(tx, { timeout: findTimeout });
+    if (!obj) {
+      continue;
+    }
+    if (opts.log) {
+      console.log(opts.log);
+    }
+    if (opts.click) {
+      tap(obj);
+      if (opts.afterClick) {
+        wait.sleepTier(opts.afterClick);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+/* ------------- 图像匹配 ------------- */
 /**
  * 在指定区域内匹配模板图片
  * @param {Image} screenImg - 屏幕截图
@@ -146,6 +192,7 @@ module.exports = {
   findElementByText,
   tap,
   tapText,
+  waitForText,
   matchImage,
   captureAndMatch,
 };
