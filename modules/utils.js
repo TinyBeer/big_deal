@@ -1,5 +1,7 @@
 /* import */
 
+const screen = require("./lib/screen");
+
 /* element */
 const defaultDuration = 500;
 function findElementByText(tx, dur) {
@@ -92,21 +94,6 @@ function doubleBackN(cnt, untilFunc) {
 }
 
 /**
- * 获取屏幕尺寸
- */
-function getScreenSize() {
-  var dm = context.getResources().getDisplayMetrics();
-
-  var width = dm.widthPixels;
-  var height = dm.heightPixels;
-
-  return {
-    width: width,
-    height: height,
-  };
-}
-
-/**
  * 高精度延迟函数
  * @param {number} ms - 期望延迟的毫秒数
  * @param {boolean} showLog - display remaining sleep time
@@ -168,20 +155,6 @@ function displayRemainTime(waitTime) {
   // console.log(`下次执行时间：${new Date(Date.now() + waitTime).toLocaleString()}`);
 }
 
-/**
- * 判断点是否在区域内部
- * @param {object} point -  point: {x,y}
- * @param {Array<int>} bounds - bounds:[x1,y1,x2,y2]
- */
-function isPointInBounds(point, bounds) {
-  return (
-    point.x > bounds[0] &&
-    point.x < bounds[2] &&
-    point.y > bounds[1] &&
-    point.y < bounds[3]
-  );
-}
-
 /* 图片匹配 */
 
 /**
@@ -229,11 +202,12 @@ function captureAndMatch(templatePath, region, threshold) {
 }
 
 // 导出函数（供其他脚本调用）
+// 由 lib/ 逐步接管，此处保留旧名称做兼容转发
 module.exports = {
   displayRemainTime,
   getTimeToTarget,
   preciseSleep,
-  getScreenSize,
+  getScreenSize: screen.size,
   miniWait,
   shortWait,
   mediumWait,
@@ -241,7 +215,7 @@ module.exports = {
   waitUntil,
   backN,
   doubleBackN,
-  isPointInBounds,
+  isPointInBounds: screen.inBounds,
   info,
   storeConfig,
   loadConfig,
