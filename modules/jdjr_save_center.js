@@ -6,6 +6,7 @@ const {
   shortWait,
   doubleBackN,
   miniWait,
+  drag,
 } = require("./utils");
 
 function run() {
@@ -32,12 +33,12 @@ function saveMore() {
   longWait();
   backCnt++;
 
-  swipe(800, 1961, 300, 1961, 500);
-  miniWait();
-  swipe(800, 1961, 300, 1961, 500);
-  miniWait();
-  swipe(800, 1961, 300, 1961, 500);
-  miniWait();
+  // 左滑三次，把「每日省更多」入口拉到可见区
+  const swipeFrom = { x: 800, y: 1961 };
+  const swipeTo = { x: 300, y: 1961 };
+  for (let i = 0; i < 3; i++) {
+    drag(swipeFrom, swipeTo, { duration: 500, wait: "mini" });
+  }
 
   let saveMoreEntry = text("每日省更多").findOne(1000);
   if (!saveMoreEntry) {
