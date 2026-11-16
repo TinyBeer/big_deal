@@ -2,137 +2,315 @@
 
 const {
   longWait,
-  doubleBackN,
-  shortWait,
-  miniWait,
-  getScreenSize,
-  backN,
-  mediumWait,
+  waitUntil,
   waitForText,
+  sleepTier,
+  tap,
+  getScreenSize,
+  doubleBackN,
 } = require("./utils");
+const { info, debug } = require("./lib/logger");
 
 function run() {
-  let screen = getScreenSize();
-  /* launch app */
+  let ok = false;
+  try {
+    ok = launchAndEnterGame();
+    if (ok) {
+      browseTasks();
+    } else {
+      debug("进入互动游戏失败，跳过");
+    }
+  } finally {
+    backToHome();
+    info(ok ? "互动游戏任务完成" : "互动游戏任务未完成");
+  }
+}
+
+/* 页面判断：依靠三个页面互不重叠的标志控件 */
+
+function isHomePage() {
+  return !!text("新品").findOne(300);
+}
+
+function isMinePage() {
+  return !!desc("我的").findOne(300) && !!text("互动游戏").findOne(300);
+}
+
+function isGamePage() {
+  return !!text("返回").findOne(300);
+}
+
+/* 进入互动游戏：启动京东 -> 我的 -> 互动游戏，每一步都等待并校验 */
+
+function launchAndEnterGame() {
+  debug("启动京东...");
   app.launchApp("京东");
   longWait();
 
-  /* run task */
-  interactiveGame(screen);
+  let ready = function () {
+    return isHomePage() || isMinePage() || isGamePage();
+  };
+  if (!waitUntil(10000, ready)) {
+    // 冷启动或被系统清理后 launchApp 可能不生效，直接拉起主 Activity
+    app.startActivity({
+      packageName: "com.jingdong.app.mall",
+      className: "com.jingdong.app.mall.MainFrameActivity",
+    });
+    longWait();
+    if (!waitUntil(15000, ready)) {
+      debug("京东页面未就绪");
+      return false;
+    }
+  }
 
-  doubleBackN(1);
-}
-
-/* tasks */
-
-function interactiveGame(screen) {
-  console.log("互动游戏...");
-
-  let backCnt = 0;
-  let enter = desc("我的").findOne(1000);
-  if (!enter) {
-    console.log("missinge entry");
+  // 上次运行可能停在游戏页或"我的"页，先回到首页
+  if (!ensureHomePage()) {
+    debug("未能回到京东首页");
     return false;
   }
-  click(enter.center());
-  shortWait();
-  backCnt++;
+  sleepTier("short");
 
-  let gameEnter = text("互动游戏").findOne(1000);
+  debug("进入我的界面...");
+  let mineTab = desc("我的").findOne(5000);
+  if (!mineTab) {
+    debug("未找到我的入口");
+    return false;
+  }
+  tap(mineTab);
+  if (!waitUntil(12000, isMinePage)) {
+    debug("未进入我的界面");
+    return false;
+  }
+  sleepTier("short");
+
+  debug("进入互动游戏...");
+  let gameEnter = text("互动游戏").findOne(5000);
   if (!gameEnter) {
-    backN(backCnt);
+    debug("未找到互动游戏入口");
     return false;
   }
-  click(gameEnter.center());
-  longWait();
-  backCnt++;
-
-  viewTask();
+  tap(gameEnter);
+  if (!waitUntil(30000, isGamePage)) {
+    debug("未进入互动游戏页面");
+    return false;
+  }
+  // WebView 加载较慢，进入后再留出稳定时间
+  sleepTier("medium");
+  return true;
 }
 
-const taskTag = "浏览10s";
+/* 返回主界面：互动游戏 -> 我的 -> 首页 */
 
-function viewTask() {
-  let singleBackTasks = [
-    "种豆得豆",
-    "东东农场",
-    "赚红包",
-    "欢乐挖宝",
-    "单单反",
-    "京东小游戏",
-  ];
+function backToHome() {
+  debug("返回主界面...");
 
-  while (hasViewTasks()) {
-    let task = getOneViewTask();
-    if (!task) {
-      console.log("no task found!!!");
-      break;
+  if (ensureHomePage()) {
+    debug("已回到京东主界面");
+    return true;
+  }
+
+  // 小游戏等页面可能拦截返回键，直接拉起主 Activity 兜底
+  for (let retry = 0; retry < 2; retry++) {
+    debug("返回键无效，重新拉起京东主界面");
+    app.startActivity({
+      packageName: "com.jingdong.app.mall",
+      className: "com.jingdong.app.mall.MainFrameActivity",
+    });
+    longWait();
+    if (ensureHomePage()) {
+      debug("已回到京东主界面");
+      return true;
     }
-    let taskName = getViewTaskName(task);
-    let doubleBack = true;
-    for (let idx = 0; idx < singleBackTasks.length; idx++) {
-      let name = singleBackTasks[idx];
-      if (name === taskName) {
-        doubleBack = false;
-        break;
+  }
+  debug("未能回到主界面");
+  return false;
+}
+
+/* 兜底回首页：识别到"我的"就切首页 tab，否则逐层返回 */
+
+function ensureHomePage() {
+  if (isHomePage()) {
+    return true;
+  }
+
+  for (let i = 0; i < 5 && !isHomePage(); i++) {
+    if (isGamePage()) {
+      back();
+      sleepTier("short");
+      continue;
+    }
+
+    if (isMinePage()) {
+      let homeTab = desc("首页").findOne(3000);
+      if (homeTab) {
+        tap(homeTab);
+        sleepTier("short");
+        continue;
       }
     }
-    console.log(`view task[${taskName}]`);
-    click(task.center());
 
-    if (
-      !waitForText("点击立即返回", {
-        seconds: 18,
-        click: true,
-        afterClick: "short",
-        log: "立即返回",
-      })
-    ) {
-      if (doubleBack) {
-        doubleBackN(3, function () {
-          return text("热门推荐").findOne(300);
-        });
-      } else {
-        backN(3, function () {
-          return text("热门推荐").findOne(300);
-        });
-      }
-      mediumWait();
-    }
+    back();
+    sleepTier("short");
+  }
+  return isHomePage();
+}
+
+/* 攒经验任务弹窗 */
+
+const TASK_POPUP_TITLE = "做任务 攒经验";
+const BROWSE_WAIT_SECONDS = 15;
+const BROWSE_CHECK_INTERVAL_MS = 500;
+
+/* 任务文本包含以下任意一项则跳过，按需填写 */
+const TASK_SKIP_KEYWORDS = [];
+
+function isTaskPopup() {
+  return !!text(TASK_POPUP_TITLE).findOne(300);
+}
+
+function enterTaskPopup() {
+  let entry = textContains("攒经验").findOne(5000);
+  if (!entry) {
+    entry = id("earn-jingdou-earn-experience-entry").findOne(2000);
+  }
+  if (!entry) {
+    debug("未找到攒经验入口");
+    return false;
+  }
+  tap(entry);
+  if (!waitUntil(10000, isTaskPopup)) {
+    debug("未进入攒经验任务弹窗");
+    return false;
+  }
+  sleepTier("short");
+  return true;
+}
+
+function leaveTaskPopup() {
+  for (let i = 0; i < 3 && isTaskPopup(); i++) {
+    back();
+    sleepTier("short");
   }
 }
 
-function getViewTaskName(obj) {
-  if (!obj) {
+/* 所有"逛一逛"按钮，只保留屏幕范围内、有实际高度的 */
+function getBrowseButtons(onlyVisible) {
+  let all = text("逛一逛").find(500);
+  let screen = getScreenSize();
+  let result = [];
+  for (let i = 0; i < all.length; i++) {
+    let obj = all[i];
+    let b = obj.bounds();
+    if (!b || b.height() <= 0) {
+      continue;
+    }
+    if (onlyVisible) {
+      let c = obj.center();
+      if (c.y <= 0 || c.y >= screen.height) {
+        continue;
+      }
+    }
+    result.push(obj);
+  }
+  return result;
+}
+
+/* 用同行左侧的任务名标识任务，列表重排后仍能找到同一个按钮 */
+function getTaskName(btn) {
+  let b = btn.bounds();
+  if (!b) {
+    return "";
+  }
+  let names = textMatches(".*\\(\\d+/\\d+\\).*").find(500);
+  for (let i = 0; i < names.length; i++) {
+    let nb = names[i].bounds();
+    if (!nb) {
+      continue;
+    }
+    let ny = (nb.top + nb.bottom) / 2;
+    if (ny >= b.top - 20 && ny <= b.bottom + 20 && nb.right <= b.left + 10) {
+      return names[i].text().replace(/\(\d+\/\d+\).*/, "");
+    }
+  }
+  return "";
+}
+
+/* 任务描述命中任意关键字就跳过 */
+function isTaskSkipped(name) {
+  if (!name) {
+    return false;
+  }
+  for (let i = 0; i < TASK_SKIP_KEYWORDS.length; i++) {
+    if (name.indexOf(TASK_SKIP_KEYWORDS[i]) !== -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
+/* 每轮从当前界面重新选取一个未处理过的可见逛一逛按钮 */
+function pickVisibleBrowseTask(processed) {
+  let btns = getBrowseButtons(true);
+  for (let i = 0; i < btns.length; i++) {
+    let n = getTaskName(btns[i]);
+    // 名称取不到时用位置兜底，避免空 key 把其它任务一起屏蔽
+    let key = n || "pos-" + btns[i].bounds().top;
+    if (processed[key]) {
+      continue;
+    }
+    if (isTaskSkipped(n)) {
+      debug("跳过任务: " + n);
+      processed[key] = true;
+      continue;
+    }
+    return { btn: btns[i], name: n, key: key };
+  }
+  return null;
+}
+
+function browseTasks() {
+  if (!enterTaskPopup()) {
     return;
   }
 
-  if (obj.text().length != 0 && obj.text() !== taskTag) {
-    return obj.text();
-  }
-
-  for (let idx = 0; idx < obj.children().length; idx++) {
-    let child = obj.children()[idx];
-    if (child.text() !== "" && child.text() !== taskTag) {
-      return child.text();
+  let processed = {};
+  let maxTasks = 30;
+  for (let i = 0; i < maxTasks; i++) {
+    if (!isTaskPopup()) {
+      debug("任务弹窗已关闭");
+      break;
     }
+
+    let picked = pickVisibleBrowseTask(processed);
+    if (!picked) {
+      debug("屏幕内没有可执行的逛一逛任务");
+      break;
+    }
+    processed[picked.key] = true;
+
+    debug("逛一逛任务: " + (picked.name || "未知"));
+    tap(picked.btn);
+
+    // 15 秒内每 500ms 检查一次"点击立即返回"，出现就直接点击返回
+    let returned = waitForText("点击立即返回", {
+      seconds: BROWSE_WAIT_SECONDS,
+      intervalMs: BROWSE_CHECK_INTERVAL_MS,
+      click: true,
+      log: "点击立即返回",
+    });
+    if (!returned) {
+      // 小游戏等任务没有返回按钮，按 doubleBackN 连续退两次
+      debug("未出现立即返回，连续两次返回");
+      doubleBackN(1);
+    }
+    if (!waitUntil(5000, isTaskPopup)) {
+      debug("未回到任务弹窗，结束后续任务");
+      break;
+    }
+    sleepTier("mini");
   }
 
-  return;
-}
-
-function getOneViewTask() {
-  let obj = text(taskTag).findOne(500);
-  return obj.parent();
-}
-
-function hasViewTasks() {
-  let obj = textMatch("再完成\\d+个任务").findOne(200);
-  if (!obj) {
-    console.log("no view task");
-    return false;
-  }
-  return true;
+  leaveTaskPopup();
 }
 
 //  导出函数（供其他脚本调用）
