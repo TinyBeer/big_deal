@@ -75,16 +75,6 @@
       return null;
     }
 
-    // UiObject 自带的 center() 优先；Rect 走到了会抛错，兜住
-    let c = null;
-    if (typeof obj.center === "function") {
-      try {
-        c = obj.center();
-      } catch (e) {
-        c = null;
-      }
-    }
-
     const b = typeof obj.bounds === "function" ? obj.bounds() : obj;
     if (!b) {
       return null;
@@ -105,9 +95,19 @@
       return null;
     }
 
+    // 优先用 Rect.center() 取中心点（AutoJs 里 UiObject 没有 center()，是 bounds() 才有）
+    let c = null;
+    if (typeof b.center === "function") {
+      try {
+        c = b.center();
+      } catch (e) {
+        c = null;
+      }
+    }
+
     return {
-      x: c ? c.x : Math.round((left + right) / 2),
-      y: c ? c.y : Math.round((top + bottom) / 2),
+      x: c && typeof c.x === "number" ? c.x : Math.round((left + right) / 2),
+      y: c && typeof c.y === "number" ? c.y : Math.round((top + bottom) / 2),
       width: right - left,
       height: bottom - top,
     };
@@ -176,6 +176,7 @@
    * @param {number} [opts.intervalMs] - 每次步进毫秒数，默认 1000（先睡再找）
    * @param {number} [opts.findTimeout] - 单次查找超时，默认 100
    * @param {boolean} [opts.click] - 找到后是否点击，默认 false
+   * @param {boolean} [opts.partial] - 使用包含匹配（textContains），默认 false
    * @param {string} [opts.afterClick] - 点击后额外等待的档位，如 "short"；不传则不等
    * @param {string} [opts.log] - 找到时打印的文案，不传则不打印
    * @returns {boolean} 是否等到了
@@ -189,20 +190,22 @@
 
     for (let i = 0; i < rounds; i++) {
       sleep(intervalMs);
-      const obj = findText(tx, { timeout: findTimeout });
+      const obj = findText(tx, { timeout: findTimeout, partial: opts.partial });
       if (!obj) {
         continue;
       }
-      if (opts.log) {
-        console.log(opts.log);
-      }
+      let clicked = true;
       if (opts.click) {
-        tap(obj);
-        if (opts.afterClick) {
+        // 取控件 center 模拟点击；clickable=false 的 TextView 也照样能点
+        clicked = tap(obj);
+        if (clicked && opts.afterClick) {
           uiWait.sleepTier(opts.afterClick);
         }
       }
-      return true;
+      if (clicked && opts.log) {
+        console.log(opts.log);
+      }
+      return clicked;
     }
     return false;
   }

@@ -22,54 +22,167 @@ function getSelectedSections() {
   return sections;
 }
 
+/* ---- 主题样式 ---- */
+
+const C = {
+  bg: "#12151C",
+  surface: "#1E2430",
+  border: "#2B3342",
+  primary: "#E1251B",
+  primaryLight: "#F04335",
+  primaryDark: "#C21810",
+  text: "#F1F3F7",
+  textDim: "#98A2B3",
+  btn: "#2A3140",
+  btnBorder: "#374154",
+};
+
 ui.layout(
-  <vertical gravity="center_vertical">
-    <horizontal gravity="left">
-      <button id="jd" text="京东" margin="5" />
-      <button id="jdbb" text="京东-抽盲盒" margin="5" />
-      <button id="jddddb" text="京东-国补" margin="5" />
-    </horizontal>
-    <horizontal>
-      <button id="jd121" text="121京豆" margin="5" />
-      <button id="jdst" text="刮卡任务" margin="5" />
-      <button id="jdss" text="超级明星" margin="5" />
-      <button id="jdig" text="互动游戏" margin="5" />
-    </horizontal>
-    <horizontal gravity="left">
-      <button id="jdjrm" text="京东金融 手动" margin="5" />
-      <button id="ddep" text="天天赚京豆" margin="5" />
-      <button id="save" text="省钱中心" margin="5" />
-    </horizontal>
+  <vertical background={C.bg} padding="16 18 24 18">
 
-    {/* 互动游戏控制区域 */}
-    <card margin="5" cardCornerRadius="8" cardElevation="2">
-      <vertical padding="10">
-        <text text="互动游戏" textSize="16sp" textStyle="bold" marginBottom="5" />
-        <text text="执行分区:" textSize="14sp" marginBottom="5" />
-        <horizontal gravity="center_vertical" wrap="wrap">
-          <checkbox id="igHot" text="热门游戏" />
-          <checkbox id="igDaily" text="每日必玩" marginLeft="10" />
+      {/* 顶部标题 */}
+      <vertical marginBottom="18">
+        <horizontal gravity="center_vertical">
+          <view w="4" h="24" background={C.primary} marginRight="10" />
+          <text text="京东任务助手" textSize="22sp" textColor={C.text} textStyle="bold" />
         </horizontal>
-        <horizontal gravity="center_vertical" wrap="wrap">
-          <checkbox id="igRecommend" text="好游推荐" />
-          <checkbox id="igGuess" text="猜你喜欢" marginLeft="10" />
-        </horizontal>
-        <horizontal gravity="center_vertical" wrap="wrap">
-          <checkbox id="igDiscover" text="发现更多" />
-          <checkbox id="igNew" text="游戏尝鲜" marginLeft="10" />
-        </horizontal>
-        <horizontal gravity="center_vertical" marginTop="5">
-          <checkbox id="igtest" text="测试模式" />
-          <checkbox id="igtimer" text="定时执行" marginLeft="20" />
-        </horizontal>
-        <button id="igrun" text="运行互动游戏" margin="0 5 0 0" />
+        <text
+          text="每日任务 · 一键控制台"
+          textSize="12sp"
+          textColor={C.textDim}
+          marginLeft="14"
+          marginTop="4"
+        />
       </vertical>
-    </card>
 
-    <button id="panda" text="熊猫乐园" margin="5" />
-    <button id="exit" text="退出" margin="5" />
+      {/* 京东商城 */}
+      <vertical id="cardShop" background={C.surface} padding="14 12 12 12">
+        <horizontal gravity="center_vertical">
+          <view w="3" h="14" background={C.primary} marginRight="8" />
+          <text text="京东商城" textSize="14sp" textColor={C.text} textStyle="bold" />
+        </horizontal>
+        <horizontal marginTop="10" w="*">
+          <button id="jd" text="京东" w="0" h="42" layout_weight="1" textSize="12sp" />
+          <button id="jdbb" text="抽盲盒" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+          <button id="jddddb" text="国补" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+        </horizontal>
+        <horizontal marginTop="8" w="*">
+          <button id="jd121" text="121京豆" w="0" h="42" layout_weight="1" textSize="12sp" />
+          <button id="jdst" text="刮卡任务" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+          <button id="jdss" text="超级明星" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+        </horizontal>
+      </vertical>
+
+      {/* 互动游戏 */}
+      <vertical id="cardGame" background={C.surface} padding="14 12 12 12" marginTop="14">
+        <horizontal gravity="center_vertical">
+          <view w="3" h="14" background={C.primary} marginRight="8" />
+          <text text="互动游戏" textSize="14sp" textColor={C.text} textStyle="bold" />
+        </horizontal>
+        <button
+          id="jdig"
+          text="启动京东互动游戏"
+          w="*"
+          h="48"
+          textSize="15sp"
+          textStyle="bold"
+          marginTop="10"
+        />
+
+        {/* 京东金融互动游戏控制 */}
+        <text text="金融互动游戏 · 执行分区" textSize="12sp" textColor={C.textDim} marginTop="14" marginBottom="6" />
+        <horizontal gravity="center_vertical" wrap="wrap">
+          <checkbox id="igHot" text="热门游戏" textColor={C.text} />
+          <checkbox id="igDaily" text="每日必玩" textColor={C.text} marginLeft="10" />
+        </horizontal>
+        <horizontal gravity="center_vertical" wrap="wrap" marginTop="2">
+          <checkbox id="igRecommend" text="好游推荐" textColor={C.text} />
+          <checkbox id="igGuess" text="猜你喜欢" textColor={C.text} marginLeft="10" />
+        </horizontal>
+        <horizontal gravity="center_vertical" wrap="wrap" marginTop="2">
+          <checkbox id="igDiscover" text="发现更多" textColor={C.text} />
+          <checkbox id="igNew" text="游戏尝鲜" textColor={C.text} marginLeft="10" />
+        </horizontal>
+        <horizontal gravity="center_vertical" marginTop="6">
+          <checkbox id="igtest" text="测试模式" textColor={C.textDim} />
+          <checkbox id="igtimer" text="定时执行" textColor={C.textDim} marginLeft="20" />
+        </horizontal>
+        <button id="igrun" text="运行金融互动游戏" w="*" h="42" textSize="13sp" marginTop="8" />
+      </vertical>
+
+      {/* 京东金融 */}
+      <vertical id="cardJr" background={C.surface} padding="14 12 12 12" marginTop="14">
+        <horizontal gravity="center_vertical">
+          <view w="3" h="14" background={C.primary} marginRight="8" />
+          <text text="京东金融" textSize="14sp" textColor={C.text} textStyle="bold" />
+        </horizontal>
+        <horizontal marginTop="10" w="*">
+          <button id="jdjrm" text="手动签到" w="0" h="42" layout_weight="1" textSize="12sp" />
+          <button id="ddep" text="天天赚京豆" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+          <button id="save" text="省钱中心" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+        </horizontal>
+      </vertical>
+
+      {/* 其他 */}
+      <horizontal marginTop="14" w="*">
+        <button id="panda" text="熊猫乐园" w="0" h="42" layout_weight="1" textSize="12sp" />
+        <button id="exit" text="退出" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+      </horizontal>
+
   </vertical>,
 );
+
+/* ---- 应用圆角/配色 ---- */
+
+const density = context.getResources().getDisplayMetrics().density;
+function dp(v) {
+  return Math.round(v * density);
+}
+function color(hex) {
+  return android.graphics.Color.parseColor(hex);
+}
+function rounded(id, fill, radius, stroke, strokeWidth) {
+  let v = ui[id];
+  if (!v) return;
+  let gd = new android.graphics.drawable.GradientDrawable();
+  gd.setColor(color(fill));
+  gd.setCornerRadius(dp(radius));
+  if (stroke) gd.setStroke(dp(strokeWidth || 1), color(stroke));
+  v.setBackground(gd);
+}
+function gradient(id, from, to, radius) {
+  let v = ui[id];
+  if (!v) return;
+  let gd = new android.graphics.drawable.GradientDrawable();
+  gd.setOrientation(android.graphics.drawable.GradientDrawable.Orientation.LEFT_RIGHT);
+  gd.setColors([color(from), color(to)]);
+  gd.setCornerRadius(dp(radius));
+  v.setBackground(gd);
+}
+function tintCheck(id) {
+  let v = ui[id];
+  if (!v || !v.setButtonTintList) return;
+  try {
+    v.setButtonTintList(android.content.res.ColorStateList.valueOf(color(C.primary)));
+  } catch (e) {}
+}
+
+["cardShop", "cardGame", "cardJr"].forEach((id) => rounded(id, C.surface, 14, C.border, 1));
+
+[
+  "jd", "jdbb", "jddddb", "jd121", "jdst", "jdss",
+  "jdjrm", "ddep", "save", "panda", "exit", "igrun",
+].forEach((id) => {
+  rounded(id, id === "igrun" ? C.primaryDark : C.btn, 10, id === "igrun" ? null : C.btnBorder, 1);
+  ui[id].setTextColor(color(C.text));
+});
+
+gradient("jdig", C.primaryLight, C.primaryDark, 12);
+ui.jdig.setTextColor(color("#FFFFFF"));
+
+[
+  "igHot", "igDaily", "igRecommend", "igGuess", "igDiscover", "igNew", "igtest", "igtimer",
+].forEach(tintCheck);
 
 ui.jd.click(() => startTask(require("./modules/jd").run, "京东"));
 ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run, "抽盲盒"));

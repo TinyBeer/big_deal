@@ -291,11 +291,12 @@ function browseTasks() {
     debug("逛一逛任务: " + (picked.name || "未知"));
     tap(picked.btn);
 
-    // 15 秒内每 500ms 检查一次"点击立即返回"，出现就直接点击返回
+    // 15 秒内每 500ms 检查一次"点击立即返回"（包含匹配），出现就直接点击返回
     let returned = waitForText("点击立即返回", {
       seconds: BROWSE_WAIT_SECONDS,
       intervalMs: BROWSE_CHECK_INTERVAL_MS,
       click: true,
+      partial: true,
       log: "点击立即返回",
     });
     if (!returned) {
