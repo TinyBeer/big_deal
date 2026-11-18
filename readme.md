@@ -1,24 +1,23 @@
 # big_deal
 
-基于 AutoJS6 的京东系 App 自动化任务脚本项目，主入口为 `main.js`。
+基于 AutoJS6 的京东系 App 自动化脚本，主入口为 `main.js`。
 
-## 环境
+## 线卷三消辅助
 
-- Android 手机安装 AutoJS6 并开启无障碍服务
-- 京东 App 已登录
+通过 adb 截取手机画面，自动识别大线卷目标颜色，点击同色且未被遮挡的小线卷；没有可消除目标时会先解锁锁定槽、再尝试释放挡板。遇到广告、失败和京东验证会按规则处理或暂停等待。
 
-## 使用
+```bash
+python3 -m venv .venv
+.venv/bin/pip install -r scripts/requirements.txt
+.venv/bin/python scripts/spool_assist.py --auto
+```
 
-在 AutoJS6 中运行 `main.js`，点击主界面的「互动游戏」按钮即可启动京东互动游戏任务。
+默认最长自动运行 10 分钟。更多参数（设备、超时、次数、调试等）查看：
 
-任务会自动：启动京东 → 我的 → 互动游戏 → 攒经验 → 依次完成屏幕内的「逛一逛」任务 → 返回首页。结束后 toast 提示结果。
+```bash
+.venv/bin/python scripts/spool_assist.py --help
+```
 
-点击任务后等待 15 秒，期间每 500ms 检查一次「点击立即返回」，出现即返回；屏幕外的任务不处理。
+## 原有 AutoJS 任务
 
-## 配置
-
-在 `modules/jd_interactive_games.js` 顶部修改：
-
-- `TASK_SKIP_KEYWORDS`：跳过的任务关键字数组，默认 `[]`
-- `BROWSE_WAIT_SECONDS`：等待返回按钮秒数，默认 `15`
-- `BROWSE_CHECK_INTERVAL_MS`：检查间隔毫秒，默认 `500`
+手机安装 AutoJS6 并开启无障碍、京东已登录后，运行 `main.js`，在主界面选择对应任务即可。

@@ -13,7 +13,11 @@ autojs6-dts/
 
 # 调试产物
 test_screenshot.png
+spool_annotated.png
 *.log
+.venv/
+__pycache__/
+*.pyc
 
 # 删除操作产生的回收站目录
 .Trash-0/
