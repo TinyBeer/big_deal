@@ -3,11 +3,11 @@
 """三消线卷辅助识别：截屏 -> 找目标大线卷 -> 圈出可点击的小线卷。
 
 用法示例：
-  .venv/bin/python scripts/spool_assist.py --image shot.png --once
-  .venv/bin/python scripts/spool_assist.py --once --output result.png
-  .venv/bin/python scripts/spool_assist.py --live
-  .venv/bin/python scripts/spool_assist.py --live --targets yellow pink --interval 0.7
-  .venv/bin/python scripts/spool_assist.py --auto
+  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --image shot.png --once
+  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --once --output result.png
+  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --live
+  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --live --targets yellow pink --interval 0.7
+  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --auto
 
 说明：
   --targets 可手动指定目标颜色；不传时自动从顶部彩色大线卷读取。
@@ -272,6 +272,16 @@ def annotate(img, big, small, targets):
         cv2.putText(out, text, pt(20 * scale, (48 + 40 * i) * scale),
                     font, 0.95 * scale, (255, 255, 255), max(1, thick - 1), cv2.LINE_AA)
     return out, clickable
+
+
+def has_gui():
+    """headless 构建不支持 imshow；探测一次，用于 --live 降级为写文件。"""
+    try:
+        cv2.imshow("__probe__", np.zeros((2, 2), np.uint8))
+        cv2.destroyAllWindows()
+        return True
+    except Exception:
+        return False
 
 
 def grab(serial=None):
@@ -654,18 +664,26 @@ def main():
         return
 
     if args.live:
+        gui = has_gui()
+        if not gui:
+            print("提示: 当前 OpenCV 为 headless 构建，--live 每轮保存标注图、不弹窗；"
+                  "按 Ctrl+C 退出", flush=True)
         try:
             while True:
                 img = grab(args.device)
                 annotated, clickable, big, small, targets = step(img)
-                cv2.imshow("spool assist", annotated)
-                if cv2.waitKey(1) & 0xFF == ord("q"):
-                    break
+                if gui:
+                    cv2.imshow("spool assist", annotated)
+                    if cv2.waitKey(1) & 0xFF == ord("q"):
+                        break
+                else:
+                    print("已保存 %s  可点击 %d" % (args.output, len(clickable)), flush=True)
                 time.sleep(args.interval)
         except KeyboardInterrupt:
             pass
         finally:
-            cv2.destroyAllWindows()
+            if gui:
+                cv2.destroyAllWindows()
         return
 
     img = grab(args.device)

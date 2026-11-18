@@ -11,7 +11,8 @@ autojs6-dts/
 # 工作区数据（非代码）
 .workbuddy/
 
-# 调试产物
+# 调试产物与工具运行输出（不纳入仓库）
+outputs/
 test_screenshot.png
 spool_annotated.png
 *.log

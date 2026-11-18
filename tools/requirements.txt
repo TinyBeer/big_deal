@@ -1,0 +1,14 @@
+# big_deal 截图类游戏辅助工具 —— 共用 Python 依赖
+#
+# 安装（项目根目录执行）：
+#   pip install -r tools/requirements.txt
+#
+# 说明：
+# - OpenCV 使用 headless 版：无 GUI 依赖，适合 adb 驱动的自动运行；
+#   spool 的 --live 在 headless 下会自动降级为「每轮保存标注图」。
+# - 两个工具共用同一套依赖，无需分别安装。
+
+numpy>=1.26
+Pillow>=10
+scipy>=1.11
+opencv-python-headless>=4.10

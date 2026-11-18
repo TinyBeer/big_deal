@@ -1,0 +1,79 @@
+# 线卷三消辅助
+
+通过 adb 截屏并用 OpenCV 识别画面：自动从顶部彩色大线卷读取目标颜色，优先点击同色且未被遮挡的小线卷；没有目标时先解锁锁定槽，再尝试释放挡板。
+
+## 运行
+
+快速脚本（推荐）：
+
+```bash
+tools/spool/quick.sh              # 默认 --auto，自动点击直到无可操作线卷
+tools/spool/quick.sh --once       # 只识别一次
+tools/spool/quick.sh --live       # 实时循环标注
+```
+
+`quick.sh` 固定解释器与输出路径，其余参数原样透传；输出默认 `outputs/spool_annotated.png`。
+
+不使用快速脚本时，也可直接调用：
+
+```bash
+PY=/home/beer/.workbuddy/binaries/python/envs/default/bin/python
+$PY tools/spool/spool_assist.py --auto --output outputs/spool_annotated.png
+```
+
+依赖由 `tools/requirements.txt` 统一管理，安装一次两个工具共用。OpenCV 为 headless 版，`--live` 在无 GUI 环境会自动改为每轮保存标注图。
+
+## 常用示例
+
+```bash
+# 指定设备与目标颜色
+$PY tools/spool/spool_assist.py --device <serial> --targets yellow pink
+
+# 调试本地截图
+$PY tools/spool/spool_assist.py --image shot.png --once
+
+# 只演示第一步，不实际点击
+$PY tools/spool/spool_assist.py --auto --dry-run
+```
+
+## 参数
+
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `--image` | 直接处理本地图片（调试用） | - |
+| `--device` | adb 设备序列号 | - |
+| `--once` | 只识别一次 | - |
+| `--live` | 实时循环标注 | - |
+| `--auto` | 自动点击直到没有可操作线卷 | - |
+| `--interval` | 实时模式间隔秒 | `0.8` |
+| `--output` | 标注结果保存路径 | `spool_annotated.png` |
+| `--targets` | 手动指定目标颜色，覆盖自动识别 | 自动识别 |
+| `--max-clicks` | 自动模式最大点击次数 | `200` |
+| `--max-seconds` | 自动模式最长运行秒数 | `600` |
+| `--dry-run` | 自动模式只演示第一步，不点击 | - |
+| `--no-revive` | 失败时不看广告复活，直接停止 | - |
+| `--security-timeout` | 等待用户手动完成安全验证的超时秒数 | `300` |
+
+<details>
+<summary>更多参数（点击、复活与解锁微调）</summary>
+
+| 参数 | 说明 | 默认值 |
+| --- | --- | --- |
+| `--wait` / `--max-wait` | 点击后最短 / 最长等待秒数 | `0.35` / `1.8` |
+| `--gap` | 每轮之间的额外间隔秒数 | `0.15` |
+| `--recent-seconds` | 多久内不重复点击同一位置 | `4.0` |
+| `--modal-v` | 画面平均亮度低于此值视为失败 / 弹窗 | `150` |
+| `--max-revive` | 自动看广告复活的最大次数 | `3` |
+| `--max-slot-unlock` | 看广告解锁锁定线卷槽的最大次数 | `4` |
+| `--revive-x` / `--revive-y` | 「获得」按钮横向 / 纵向比例 | `0.50` / `0.738` |
+| `--revive-wait` | 看广告等待秒数 | `15` |
+| `--revive-timeout` | 等待回到对局的总超时秒数 | `30` |
+| `--revive-settle` | 复活后额外等待秒数 | `3.0` |
+
+</details>
+
+## 行为说明
+
+- 暂存区、挡板分组、复活广告等状态按规则处理。
+- 消除之前先看广告解锁锁定的线卷槽；失败弹窗会点「获得」看广告复活。
+- 遇到京东安全验证会暂停，等待用户手动完成后继续。
