@@ -3,11 +3,9 @@
 const {
   longWait,
   waitUntil,
-  waitForText,
   sleepTier,
   tap,
   getScreenSize,
-  doubleBackN,
 } = require("./utils");
 const { info, debug } = require("./lib/logger");
 
@@ -158,8 +156,8 @@ function ensureHomePage() {
 /* 攒经验任务弹窗 */
 
 const TASK_POPUP_TITLE = "做任务 攒经验";
-const BROWSE_WAIT_SECONDS = 15;
-const BROWSE_CHECK_INTERVAL_MS = 500;
+const BROWSE_LOAD_BUFFER_MS = 5000; // 任务卡片写的浏览时长之外，额外预留的页面加载时间
+const BROWSE_DEFAULT_SECONDS = 8; // 读不到"浏览X秒"时的兜底时长
 
 /* 任务文本包含以下任意一项则跳过，按需填写 */
 const TASK_SKIP_KEYWORDS = [];
@@ -235,6 +233,27 @@ function getTaskName(btn) {
   return "";
 }
 
+/* 从任务卡片中"浏览X秒"的描述读出所需浏览秒数；读不到返回 0 */
+function getBrowseSeconds(btn) {
+  let b = btn.bounds();
+  if (!b) {
+    return 0;
+  }
+  let descs = textMatches("浏览\\d+秒").find(500);
+  for (let i = 0; i < descs.length; i++) {
+    let db = descs[i].bounds();
+    if (!db) {
+      continue;
+    }
+    let dy = (db.top + db.bottom) / 2;
+    if (dy >= b.top - 20 && dy <= b.bottom + 20 && db.right <= b.left + 10) {
+      let m = /(\d+)/.exec(descs[i].text());
+      return m ? parseInt(m[1], 10) : 0;
+    }
+  }
+  return 0;
+}
+
 /* 任务描述命中任意关键字就跳过 */
 function isTaskSkipped(name) {
   if (!name) {
@@ -263,7 +282,7 @@ function pickVisibleBrowseTask(processed) {
       processed[key] = true;
       continue;
     }
-    return { btn: btns[i], name: n, key: key };
+    return { btn: btns[i], name: n, key: key, seconds: getBrowseSeconds(btns[i]) };
   }
   return null;
 }
@@ -288,21 +307,18 @@ function browseTasks() {
     }
     processed[picked.key] = true;
 
-    debug("逛一逛任务: " + (picked.name || "未知"));
+    // 时长直接取任务卡片上的"浏览X秒"，再加加载缓冲；不观测返回控件，到时间自动返回。
+    let browseMs = (picked.seconds || BROWSE_DEFAULT_SECONDS) * 1000 + BROWSE_LOAD_BUFFER_MS;
+    debug("逛一逛任务: " + (picked.name || "未知") + "，浏览" + (picked.seconds || BROWSE_DEFAULT_SECONDS) + "秒，等待" + (browseMs / 1000) + "秒");
     tap(picked.btn);
 
-    // 15 秒内每 500ms 检查一次"点击立即返回"（包含匹配），出现就直接点击返回
-    let returned = waitForText("点击立即返回", {
-      seconds: BROWSE_WAIT_SECONDS,
-      intervalMs: BROWSE_CHECK_INTERVAL_MS,
-      click: true,
-      partial: true,
-      log: "点击立即返回",
-    });
-    if (!returned) {
-      // 小游戏等任务没有返回按钮，按 doubleBackN 连续退两次
-      debug("未出现立即返回，连续两次返回");
-      doubleBackN(1);
+    sleep(browseMs);
+    // 先退一次；绝大多数任务一次就回到弹窗。
+    back();
+    // 少数（如掼蛋游戏）一次退不回弹窗，3 秒内没回来就再补一次返回。
+    if (!waitUntil(3000, isTaskPopup)) {
+      debug("一次返回未回到弹窗，再返回一次");
+      back();
     }
     if (!waitUntil(5000, isTaskPopup)) {
       debug("未回到任务弹窗，结束后续任务");
