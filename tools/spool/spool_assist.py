@@ -390,6 +390,83 @@ def pick_next(clickable, recent, scale):
     return pool[0]
 
 
+def detect_top_boards(img, small=None, min_area=8000):
+    """检测顶层挡板：挡板外围白色描边完整闭合的区域即顶层。
+
+    原理：顶层挡板没被别的挡板/线卷压住，白色描边围成封闭环；下层挡板被
+    遮挡，描边断开并与背景连通。做法是在棋盘区提取纯白像素、轻微膨胀补上
+    被线卷压出的细小缺口，再找不与边界连通的封闭区域。若一个封闭区套在
+    另一个里（嵌套挡板），只保留最内层作为当前顶层。
+
+    @param min_area: 封闭区最小像素面积（按 1080 宽归一化的量级），过滤小空隙
+    @returns: 顶层挡板列表，每项含 bbox(x,y,w,h)、cx/cy(全屏坐标)、area、spools
+    """
+    h, w = img.shape[:2]
+    scale = w / 1080.0
+    x0, y0, x1, y1 = BOARD_BAND
+    rx0, ry0, rx1, ry1 = int(x0 * w), int(y0 * h), int(x1 * w), int(y1 * h)
+    crop = img[ry0:ry1, rx0:rx1]
+
+    # 挡板描边是接近纯白的实线（背景浅蓝 G/B 通道明显低于 R，不会命中）
+    white = ((crop[:, :, 0] > 235) & (crop[:, :, 1] > 235) &
+             (crop[:, :, 2] > 235)).astype(np.uint8)
+    wall = cv2.dilate(white, np.ones((3, 3), np.uint8), iterations=1)
+    free = (1 - wall).astype(np.uint8)
+    n, labels, stats, cents = cv2.connectedComponentsWithStats(free, 4)
+    ch, cw = free.shape
+
+    regions = []
+    min_px = min_area * scale * scale
+    for i in range(1, n):
+        x, y, ww, hh, area = stats[i]
+        # 与裁剪边界连通 = 背景，不是封闭挡板
+        if x == 0 or y == 0 or x + ww == cw or y + hh == ch:
+            continue
+        if area < min_px:
+            continue
+        mask = (labels == i).astype(np.uint8)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            continue
+        hull = cv2.convexHull(max(contours, key=cv2.contourArea))
+        regions.append({
+            "i": i, "area": int(area),
+            "bbox": (rx0 + x, ry0 + y, ww, hh),
+            "cx": rx0 + cents[i][0], "cy": ry0 + cents[i][1],
+            "hull": [(rx0 + p[0][0], ry0 + p[0][1]) for p in hull],
+        })
+
+    # 嵌套：若区域 a 的中心落在区域 b 的凸包内，说明 b 套在 a 外面（b 是外层）。
+    # 只保留没有子层的最内层封闭区作为顶层挡板——嵌套时内层压在外层上面。
+    top = []
+    for a in regions:
+        has_inner = any(
+            b is not a and b["area"] < a["area"] and
+            cv2.pointPolygonTest(np.array(a["hull"], np.float32),
+                                 (b["cx"], b["cy"]), False) >= 0
+            for b in regions
+        )
+        if not has_inner:
+            top.append(a)
+
+    # 把线卷归到所属顶层挡板（判断线卷中心是否落在封闭区内）
+    if small:
+        for b in top:
+            b["spools"] = []
+        for sp in small:
+            lx, ly = int(sp["x"] - rx0), int(sp["y"] - ry0)
+            if 0 <= lx < cw and 0 <= ly < ch:
+                lab = labels[ly, lx]
+                for b in top:
+                    if lab == b["i"]:
+                        b["spools"].append(sp)
+    else:
+        for b in top:
+            b["spools"] = []
+
+    return top
+
+
 def group_by_board(spools, img):
     """按线卷周围的挡板底色分组：挡板是半透明色块，色相可区分。"""
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -439,9 +516,20 @@ def pick_by_board(candidates, small, excluded, scale, img):
     return cand, "fallback"
 
 
-def pick_unlock(small, targets, excluded, scale, img):
-    """没有目标色可点时，优先清掉剩余线卷最少的挡板。"""
+def pick_unlock(small, targets, excluded, scale, img, top_boards=None):
+    """没有目标色可点时，优先清掉顶层挡板（白色描边完整）里剩余线卷少的。
+
+    顶层挡板才可能被释放；点下层挡板往往被遮挡而无效。若顶层挡板没有可点
+    线卷，回退到原有「按挡板线卷数最少」策略。
+    """
     pool = [s for s in small if s["color"] not in targets]
+    if top_boards:
+        top_spools = [sp for b in top_boards for sp in b.get("spools", [])]
+        top_pool = [s for s in pool if s in top_spools]
+        if top_pool:
+            cand, reason = pick_by_board(top_pool, small, excluded, scale, img)
+            if cand is not None:
+                return cand, "top-board|" + reason
     return pick_by_board(pool, small, excluded, scale, img)
 
 
@@ -608,7 +696,8 @@ def auto_run(args):
             if unlocks >= args.max_unlock:
                 print("stop: 已尝试 %d 次解放挡板，仍未出现目标线卷" % unlocks)
                 break
-            cand, reason = pick_unlock(small, targets, excluded, scale, img)
+            top_boards = detect_top_boards(img, small, args.board_min_area)
+            cand, reason = pick_unlock(small, targets, excluded, scale, img, top_boards)
             if cand is None:
                 print("stop: 没有可操作的线卷，也无法通过点击其他线卷解放挡板")
                 break
@@ -685,6 +774,8 @@ def main():
                     help="复活后额外等待秒数，等暂存区收集动画结束")
     ap.add_argument("--security-timeout", type=float, default=300,
                     help="遇到安全验证时等待用户手动处理的超时秒数")
+    ap.add_argument("--board-min-area", type=float, default=8000,
+                    help="顶层挡板检测的最小封闭区面积（1080 宽量级，过小易把空隙当挡板）")
     ap.add_argument("--notify", dest="notify", action="store_true", default=True,
                     help="自动运行结束后让手机 AutoJS 发出状态栏通知提醒（默认开启）")
     ap.add_argument("--no-notify", dest="notify", action="store_false",
