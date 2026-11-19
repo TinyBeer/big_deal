@@ -53,6 +53,9 @@ $PY tools/spool/spool_assist.py --auto --dry-run
 | `--dry-run` | 自动模式只演示第一步，不点击 | - |
 | `--no-revive` | 失败时不看广告复活，直接停止 | - |
 | `--security-timeout` | 等待用户手动完成安全验证的超时秒数 | `300` |
+| `--notify` / `--no-notify` | 自动模式结束后是否让手机 AutoJS 发出状态栏通知提醒 | 默认提醒 |
+| `--notify-message` | 通知内容（标题固定为「线卷三消」） | `线卷三消已完成` |
+| `--notify-script` | 写到手机上供 AutoJS 运行的临时脚本路径 | `/sdcard/Scripts/spool_notify.js` |
 
 <details>
 <summary>更多参数（点击、复活与解锁微调）</summary>
@@ -77,3 +80,4 @@ $PY tools/spool/spool_assist.py --auto --dry-run
 - 暂存区、挡板分组、复活广告等状态按规则处理。
 - 消除之前先看广告解锁锁定的线卷槽；失败弹窗会点「获得」看广告复活。
 - 遇到京东安全验证会暂停，等待用户手动完成后继续。
+- 自动模式结束（正常跑完或提前停止）后会通过 adb 把一条 `notice()` 脚本推送到手机，并调用 AutoJS6 的 `RunIntentActivity` 直接执行，在状态栏生成常驻通知（标题「线卷三消」），无需手机上常驻监听脚本；异常中断时也会提醒。需要 AutoJS6 的通知权限（POST_NOTIFICATIONS）。用 `--no-notify` 可关闭，`--notify-message` 改内容。
