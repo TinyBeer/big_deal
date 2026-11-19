@@ -14,7 +14,11 @@ set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${SPOOL_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
+PY="${SPOOL_PYTHON:-$(command -v python || command -v python3 || true)}"
+if [ -z "$PY" ]; then
+  echo "✗ 未找到 Python，请先激活环境（如 conda activate xxx）或设置 SPOOL_PYTHON" >&2
+  exit 1
+fi
 OUT="$ROOT/outputs/spool_annotated.png"
 
 for a in "$@"; do

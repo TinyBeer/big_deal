@@ -46,8 +46,7 @@ tools/find-diff/find_diff.sh <图片路径> -c 25 -t 14
 碎框过多时（同一物体出多个框），可合并重排编号：
 
 ```bash
-/home/beer/.workbuddy/binaries/python/envs/default/bin/python \
-  tools/find-diff/merge_and_mark.py <原图> <BASE>_diffs.json <输出前缀>.png
+python tools/find-diff/merge_and_mark.py <原图> <BASE>_diffs.json <输出前缀>.png
 ```
 
 规则：面积 < 120px² 且彼此间距 < 40px 的碎框合并为一个（典型：左右眼、上下睫毛线各出一框，实为一处"眼睛变了"）；再按"从上到下、从左到右"重排 1..N。
@@ -68,5 +67,5 @@ tools/find-diff/find_diff.sh <图片路径> -c 25 -t 14
 ## 依赖
 
 - Python + `numpy` / `Pillow` / `scipy`（检测本身不需要 adb，只有 `quick.sh` 抓图环节需要）
-- 与 spool 共用一份依赖清单：在项目根目录执行 `pip install -r tools/requirements.txt`
-- 默认解释器 `/home/beer/.workbuddy/binaries/python/envs/default/bin/python`，可用环境变量 `FIND_DIFF_PYTHON` 覆盖
+- 与 spool 共用一份依赖清单：先激活环境，再在项目根目录执行 `python -m pip install -r tools/requirements.txt`
+- 默认使用当前激活环境中的 Python（优先 `python`，找不到时回退 `python3`），可用环境变量 `FIND_DIFF_PYTHON` 覆盖；`quick.sh` 会把该变量传给内部调用的 `find_diff.sh`

@@ -12,12 +12,12 @@ tools/spool/quick.sh --once       # 只识别一次
 tools/spool/quick.sh --live       # 实时循环标注
 ```
 
-`quick.sh` 固定解释器与输出路径，其余参数原样透传；输出默认 `outputs/spool_annotated.png`。
+`quick.sh` 默认使用当前激活环境中的 Python（优先 `python`，找不到时回退 `python3`），可用 `SPOOL_PYTHON` 覆盖；输出路径固定，其余参数原样透传；输出默认 `outputs/spool_annotated.png`。
 
 不使用快速脚本时，也可直接调用：
 
 ```bash
-PY=/home/beer/.workbuddy/binaries/python/envs/default/bin/python
+PY=python   # 当前激活环境中的解释器，也可用 SPOOL_PYTHON 指定
 $PY tools/spool/spool_assist.py --auto --output outputs/spool_annotated.png
 ```
 

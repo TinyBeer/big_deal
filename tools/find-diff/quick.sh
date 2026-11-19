@@ -35,7 +35,12 @@ done
 case "$NUM" in 1|2|3|4) ;; *) echo "-k 只支持 1~4" >&2; exit 2 ;; esac
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PY="${FIND_DIFF_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
+PY="${FIND_DIFF_PYTHON:-$(command -v python || command -v python3 || true)}"
+if [ -z "$PY" ]; then
+  echo "✗ 未找到 Python，请先激活环境（如 conda activate xxx）或设置 FIND_DIFF_PYTHON" >&2
+  exit 1
+fi
+export FIND_DIFF_PYTHON="$PY"
 export TMPDIR="${TMPDIR:-/home/beer/tmp}"
 mkdir -p "$OUTDIR" "$TMPDIR"
 WORK="$(mktemp -d "$TMPDIR/zc.XXXXXX")"

@@ -44,10 +44,10 @@ big_deal/
 
 ### 游戏辅助工具
 
-两个工具共用同一个 Python 环境与依赖清单，安装一次即可（需 Python 3.9+、adb 已连接设备）：
+两个工具共用同一个 Python 环境与依赖清单，安装一次即可（需 Python 3.9+、adb 已连接设备）。先激活你要用的环境（如 miniconda 的 `conda activate <环境名>`）：
 
 ```bash
-pip install -r tools/requirements.txt
+python -m pip install -r tools/requirements.txt
 ```
 
 **找不同**（手机停在关卡界面）：
