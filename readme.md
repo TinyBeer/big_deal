@@ -19,7 +19,7 @@
 仓库包含两部分能力：
 
 - **AutoJS6 任务助手**：以 `main.js` 为入口，提供京东商城、京东金融、互动游戏等日常任务的图形化控制台。
-- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」与「线卷三消」。
+- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」与「停车场接客」。
 
 ## 目录结构
 
@@ -30,7 +30,9 @@ big_deal/
 ├── tools/                # 游戏辅助工具
 │   ├── find-diff/        # 找不同：检测并标注差异点
 │   ├── spool/            # 线卷三消：识别并自动点击
-│   └── requirements.txt  # 两个工具共用的 Python 依赖
+│   ├── dogs/             # 狗狗三消：识别并自动点击
+│   ├── parking/          # 停车场接客：识别、解锁接驳位并自动接客
+│   └── requirements.txt  # 各工具共用的 Python 依赖
 └── outputs/              # 工具运行产物（已 gitignore）
 ```
 
@@ -44,7 +46,7 @@ big_deal/
 
 ### 游戏辅助工具
 
-两个工具共用同一个 Python 环境与依赖清单，安装一次即可（需 Python 3.9+、adb 已连接设备）。先激活你要用的环境（如 miniconda 的 `conda activate <环境名>`）：
+各工具共用同一个 Python 环境与依赖清单，安装一次即可（需 Python 3.9+、adb 已连接设备）。先激活你要用的环境（如 miniconda 的 `conda activate <环境名>`）：
 
 ```bash
 python -m pip install -r tools/requirements.txt
@@ -64,10 +66,26 @@ tools/spool/quick.sh                # 默认自动点击，输出 outputs/spool_
 tools/spool/quick.sh --once         # 只识别一次
 ```
 
+**狗狗三消**：
+
+```bash
+tools/dogs/quick.sh                 # 默认自动点击（--once 只标注）
+```
+
+**停车场接客**（先看广告解锁全部接驳位，再自动接客，剩 1 空位时停手交还）：
+
+```bash
+tools/parking/quick.sh --dry-run                              # 试运行，只演示一步决策
+tools/parking/quick.sh --no-unlock --no-notify --max-clicks N # 续跑：不解锁、不通知、限 N 步
+tools/parking/quick.sh                                        # 默认：解锁全部 + 打通单关 + 通知
+```
+
 完整参数与算法说明见各工具目录：
 
 - `tools/find-diff/README.md` — 找不同
 - `tools/spool/README.md` — 线卷三消
+- `tools/dogs/README.md` — 狗狗三消
+- `tools/parking/PLAN.md` — 停车场接客（方案、规则与实现说明）
 - `tools/README.md` — 工具总览与共用环境
 
 ## TODO
