@@ -6,6 +6,7 @@
 |------|------|------|
 | `find-diff/` | 找不同（找茬）差异检测与标注 | `tools/find-diff/quick.sh` |
 | `spool/` | 三消「线卷」识别、标注与自动点击 | `tools/spool/quick.sh` |
+| `dogs/` | 狗狗三消识别、标注与自动点击 | `tools/dogs/quick.sh`（默认 `--auto`，`--once` 只标注） |
 
 ## 约定
 
