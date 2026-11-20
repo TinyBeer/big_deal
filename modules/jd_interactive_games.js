@@ -156,7 +156,7 @@ function ensureHomePage() {
 /* 攒经验任务弹窗 */
 
 const TASK_POPUP_TITLE = "做任务 攒经验";
-const BROWSE_LOAD_BUFFER_MS = 5000; // 任务卡片写的浏览时长之外，额外预留的页面加载时间
+const BROWSE_LOAD_BUFFER_MS = 8000; // 任务卡片写的浏览时长之外，额外预留的页面加载时间
 const BROWSE_DEFAULT_SECONDS = 8; // 读不到"浏览X秒"时的兜底时长
 
 /* 任务文本包含以下任意一项则跳过，按需填写 */
