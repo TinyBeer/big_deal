@@ -72,11 +72,12 @@ tools/spool/quick.sh --once         # 只识别一次
 tools/dogs/quick.sh                 # 默认自动点击（--once 只标注）
 ```
 
-**停车场接客**（先看广告解锁全部接驳位，再自动接客，剩 1 空位时停手交还）：
+**停车场接客**（先看广告解锁全部接驳位，再自动接客；遇倾斜/8 方向关卡只解锁不自动打，剩 1 空位也停手交还）：
 
 ```bash
 tools/parking/quick.sh --dry-run                              # 试运行，只演示一步决策
 tools/parking/quick.sh --no-unlock --no-notify --max-clicks N # 续跑：不解锁、不通知、限 N 步
+tools/parking/quick.sh --allow-tilted                         # 显式开启：倾斜关卡也自动接客
 tools/parking/quick.sh                                        # 默认：解锁全部 + 打通单关 + 通知
 ```
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """停车场接客辅助 · 视觉识别模块。
 
-抓图 -> 分水岭分离车辆 -> 识别每辆车(颜色/朝向/中心/可开出) -> 识别队首乘客颜色
--> 输出标注图 + JSON 摘要。
+抓图 -> 按颜色连通域分离车辆 -> 识别每辆车(颜色/8 方向朝向/中心/可开出/点击点)
+-> 识别队首乘客颜色与接驳位状态 -> 判断是否倾斜关卡 -> 输出标注图 + JSON 摘要。
 
 坐标基于 1080x2400 竖屏，比例化以适配相近分辨率。
 """
@@ -26,6 +26,9 @@ COLORS = {
     "pink":   ((150, 169), (170, 70, 235)),
 }
 GRAY = "unknown"  # 灰色?车
+# 各车色的代表 hue（像素射线法用），与 COLORS 范围中心对应
+CAR_HUE = {"red": 3, "brown": 176, "yellow": 25, "green": 56,
+           "cyan": 89, "blue": 112, "pink": 159, "unknown": 0}
 
 # 区域比例
 BOARD = (0.037, 0.410, 0.963, 0.763)   # 棋盘 x0,y0,x1,y1
@@ -39,7 +42,32 @@ DRAW = {
     "green": (60, 215, 75), "cyan": (225, 215, 70), "blue": (235, 100, 45),
     "pink": (170, 70, 235), "unknown": (150, 150, 150),
 }
-DIR_ARROW = {"left": "←", "right": "→", "up": "↑", "down": "↓"}
+DIR_ARROW = {"left": "←", "right": "→", "up": "↑", "down": "↓",
+             "up-left": "↖", "up-right": "↗", "down-left": "↙", "down-right": "↘"}
+
+# 屏幕上的 4 条标准轴向（度）。等距投影下世界 8 方向映射到这 4 轴 × 2 朝向：
+#   水平 0° / 垂直 90° / 斜 26.565°(arctan 1/2) / 斜 153.435°
+# 关卡按倾角分批出现（某关全是正交轴，某关全是斜轴），每关固定一种。
+AXES_DEG = (0.0, 90.0, 26.565, 153.435)
+# 斜关卡判定：世界 45° 经 2:1 等距投影后落在 26.565° / 153.435°。
+# 旧正交关实测轴角约 10°/75°/168°，与这两个值相差 >=12°，容差 8° 不会误报。
+TILT_AXES_DEG = (26.565, 153.435)
+TILT_TOL_DEG = 8.0
+DIAG_DIRS = ("up-left", "up-right", "down-left", "down-right")
+# 8 方向名 -> 单位向量(屏幕坐标, y向下) + 用于排序的"朝上"优先级
+DIR_VEC = {
+    "right":      (1.0, 0.0),
+    "down":       (0.0, 1.0),
+    "left":       (-1.0, 0.0),
+    "up":         (0.0, -1.0),
+    "down-right": (np.cos(np.radians(26.565)), np.sin(np.radians(26.565))),
+    "up-left":    (-np.cos(np.radians(26.565)), -np.sin(np.radians(26.565))),
+    "down-left":  (-np.cos(np.radians(153.435)), np.sin(np.radians(153.435))),
+    "up-right":   (np.cos(np.radians(153.435)), -np.sin(np.radians(153.435))),
+}
+# 排序优先级：越朝上越优先（车开向顶部接驳区）
+DIR_PRIORITY = {"up": 0, "up-left": 1, "up-right": 1, "left": 2, "right": 2,
+                "down": 3, "down-left": 4, "down-right": 4}
 
 
 def grab(serial=None):
@@ -117,21 +145,62 @@ def detect_cars(img):
             if key in seen:
                 continue
             seen.add(key)
+            # 车身 OBB：用连通域原始像素做 minAreaRect，拿到真实长轴角度和长宽。
+            # 轴对齐 bbox(ww,hh) 在斜车上会膨胀，不能直接用来判方向/算射线走廊。
+            obb = None
+            ys, xs = np.where(lab == i)
+            if xs.size >= 200:
+                (rcx, rcy), (rw, rh), rang = cv2.minAreaRect(
+                    np.column_stack([xs, ys]).astype(np.float32))
+                if rw >= rh:
+                    L, W, la = rw, rh, rang % 180
+                else:
+                    L, W, la = rh, rw, (rang + 90) % 180
+                obb = {"cx": float(rcx) + x0, "cy": float(rcy) + y0,
+                       "L": float(L), "W": float(W), "angle": float(la)}
             cars.append({
                 "x": gx, "y": gy,
                 "bx": xx + x0, "by": yy + y0, "bw": ww, "bh": hh,
                 "color": name,
                 "area": int(area),
+                "obb": obb,
             })
     return cars
 
 
-def detect_arrows(img):
-    """全图检测白色箭头（车身上唯一的纯白实心块），返回每个箭头的中心和朝向。
+def _axis_dir(angle_deg, sign):
+    """把「主轴角度(0~180) + 正反符号」映射到 8 方向名和屏幕单位向量。
 
-    箭头大小/颜色固定、只是方向不同：横箭头约 65x23、竖箭头约 26x55。
-    朝向由「三角头那一端更宽」判定（箭杆细、三角粗），与箭头在车身上的位置无关，
-    比白色质心法可靠得多。灰「?」障碍车没有箭头，天然被排除。
+    sign=+1 表示沿角度正向(cos,sin)，=-1 表示反向。图像 y 向下。
+    """
+    # 用主轴方向向量判定落在哪条轴
+    th = np.radians(angle_deg)
+    ux, uy = np.cos(th) * sign, np.sin(th) * sign
+    dx, dy = ux, uy
+    ax, ay = abs(dx), abs(dy)
+    if ax >= ay:
+        name = "right" if dx > 0 else "left"
+    else:
+        name = "down" if dy > 0 else "up"
+    # 斜向：角度偏离水平/垂直超过 ~10° 时，用组合名
+    dev = min(abs(angle_deg - 0), abs(angle_deg - 90), abs(angle_deg - 180))
+    if dev > 10:
+        v = "right" if dx > 0 else "left"
+        h = "down" if dy > 0 else "up"
+        name = h + "-" + v          # 统一「上下-左右」，如 down-right / up-left
+        if name not in DIR_VEC:
+            name = v if ax >= ay else h
+    return name, (float(dx), float(dy))
+
+
+def detect_arrows(img):
+    """全图检测白色箭头，返回中心、8 方向名、单位向量、主轴角度。
+
+    箭头是车身上唯一的纯白实心块（灰「?」车没有，天然排除）。大小/颜色固定、
+    仅朝向不同。判向分两步，与箭头在车身上的位置和 bbox 宽高比无关：
+      1) minAreaRect 取主轴角度 -> 量化到 4 条标准轴之一；
+      2) 把点旋转到主轴水平，比较两端横向跨度 -> 三角头(宽)端为箭头指向。
+    这样即使棋盘倾斜 26.6°（45° 经 2:1 等距投影）也能正确判 8 方向。
     """
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     white = ((hsv[:, :, 2] > 235) & (hsv[:, :, 1] < 50)).astype(np.uint8)
@@ -142,23 +211,52 @@ def detect_arrows(img):
     arrows = []
     for i in range(1, n):
         x, y, w, h, area = stats[i]
-        if not (200 < area < 2000 and 15 < w < 100 and 10 < h < 100):
+        if not (200 < area < 2500 and 15 < w < 110 and 10 < h < 110):
             continue
         ys, xs = np.where(lab == i)
-        horizontal = w >= h
-        if horizontal:
-            mid = (xs.min() + xs.max()) / 2.0
-            left = np.ptp(ys[xs < mid]) if (xs < mid).any() else 0
-            right = np.ptp(ys[xs >= mid]) if (xs >= mid).any() else 0
-            d = "right" if right > left else "left"
-        else:
-            mid = (ys.min() + ys.max()) / 2.0
-            top = np.ptp(xs[ys < mid]) if (ys < mid).any() else 0
-            bot = np.ptp(xs[ys >= mid]) if (ys >= mid).any() else 0
-            d = "down" if bot > top else "up"
+        pts = np.column_stack([xs, ys]).astype(np.float32)
+        (rcx, rcy), (rw, rh), rang = cv2.minAreaRect(pts)
+        # 长轴角度归一到 [0,180)
+        la = (rang if rw >= rh else rang + 90) % 180
+        # 旋转到主轴水平，比较两端横向(垂直轴)跨度，三角头端更宽
+        th = np.radians(la)
+        X = xs * np.cos(-th) - ys * np.sin(-th)
+        Y = xs * np.sin(-th) + ys * np.cos(-th)
+        mid = (X.min() + X.max()) / 2.0
+        lo = Y[X < mid]
+        hi = Y[X >= mid]
+        span_lo = float(np.ptp(lo)) if lo.size else 0.0
+        span_hi = float(np.ptp(hi)) if hi.size else 0.0
+        sign = 1 if span_hi > span_lo else -1   # 尖端在 +主轴 方向
+        name, vec = _axis_dir(la, sign)
         arrows.append({"x": float(cents[i][0]) + x0, "y": float(cents[i][1]) + y0,
-                       "dir": d, "w": int(w), "h": int(h)})
+                       "dir": name, "vec": vec, "axis": round(la, 2),
+                       "w": int(w), "h": int(h)})
     return arrows
+
+
+def _angle_dist(a, b):
+    """主轴角(0~180 等价)的最小夹角。"""
+    d = abs((float(a) - float(b)) % 180.0)
+    return min(d, 180.0 - d)
+
+
+def tilt_info(arrows, tol=TILT_TOL_DEG):
+    """判断当前关卡是否为倾斜（8 方向）关卡。
+
+    只把「方向名为斜向」且「主轴角贴近等距投影标准斜轴」的箭头算进来，
+    避免旧正交关里 15°/165° 这类轻微偏转箭头被误判成斜向。
+    """
+    tilted = [a for a in arrows
+              if a.get("dir") in DIAG_DIRS
+              and any(_angle_dist(a.get("axis", 0.0), t) <= tol
+                      for t in TILT_AXES_DEG)]
+    return {
+        "tilted": bool(tilted),
+        "count": len(tilted),
+        "axes": sorted({round(float(a["axis"]), 1) for a in tilted}),
+        "dirs": sorted({a["dir"] for a in tilted}),
+    }
 
 
 def detect_direction(car, img, arrows=None):
@@ -172,7 +270,10 @@ def detect_direction(car, img, arrows=None):
         if inside:
             # 取最近的一个
             inside.sort(key=lambda a: (a["x"]-(bx0+bx1)/2)**2 + (a["y"]-(by0+by1)/2)**2)
-            return inside[0]["dir"], 0.0
+            a = inside[0]
+            car["vec"] = a.get("vec", DIR_VEC.get(a["dir"], (0.0, -1.0)))
+            car["axis"] = a.get("axis", 0.0)
+            return a["dir"], 0.0
     # 退化：车身 bbox 内白色质心（旧法，仅在箭头块漏检时用）
     bx, by, bw, bh = car["bx"], car["by"], car["bw"], car["bh"]
     roi = img[by:by+bh, bx:bx+bw]
@@ -182,12 +283,15 @@ def detect_direction(car, img, arrows=None):
         proj = white.sum(axis=0); mid = bw/2.0
         ws = proj[2:bw-2]; xs = np.arange(2, bw-2)
         c = float((xs*ws).sum()/ws.sum()) if ws.sum() else mid
-        return ("right" if c >= mid else "left"), round(c, 1)
+        d = "right" if c >= mid else "left"
     else:
         proj = white.sum(axis=1); mid = bh/2.0
         ws = proj[2:bh-2]; ys = np.arange(2, bh-2)
         c = float((ys*ws).sum()/ws.sum()) if ws.sum() else mid
-        return ("down" if c >= mid else "up"), round(c, 1)
+        d = "down" if c >= mid else "up"
+    car["vec"] = DIR_VEC[d]
+    car["axis"] = 0.0 if d in ("left", "right") else 90.0
+    return d, round(c, 1)
 
 
 def detect_queue(img):
@@ -239,42 +343,117 @@ def detect_queue(img):
     return {"seq": seq, "colors": colors, "head": None, "head_side": "left"}
 
 
-def can_exit(car, cars, img_shape, docked=None):
-    """沿箭头方向做全程射线扫描：路径上任一占用块（车/障碍/接驳车）都挡住。
+def _obb_of(car):
+    """取车的 OBB(cx,cy,L,W,angle)。缺失时退回轴对齐 bbox 估算。"""
+    o = car.get("obb")
+    if o:
+        return o["cx"], o["cy"], o["L"], o["W"], o["angle"]
+    return (car["bx"] + car["bw"]/2.0, car["by"] + car["bh"]/2.0,
+            max(car["bw"], car["bh"]), min(car["bw"], car["bh"]), 0.0)
 
-    建立以车辆 bbox 为单元的二维占用坐标系。沿行进方向从车头前端一直扫到
-    画面边界（而非只看邻近几格），检查是否有任何其它车/接驳位车辆的
-    投影区间与该射线走廊相交。相交即不可开出。
+
+def pick_tap_point(car, hsv_img):
+    """在车身内选一个落在实心车漆上的可点击点（支持斜向车）。
+
+    车中心通常就是车漆；正交车有时中心落在下半车窗，故准备多个候选：
+    中心 -> 沿行进反方向小偏移 -> 垂直方向偏移。选第一个 HSV 匹配本车色的点。
     """
-    h, w = img_shape[:2]
+    cx, cy = int(car["x"]), int(car["y"])
     bx, by, bw, bh = car["bx"], car["by"], car["bw"], car["bh"]
-    d = car["dir"]
-    # 射线走廊：横向车沿 x 方向扫(用 y 区间做投影)，竖向车沿 y 方向扫(用 x 区间)
-    if d in ("left", "right"):
-        lane_lo, lane_hi = by + 6, by + bh - 6   # 垂直于行进方向的占用区间
-    else:
-        lane_lo, lane_hi = bx + 6, bx + bw - 6
+    my_hue = CAR_HUE.get(car["color"], 0)
+    ux, uy = car.get("vec", (0.0, -1.0))
+    short = max(10, min(bw, bh) // 5)
+    cand = [(cx, cy)]
+    for k in (0.5, 1.0):
+        cand.append((int(cx - ux*short*k), int(cy - uy*short*k)))
+        cand.append((int(cx + uy*short*k), int(cy + ux*short*k)))
+        cand.append((int(cx - uy*short*k), int(cy - ux*short*k)))
+    h, w = hsv_img.shape[:2]
+    for x, y in cand:
+        if not (0 <= x < w and 0 <= y < h):
+            continue
+        if not (bx <= x <= bx+bw and by <= y <= by+bh):
+            continue
+        hh, ss, vv = hsv_img[y, x]
+        dh = min(abs(int(hh)-my_hue), 180-abs(int(hh)-my_hue))
+        if ss > 70 and vv > 130 and dh <= 22:   # 实心车漆
+            return x, y
+    return cx, cy
 
-    # 所有占用块 = 棋盘车 + 接驳位停着的车
-    blocks = [o for o in cars if o is not car] + [o for o in (docked or [])]
 
-    for o in blocks:
-        ox0, oy0 = o["bx"], o["by"]
-        ox1, oy1 = ox0 + o["bw"], oy0 + o["bh"]
-        if d == "left":
-            # 占用块在车左侧、且投影区间重叠 => 挡住
-            if ox1 <= bx + 4 and oy1 > lane_lo and oy0 < lane_hi:
-                return False
-        elif d == "right":
-            if ox0 >= bx + bw - 4 and oy1 > lane_lo and oy0 < lane_hi:
-                return False
-        elif d == "up":
-            if oy1 <= by + 4 and ox1 > lane_lo and ox0 < lane_hi:
-                return False
-        else:  # down
-            if oy0 >= by + bh - 4 and ox1 > lane_lo and ox0 < lane_hi:
-                return False
+def _can_exit_geom(car, cars, docked):
+    """几何法：沿方向向量用 OBB 投影判断占用块是否挡路。"""
+    vec = car.get("vec", DIR_VEC.get(car["dir"], (0.0, -1.0)))
+    ux, uy = float(vec[0]), float(vec[1])
+    px, py = -uy, ux
+    ccx, ccy, cL, cW, _ = _obb_of(car)
+    start_x = ccx + ux * (cL/2.0 - 4)
+    start_y = ccy + uy * (cL/2.0 - 4)
+    lane_half = cW/2.0 + 4
+    for o in [o for o in cars if o is not car] + list(docked or []):
+        ox, oy, oL, oW, _ = _obb_of(o)
+        rx, ry = ox - start_x, oy - start_y
+        along = rx*ux + ry*uy
+        across = abs(rx*px + ry*py)
+        if along < -oW/2.0:
+            continue
+        if along - oL/2.0 < 2600 and across < lane_half + oW/2.0:
+            if along <= oL/2.0 + 6 and across < 3:
+                continue
+            return False
     return True
+
+
+def _can_exit_pixels(img, car):
+    """像素法：沿方向向量在棋盘内采样，检测前方是否有别的车漆/灰障碍。
+
+    从车中心先走完本车颜色，再向前扫：连续出现异色车漆或灰车块即判被挡；
+    走出棋盘边界即判可开出。能发现未被识别的遮挡车，弥补几何法依赖检测的短板。
+    """
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    x0, y0, x1, y1 = _region_px(img, BOARD)
+    cx, cy = car["x"], car["y"]
+    ux, uy = car.get("vec", DIR_VEC.get(car["dir"], (0.0, -1.0)))
+    my_hue = CAR_HUE.get(car["color"], 0)
+    step = 3
+    # 跳过本车：走到脱离本车颜色为止
+    t = 10
+    while t < 210:
+        x, y = int(cx+ux*t), int(cy+uy*t)
+        if not (x0 <= x < x1 and y0 <= y < y1):
+            return True
+        h, s, v = hsv[y, x]
+        dh = min(abs(int(h)-my_hue), 180-abs(int(h)-my_hue))
+        if not (s > 55 and dh <= 22):
+            break
+        t += step
+    # 向前扫占用像素
+    run = 0
+    while t < 430:
+        x, y = int(cx+ux*t), int(cy+uy*t)
+        if not (x0 <= x < x1 and y0 <= y < y1):
+            return True                       # 出棋盘 => 可开出
+        h, s, v = hsv[y, x]
+        gray_block = (s < 52 and 70 < v < 215)
+        dh = min(abs(int(h)-my_hue), 180-abs(int(h)-my_hue))
+        other_car = (s > 70 and v > 70 and dh > 20)
+        run = run + 1 if (gray_block or other_car) else 0
+        if run >= 10:                          # 连续 ~30px 占用 => 挡住
+            return False
+        t += step
+    return True
+
+
+def can_exit(car, cars, img_shape, docked=None, img=None):
+    """可开出判定 = 几何法 AND 像素法（支持 8 方向）。
+
+    两法取交集：几何法依赖车辆检测（可能漏检遮挡车），像素法直接看画面（可能
+    误判车身装饰/棋盘外深灰区）。交集偏保守——宁可漏掉一两辆可开车，也不把
+    被挡的车判成可开出导致反复点击卡死（用户核心痛点）。
+    """
+    if img is None:
+        return _can_exit_geom(car, cars, docked)
+    return _can_exit_geom(car, cars, docked) and _can_exit_pixels(img, car)
 
 
 def detect_unlock_slots(img, template_path=None, threshold=0.72):
@@ -351,14 +530,16 @@ def analyze(img, head_side="left"):
         c["arrow_off"] = off
     # 阻挡判定：棋盘内所有车 + 接驳位停着的车（后者挡住 up 方向）
     docked = detect_docked_cars(img)
+    hsv_full = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
     for c in cars:
-        c["can_exit"] = can_exit(c, cars, img.shape, docked)
+        c["can_exit"] = can_exit(c, cars, img.shape, docked, img)
+        c["tap"] = pick_tap_point(c, hsv_full)
     q = detect_queue(img)
     if q["colors"]:
         q["head"] = q["colors"][0] if head_side == "left" else q["colors"][-1]
         q["head_side"] = head_side
     return {"cars": cars, "queue": q, "docked": docked,
-            "empty_slots": detect_empty_slots(img)}
+            "empty_slots": detect_empty_slots(img), "tilt": tilt_info(arrows)}
 
 
 def annotate(img, result, pick=None):
@@ -368,6 +549,11 @@ def annotate(img, result, pick=None):
         cv2.rectangle(vis, (c["bx"], c["by"]), (c["bx"]+c["bw"], c["by"]+c["bh"]), col, 2)
         label = DIR_ARROW.get(c["dir"], "?")
         cv2.putText(vis, label, (c["x"]-6, c["y"]+6), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,0), 2)
+        vec = c.get("vec")
+        if vec:
+            ex = int(c["x"] + vec[0]*22); ey = int(c["y"] + vec[1]*22)
+            cv2.line(vis, (int(c["x"]), int(c["y"])), (ex, ey), (255, 0, 255), 2)
+            cv2.circle(vis, (ex, ey), 3, (255, 0, 255), -1)
     q = result["queue"]
     for s in q["seq"]:
         col = DRAW.get(s["color"], (150,150,150))
@@ -402,6 +588,7 @@ def main():
                    for c in set(x["color"] for x in res["cars"])},
         "queue_seq": res["queue"]["colors"],
         "head": res["queue"]["head"],
+        "tilt": res["tilt"],
     }, ensure_ascii=False))
     vis = annotate(img, res)
     cv2.imwrite(args.output, vis)

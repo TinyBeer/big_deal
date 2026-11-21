@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """停车场接客自动点击。
 
-流程：开局看广告解锁全部接驳位 -> 循环 {抓图识别 -> 按队首颜色选可开出的车 ->
-点击 -> 等稳定}；无同色车时点任意可开出车疏通（愤怒无后果）。无可开车则结束并通知。
+流程：开局看广告解锁全部接驳位 -> 若为倾斜(8 方向)关卡则停手交还用户 ->
+循环 {抓图识别 -> 按队首颜色选可开出的车 -> 点击 -> 等稳定}；无同色车时点任意
+可开出车疏通（愤怒无后果）。无可开车则结束并通知。倾斜关卡可用 --allow-tilted 强制执行。
 
 用法（统一入口见 quick.sh）：
   tools/parking/quick.sh --dry-run
@@ -36,14 +37,22 @@ CN = {"red": "红", "brown": "深红", "yellow": "黄", "green": "绿",
 
 
 def car_tap_point(car):
-    """取车身偏上 1/3 处点击。
+    """取车身实心区点击：沿行进反方向(车尾)偏移一点，避开车窗/描边。
 
-    质心有时落在车身下半部（紧贴下方车辆/深色车窗区），游戏不响应；
-    偏上位置落在车顶实心区，点击稳定生效。
+    正交车：车尾在行进反方向；斜向车(26.6°/153.4°)同样沿反方向偏移。
+    质心/轴对齐 bbox 的"偏上"在斜车上会落到车外或相邻车，故用方向向量。
     """
+    if "tap" in car:
+        return car["tap"]
     bx, by = int(car["bx"]), int(car["by"])
     bw, bh = int(car["bw"]), int(car["bh"])
-    return bx + bw // 2, by + max(10, bh // 3)
+    cx, cy = bx + bw // 2, by + bh // 2
+    vec = car.get("vec")
+    if vec:
+        ux, uy = float(vec[0]), float(vec[1])
+        off = max(10, min(bw, bh) // 5)
+        return int(cx - ux*off), int(cy - uy*off)
+    return cx, by + max(10, bh // 3)
 
 
 def tap(x, y, serial=None, touch=False):
@@ -218,12 +227,13 @@ def pick_car(result, head_side):
     cars = result["cars"]
     exitable = [c for c in cars if c["can_exit"]]
     match = [c for c in exitable if c["color"] == head]
+    from parking_vision import DIR_PRIORITY
     if match:
-        # 优先选离顶部出口近的（y 小），其次车头朝上/右
-        match.sort(key=lambda c: (c["y"], {"up": 0, "right": 1, "left": 2, "down": 3}[c["dir"]]))
+        # 优先离顶部近(y 小)，其次方向越朝上越优先（兼容 8 方向）
+        match.sort(key=lambda c: (c["y"], DIR_PRIORITY.get(c["dir"], 5)))
         return match[0], "match"
     if exitable:
-        exitable.sort(key=lambda c: (c["y"], {"up": 0, "right": 1, "left": 2, "down": 3}[c["dir"]]))
+        exitable.sort(key=lambda c: (c["y"], DIR_PRIORITY.get(c["dir"], 5)))
         return exitable[0], "clear"
     return None, "none"
 
@@ -232,20 +242,46 @@ def auto_run(args):
     serial = args.device
     start = time.time()
     clicks = 0
+    stop_reason = ""
 
     # 开局解锁全部接驳位
     if not args.no_unlock:
         unlock_all_docks(serial, args)
         time.sleep(args.settle)
 
+    # 倾斜（8 方向）关卡：用户确认只解锁、不自动接客，后续手动处理。
+    # 判定用等距投影的标准斜轴 26.565°/153.435°，容差 8° 不会把旧正交关误判为斜关。
+    if not args.allow_tilted:
+        tilt_result = None
+        for _ in range(3):
+            check_img = wait_stable(serial, 0.2, 0.8, 0.1)
+            if check_img is None or float(check_img.mean()) < 15:
+                time.sleep(args.settle); continue
+            tilt_result = pv.analyze(check_img, args.head_side)
+            if tilt_result["cars"]:
+                break
+            time.sleep(args.settle)
+        tilt = tilt_result.get("tilt", {}) if tilt_result else {}
+        if tilt.get("tilted"):
+            unlock_note = "已解锁全部接驳位" if not args.no_unlock else "本轮未执行解锁"
+            stop_reason = ("检测到倾斜角度小车（斜向箭头 %d 个，轴向 %s），%s，"
+                           "停止自动接客请手动处理" % (
+                               tilt["count"], "/".join(str(x) for x in tilt["axes"]),
+                               unlock_note))
+            print(stop_reason, flush=True)
+        elif not tilt_result or not tilt_result["cars"]:
+            print("开局倾斜检测：未识别到棋盘，跳过检测（按原流程继续）", flush=True)
+    else:
+        print("已启用 --allow-tilted：倾斜关卡也会自动接客", flush=True)
+
     last_no_move = 0
     no_effect_streak = 0
     low_slot_streak = 0
-    stop_reason = ""
     ui_check_counter = 0
     recent_clicks = []  # (x, y, timestamp) 短期内不重复点同一位置
     failed_taps = []    # 点过但车没动的位置，本轮内不再尝试
-    while clicks < args.max_clicks and time.time() - start < args.max_seconds:
+    while (not stop_reason and clicks < args.max_clicks
+           and time.time() - start < args.max_seconds):
         img = pv.grab(serial)
         if img is None or float(img.mean()) < 15:
             # 画面异常（黑屏/广告/验证）才检查 UI
@@ -377,6 +413,8 @@ def main():
     ap.add_argument("--device", help="adb 设备序列号")
     ap.add_argument("--dry-run", action="store_true", help="只演示第一步不点击")
     ap.add_argument("--no-unlock", action="store_true", help="跳过开局解锁接驳位")
+    ap.add_argument("--allow-tilted", action="store_true",
+                    help="倾斜关卡也自动接客（默认：解锁后停手交还用户）")
     ap.add_argument("--max-unlock", type=int, default=6)
     ap.add_argument("--unlock-threshold", type=float, default=0.72)
     ap.add_argument("--max-clicks", type=int, default=200)
