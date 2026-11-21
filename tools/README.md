@@ -8,6 +8,7 @@
 | `spool/` | 三消「线卷」识别、标注与自动点击 | `tools/spool/quick.sh` |
 | `dogs/` | 狗狗三消识别、标注与自动点击 | `tools/dogs/quick.sh`（默认 `--auto`，`--once` 只标注） |
 | `parking/` | 停车场接客：看广告解锁接驳位 + 自动接同色乘客；倾斜关卡只解锁不自动打，剩 1 空位停手 | `tools/parking/quick.sh`（见 `PLAN.md`） |
+| `ring/` | 环形岛接客：按接驳区车色出车（全占用随机）；空位 ≤1 且无新色提前结束；复活弹窗立即停手 | `tools/ring/quick.sh` |
 
 ## 约定
 
@@ -24,7 +25,7 @@ python -m pip install -r tools/requirements.txt
 ```
 
 - 默认使用当前激活环境中的 Python（优先 `python`，找不到时回退 `python3`），可用 `FIND_DIFF_PYTHON` / `SPOOL_PYTHON` 覆盖
-- 停车场接客的模板（`arrow_right.png` / `p_slot.png` / `unlock.png`）位于 `tools/parking/templates/`
+- 停车场接客的模板（`arrow_right.png` / `p_slot.png` / `unlock.png`）位于 `tools/parking/templates/`；环形岛接客的模板（`unlock.png` / `p_slot.png` / `gift_x.png` / `use_button.png` / `revive_banner.png` / `fail_banner.png`）位于 `tools/ring/templates/`
 - 手机抓图/点击依赖 adb 无线连接（停车场工具用 `--device <serial>` 指定设备；未指定时按 adb 默认设备连接）
 - OpenCV 采用 headless 版；`spool --live` 在无 GUI 环境会自动改为每轮保存标注图
 - `/tmp` 是小容量 tmpfs，涉及大临时文件的脚本统一使用 `/home/beer/tmp`

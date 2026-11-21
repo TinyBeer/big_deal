@@ -19,7 +19,7 @@
 仓库包含两部分能力：
 
 - **AutoJS6 任务助手**：以 `main.js` 为入口，提供京东商城、京东金融、互动游戏等日常任务的图形化控制台。
-- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」与「停车场接客」。
+- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「停车场接客」与「环形岛接客」。
 
 ## 目录结构
 
@@ -32,6 +32,7 @@ big_deal/
 │   ├── spool/            # 线卷三消：识别并自动点击
 │   ├── dogs/             # 狗狗三消：识别并自动点击
 │   ├── parking/          # 停车场接客：识别、解锁接驳位并自动接客
+│   ├── ring/             # 环形岛接客：识别接驳区车色并自动接客
 │   └── requirements.txt  # 各工具共用的 Python 依赖
 └── outputs/              # 工具运行产物（已 gitignore）
 ```
@@ -81,12 +82,24 @@ tools/parking/quick.sh --allow-tilted                         # 显式开启：�
 tools/parking/quick.sh                                        # 默认：解锁全部 + 打通单关 + 通知
 ```
 
+**环形岛接客**（与停车场接客类似，但乘客在环形岛上旋转；只看接驳区车色出车，全占用时随机出车；空位 ≤1 且无新颜色车时提前结束）：
+
+```bash
+tools/ring/quick.sh --once                                    # 只识别一次，输出 outputs/ring_annotated.png
+tools/ring/quick.sh --dry-run                                 # 试运行，演示解锁与选车但不真点
+tools/ring/quick.sh --no-unlock --no-notify --max-clicks N     # 续跑：不解锁、不通知、限 N 步
+tools/ring/quick.sh                                           # 默认：解锁全部 + 自动接客 + 通知
+```
+
+弹窗处理：助力礼包自动点 × 关闭；**复活弹窗最高优先级立即结束、不做任何操作**；解锁确认框自动点「使用」看广告；结算弹窗（挑战失败/成功）立即停止。完整参数见 `tools/ring/quick.sh --help`。
+
 完整参数与算法说明见各工具目录：
 
 - `tools/find-diff/README.md` — 找不同
 - `tools/spool/README.md` — 线卷三消
 - `tools/dogs/README.md` — 狗狗三消
 - `tools/parking/PLAN.md` — 停车场接客（方案、规则与实现说明）
+- `tools/ring/` — 环形岛接客（`ring_vision.py` 识别、`ring_auto.py` 决策，参数见 `quick.sh --help`）
 - `tools/README.md` — 工具总览与共用环境
 
 ## TODO
