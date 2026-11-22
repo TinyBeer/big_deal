@@ -1,0 +1,244 @@
+{
+  "board_roi": [
+    143,
+    301,
+    936,
+    1297
+  ],
+  "cell_offset": [
+    14,
+    16
+  ],
+  "grid_step_px": [
+    19.82,
+    19.92
+  ],
+  "cells": 1911,
+  "palette": [
+    {
+      "rgb": [
+        39,
+        36,
+        33
+      ],
+      "hex": "#272421",
+      "hsv": [
+        15,
+        39,
+        39
+      ],
+      "count": 711,
+      "ratio": 0.3721,
+      "current_class": "black"
+    },
+    {
+      "rgb": [
+        141,
+        28,
+        60
+      ],
+      "hex": "#8D1C3C",
+      "hsv": [
+        172,
+        204,
+        141
+      ],
+      "count": 310,
+      "ratio": 0.1622,
+      "current_class": "dark_red"
+    },
+    {
+      "rgb": [
+        255,
+        195,
+        158
+      ],
+      "hex": "#FFC39E",
+      "hsv": [
+        11,
+        97,
+        255
+      ],
+      "count": 229,
+      "ratio": 0.1198,
+      "current_class": "peach"
+    },
+    {
+      "rgb": [
+        231,
+        44,
+        46
+      ],
+      "hex": "#E72C2E",
+      "hsv": [
+        0,
+        206,
+        231
+      ],
+      "count": 157,
+      "ratio": 0.0822,
+      "current_class": "red"
+    },
+    {
+      "rgb": [
+        83,
+        33,
+        10
+      ],
+      "hex": "#53210A",
+      "hsv": [
+        9,
+        224,
+        83
+      ],
+      "count": 123,
+      "ratio": 0.0644,
+      "current_class": "dark_brown"
+    },
+    {
+      "rgb": [
+        27,
+        204,
+        255
+      ],
+      "hex": "#1BCCFF",
+      "hsv": [
+        97,
+        228,
+        255
+      ],
+      "count": 76,
+      "ratio": 0.0398,
+      "current_class": "cyan"
+    },
+    {
+      "rgb": [
+        182,
+        121,
+        84
+      ],
+      "hex": "#B67954",
+      "hsv": [
+        11,
+        137,
+        182
+      ],
+      "count": 74,
+      "ratio": 0.0387,
+      "current_class": "light_brown"
+    },
+    {
+      "rgb": [
+        67,
+        77,
+        86
+      ],
+      "hex": "#434D56",
+      "hsv": [
+        104,
+        56,
+        86
+      ],
+      "count": 72,
+      "ratio": 0.0377,
+      "current_class": "gray"
+    },
+    {
+      "rgb": [
+        255,
+        170,
+        13
+      ],
+      "hex": "#FFAA0D",
+      "hsv": [
+        19,
+        242,
+        255
+      ],
+      "count": 45,
+      "ratio": 0.0235,
+      "current_class": "orange"
+    },
+    {
+      "rgb": [
+        255,
+        255,
+        255
+      ],
+      "hex": "#FFFFFF",
+      "hsv": [
+        0,
+        0,
+        255
+      ],
+      "count": 38,
+      "ratio": 0.0199,
+      "current_class": "white"
+    },
+    {
+      "rgb": [
+        123,
+        68,
+        26
+      ],
+      "hex": "#7B441A",
+      "hsv": [
+        13,
+        201,
+        123
+      ],
+      "count": 36,
+      "ratio": 0.0188,
+      "current_class": "olive"
+    },
+    {
+      "rgb": [
+        220,
+        120,
+        86
+      ],
+      "hex": "#DC7856",
+      "hsv": [
+        8,
+        155,
+        220
+      ],
+      "count": 16,
+      "ratio": 0.0084,
+      "current_class": "coral"
+    },
+    {
+      "rgb": [
+        116,
+        207,
+        51
+      ],
+      "hex": "#74CF33",
+      "hsv": [
+        48,
+        192,
+        207
+      ],
+      "count": 13,
+      "ratio": 0.0068,
+      "current_class": "green"
+    },
+    {
+      "rgb": [
+        13,
+        105,
+        60
+      ],
+      "hex": "#0D693C",
+      "hsv": [
+        75,
+        223,
+        105
+      ],
+      "count": 11,
+      "ratio": 0.0058,
+      "current_class": "dark_green"
+    }
+  ],
+  "issues": {}
+}

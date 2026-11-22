@@ -10,6 +10,7 @@
 | `parking/` | 停车场接客：看广告解锁接驳位 + 自动接同色乘客；倾斜关卡只解锁不自动打，剩 1 空位停手 | `tools/parking/quick.sh`（见 `PLAN.md`） |
 | `ring/` | 环形岛接客：按接驳区车色出车（全占用随机）；空位 ≤1 且无新色提前结束；复活弹窗立即停手 | `tools/ring/quick.sh` |
 | `slots/` | 色块入槽：一批点第一排中颜色不在槽位且不重复的色块（全占用随机）；看广告解锁；复活/胜利界面立即停手 | `tools/slots/quick.sh` |
+| `ants/` | 搬砖大战：开局看广告解锁；只检查槽位和第一排候选块，一次选一批不在槽中的颜色投放（同色最多一槽）；福利弹窗点 X 关闭；复活弹窗立即停手；连续无法决策超过 `--idle-timeout`（默认 20 秒）停止；已点未入槽的颜色在 `--repeat-delay`（默认 8 秒）内不重复点；结束时发手机状态栏通知（`--no-notify` 关闭） | `tools/ants/quick.sh`（见 `PLAN.md`） |
 
 ## 约定
 
@@ -27,7 +28,8 @@ python -m pip install -r tools/requirements.txt
 
 - 默认使用当前激活环境中的 Python（优先 `python`，找不到时回退 `python3`），可用 `FIND_DIFF_PYTHON` / `SPOOL_PYTHON` 覆盖
 - 色块入槽的颜色池由马赛克拼图完整画板实机标定（14 色，含玫红/橙红、粉/玫红、浅紫/浅蓝灰/中灰/深灰等相近色细分）：`tools/slots/palette.json`；换关卡可用 `tools/slots/palette_calibrate.py` 重新标定（默认覆盖完整 20×26 网格；详见 `tools/slots/PLAN.md` 第十节）
-- 停车场接客的模板（`arrow_right.png` / `p_slot.png` / `unlock.png`）位于 `tools/parking/templates/`；环形岛接客的模板（`unlock.png` / `p_slot.png` / `gift_x.png` / `use_button.png` / `revive_banner.png` / `fail_banner.png`）位于 `tools/ring/templates/`；色块入槽的模板（`unlock.png` / `revive_banner.png` / `victory_banner.png`）位于 `tools/slots/templates/`
+- 停车场接客的模板（`arrow_right.png` / `p_slot.png` / `unlock.png`）位于 `tools/parking/templates/`；环形岛接客的模板（`unlock.png` / `p_slot.png` / `gift_x.png` / `use_button.png` / `revive_banner.png` / `fail_banner.png`）位于 `tools/ring/templates/`；色块入槽的模板（`unlock.png` / `revive_banner.png` / `victory_banner.png`）位于 `tools/slots/templates/`；搬砖大战的模板（`popup_close.png` / `revive_close.png` / `unlock.png`）位于 `tools/ants/templates/`
+- 搬砖大战的颜色池由 `tools/ants/palette_calibrate.py` 从上方像素画标定，结果存 `tools/ants/palette.json`；用法与 slots 的调色板标定一致（`--image` 指定截图或实时抓图，`--k` 控制聚类数）。
 - 手机抓图/点击依赖 adb 无线连接（停车场工具用 `--device <serial>` 指定设备；未指定时按 adb 默认设备连接）
 - OpenCV 采用 headless 版；`spool --live` 在无 GUI 环境会自动改为每轮保存标注图
 - `/tmp` 是小容量 tmpfs，涉及大临时文件的脚本统一使用 `/home/beer/tmp`
