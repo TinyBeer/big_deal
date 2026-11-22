@@ -132,6 +132,19 @@ def watch_ad_return(serial, wait, timeout):
 TPL_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "popup")
 POPUP_TEMPLATE = os.path.join(TPL_DIR, "no_thanks.png")
 CLAIM_TEMPLATE = os.path.join(TPL_DIR, "claim_ad.png")
+REVIVE_TEMPLATE = os.path.join(TPL_DIR, "revive_banner.png")
+
+
+def detect_revive_dialog(img, threshold=0.80):
+    """检测「复活」弹窗的橙色标题横幅。命中后由主循环立即结束，不做任何操作。
+
+    复活弹窗上也有「不了，谢谢」，绝不能被 dismiss_popup 当成普通道具弹窗关掉。
+    """
+    tpl = cv2.imread(REVIVE_TEMPLATE)
+    if tpl is None or tpl.shape[0] > img.shape[0] or tpl.shape[1] > img.shape[1]:
+        return False
+    res = cv2.matchTemplate(img, tpl, cv2.TM_CCOEFF_NORMED)
+    return float(res.max()) >= threshold
 
 
 def find_template(img, path, threshold=0.82):
@@ -147,6 +160,8 @@ def find_template(img, path, threshold=0.82):
 
 def dismiss_popup(serial, img):
     """弹窗压暗画面；优先模板匹配「不了，谢谢」，不匹配再按返回。"""
+    if detect_revive_dialog(img):
+        return False  # 复活弹窗交给主循环结束，不能在这里点「不了，谢谢」
     if float(img.mean()) > 145 and not find_text_node(dump_ui(serial), DISMISS_TEXTS):
         return False
     tpl = cv2.imread(POPUP_TEMPLATE)
@@ -228,6 +243,7 @@ def auto_run(args):
     serial = args.device
     clicks = unlocks = 0
     tried_unlock = []
+    stop_reason = ""
     start = time.time()
 
     while clicks < args.max_clicks and time.time() - start < args.max_seconds:
@@ -236,6 +252,11 @@ def auto_run(args):
             print("画面全黑，等待 ...", flush=True)
             time.sleep(2)
             continue
+        # 最高优先级：复活弹窗 → 立即结束，不做任何操作（与 ring 一致）
+        if detect_revive_dialog(img):
+            stop_reason = "检测到复活弹窗，立即结束（未做任何操作）"
+            print(stop_reason, flush=True)
+            break
         if find_text_node(dump_ui(serial), RETURN_TEXTS):
             print("广告页：等待并返回 ...", flush=True)
             watch_ad_return(serial, args.ad_wait, args.ad_timeout)
@@ -323,7 +344,8 @@ def auto_run(args):
         wait_stable(serial, args.wait, args.max_wait)
         time.sleep(args.gap)
 
-    message = "任务结束：点击 %d 次，解锁 %d 次，耗时 %.0fs" % (
+    prefix = (stop_reason + "；") if stop_reason else "任务结束："
+    message = prefix + "点击 %d 次，解锁 %d 次，耗时 %.0fs" % (
         clicks, unlocks, time.time() - start)
     print("done: " + message, flush=True)
     if args.notify and not args.dry_run:

@@ -19,7 +19,7 @@
 仓库包含两部分能力：
 
 - **AutoJS6 任务助手**：以 `main.js` 为入口，提供京东商城、京东金融、互动游戏等日常任务的图形化控制台。
-- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「停车场接客」与「环形岛接客」。
+- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「停车场接客」「环形岛接客」与「色块入槽」。
 
 ## 目录结构
 
@@ -33,6 +33,7 @@ big_deal/
 │   ├── dogs/             # 狗狗三消：识别并自动点击
 │   ├── parking/          # 停车场接客：识别、解锁接驳位并自动接客
 │   ├── ring/             # 环形岛接客：识别接驳区车色并自动接客
+│   ├── slots/            # 色块入槽：第一排选色块、看广告解锁、自动点击
 │   └── requirements.txt  # 各工具共用的 Python 依赖
 └── outputs/              # 工具运行产物（已 gitignore）
 ```
@@ -91,7 +92,16 @@ tools/ring/quick.sh --no-unlock --no-notify --max-clicks N     # 续跑：不解
 tools/ring/quick.sh                                           # 默认：解锁全部 + 自动接客 + 通知
 ```
 
-弹窗处理：助力礼包自动点 × 关闭；**复活弹窗最高优先级立即结束、不做任何操作**；解锁确认框自动点「使用」看广告；结算弹窗（挑战失败/成功）立即停止。完整参数见 `tools/ring/quick.sh --help`。
+**色块入槽**（点底部第一排中颜色不在槽位的色块，全占用则随机点一个；看广告解锁左右槽位）：
+
+```bash
+tools/slots/quick.sh --once                                   # 只识别一次，输出 outputs/slots_annotated.png
+tools/slots/quick.sh --dry-run                                # 试运行，只演示第一步决策
+tools/slots/quick.sh --no-unlock --no-notify --max-clicks 5    # 续跑：不解锁、不通知、限 5 步
+tools/slots/quick.sh                                          # 默认：解锁 + 自动点击 + 通知
+```
+
+弹窗处理：助力礼包自动点 × 关闭；**复活弹窗最高优先级立即结束、不做任何操作**；解锁确认框自动点「使用」看广告；结算弹窗（挑战失败/成功）立即停止。完整参数见 `tools/ring/quick.sh --help` / `tools/slots/quick.sh --help`。
 
 完整参数与算法说明见各工具目录：
 
@@ -100,6 +110,7 @@ tools/ring/quick.sh                                           # 默认：解锁�
 - `tools/dogs/README.md` — 狗狗三消
 - `tools/parking/PLAN.md` — 停车场接客（方案、规则与实现说明）
 - `tools/ring/` — 环形岛接客（`ring_vision.py` 识别、`ring_auto.py` 决策，参数见 `quick.sh --help`）
+- `tools/slots/PLAN.md` — 色块入槽（方案、实机结论与识别参数）
 - `tools/README.md` — 工具总览与共用环境
 
 ## TODO

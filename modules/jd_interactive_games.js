@@ -156,7 +156,7 @@ function ensureHomePage() {
 /* 攒经验任务弹窗 */
 
 const TASK_POPUP_TITLE = "做任务 攒经验";
-const BROWSE_LOAD_BUFFER_MS = 8000; // 任务卡片写的浏览时长之外，额外预留的页面加载时间
+const BROWSE_LOAD_BUFFER_MS = 10000; // 任务卡片写的浏览时长之外，额外预留的页面加载时间
 const BROWSE_DEFAULT_SECONDS = 8; // 读不到"浏览X秒"时的兜底时长
 
 /* 任务文本包含以下任意一项则跳过，按需填写 */
@@ -231,6 +231,11 @@ function getTaskName(btn) {
     }
   }
   return "";
+}
+
+/* 掼蛋游戏需要连续两次返回键才能退出；只认"掼蛋"，避免宽泛关键字误判其它任务 */
+function isGuandanTask(name) {
+  return !!name && name.indexOf("掼蛋") !== -1;
 }
 
 /* 从任务卡片中"浏览X秒"的描述读出所需浏览秒数；读不到返回 0 */
@@ -313,12 +318,18 @@ function browseTasks() {
     tap(picked.btn);
 
     sleep(browseMs);
-    // 先退一次；绝大多数任务一次就回到弹窗。
-    back();
-    // 少数（如掼蛋游戏）一次退不回弹窗，3 秒内没回来就再补一次返回。
-    if (!waitUntil(3000, isTaskPopup)) {
-      debug("一次返回未回到弹窗，再返回一次");
+    if (isGuandanTask(picked.name)) {
+      // 掼蛋游戏需要连续两次 back 才能退出
+      debug("掼蛋任务，连续两次返回");
       back();
+      back();
+    } else {
+      // 其它任务一次返回即可；万一没回弹窗，再补一次。
+      back();
+      if (!waitUntil(3000, isTaskPopup)) {
+        debug("一次返回未回到弹窗，再返回一次");
+        back();
+      }
     }
     if (!waitUntil(5000, isTaskPopup)) {
       debug("未回到任务弹窗，结束后续任务");
