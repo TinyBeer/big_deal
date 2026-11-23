@@ -36,6 +36,7 @@ big_deal/
 │   ├── ring/             # 环形岛接客：识别接驳区车色并自动接客
 │   ├── slots/            # 色块入槽：第一排选色块、看广告解锁、自动点击
 │   ├── sand/             # 沙画收集：看广告解锁槽位、批量选不重复色桶打通单关
+│   ├── common/           # 共用模块：notify.py 统一各工具的手机状态栏通知
 │   └── requirements.txt  # 各工具共用的 Python 依赖
 └── outputs/              # 工具运行产物（已 gitignore）
 ```
@@ -124,6 +125,7 @@ tools/sand/quick.sh                                           # 默认：解锁 
 - `tools/ring/` — 环形岛接客（`ring_vision.py` 识别、`ring_auto.py` 决策，参数见 `quick.sh --help`）
 - `tools/slots/PLAN.md` — 色块入槽（方案、实机结论与识别参数）
 - `tools/sand/PLAN.md` — 沙画收集（方案、关卡差异、批量选桶规则与终止弹窗模板）
+- `tools/common/notify.py` — 共用的手机状态栏通知模块（各工具统一调用，支持 `--no-notify` 关闭）
 - `tools/README.md` — 工具总览与共用环境
 
 ## TODO

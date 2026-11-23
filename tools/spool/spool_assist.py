@@ -28,12 +28,14 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 import time
 import xml.etree.ElementTree as ET
 
 import cv2
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.notify import add_notify_args, send_notify, notify_phone  # noqa: E402
 
 # HSV  hue 范围（OpenCV: 0~179）及标注用 BGR
 COLORS = {
@@ -315,45 +317,8 @@ def tap(x, y, serial=None):
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
 
 
-NOTIFY_SCRIPT = "/sdcard/Scripts/spool_notify.js"
-RUN_INTENT_ACTIVITY = "org.autojs.autojs6/org.autojs.autojs.external.open.RunIntentActivity"
+TOOL_NAME = "线卷三消"
 
-
-def notify_phone(message, serial=None, script_path=NOTIFY_SCRIPT):
-    """通过 adb 让手机上的 AutoJS6 直接运行一个 notice 脚本，无需常驻监听。
-
-    先把带标题和内容的 JS 写到手机，再用 AutoJS6 的 RunIntentActivity 执行它。
-    notice() 会在状态栏生成常驻通知，需要 AutoJS6 的 POST_NOTIFICATIONS 权限。
-    """
-    cmd = ["adb"]
-    if serial:
-        cmd += ["-s", serial]
-    js = "notice(%s, %s);\n" % (
-        json.dumps("线卷三消", ensure_ascii=False),
-        json.dumps(message, ensure_ascii=False),
-    )
-    fd, tmp = tempfile.mkstemp(prefix="spool_notify_", suffix=".js")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(js)
-        subprocess.run(cmd + ["push", tmp, script_path],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        subprocess.run(
-            cmd + ["shell", "am", "start",
-                   "-n", RUN_INTENT_ACTIVITY,
-                   "-d", "file://" + script_path,
-                   "-t", "text/javascript"],
-            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print("提醒: 已让 AutoJS 发出通知: %s" % message, flush=True)
-        return True
-    except (OSError, subprocess.CalledProcessError) as e:
-        print("提醒: 发送失败: %s" % e, flush=True)
-        return False
-    finally:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
 
 
 def wait_stable(serial=None, min_wait=0.35, max_wait=1.8, interval=0.15):
@@ -736,7 +701,7 @@ def auto_run(args):
     print("done: 共点击 %d 次（其中解放挡板 %d 次），耗时 %.1fs，最后结果 -> %s" %
           (clicks, unlocks, time.time() - started, args.output))
     if args.notify:
-        notify_phone(args.notify_message, serial, args.notify_script)
+        send_notify("线卷三消已完成", args, TOOL_NAME, tool_slug="spool")
 
 
 def main():
@@ -776,14 +741,7 @@ def main():
                     help="遇到安全验证时等待用户手动处理的超时秒数")
     ap.add_argument("--board-min-area", type=float, default=8000,
                     help="顶层挡板检测的最小封闭区面积（1080 宽量级，过小易把空隙当挡板）")
-    ap.add_argument("--notify", dest="notify", action="store_true", default=True,
-                    help="自动运行结束后让手机 AutoJS 发出状态栏通知提醒（默认开启）")
-    ap.add_argument("--no-notify", dest="notify", action="store_false",
-                    help="不发送提醒")
-    ap.add_argument("--notify-message", default="线卷三消已完成",
-                    help="提醒内容")
-    ap.add_argument("--notify-script", default=NOTIFY_SCRIPT,
-                    help="写到手机上供 AutoJS 运行的临时脚本路径")
+    add_notify_args(ap, "spool", TOOL_NAME, default_message="线卷三消已完成")
     args = ap.parse_args()
 
     def step(img):
@@ -799,7 +757,8 @@ def main():
             auto_run(args)
         except BaseException:
             if args.notify:
-                notify_phone("线卷三消异常中断", args.device, args.notify_script)
+                notify_phone("线卷三消异常中断", args.device,
+                             tool_name=TOOL_NAME, tool_slug="spool")
             raise
         return
 

@@ -20,20 +20,20 @@ import os
 import re
 import subprocess
 import sys
-import tempfile
 import time
 import xml.etree.ElementTree as ET
 
 import cv2
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 from ants_vision import analyze, annotate, grab, CN, detect_queue  # noqa: E402
+from common.notify import add_notify_args, send_notify
 
 ROOT = "/home/beer/workspace/big_deal"
 ANNOTATED = os.path.join(ROOT, "outputs", "ants_annotated.png")
 RETURN_TEXTS = ("点击立即返回", "返回游戏")
-NOTIFY_SCRIPT = "/sdcard/Scripts/ants_notify.js"
-RUN_INTENT_ACTIVITY = "org.autojs.autojs6/org.autojs.autojs.external.open.RunIntentActivity"
+TOOL_NAME = "搬砖大战"
 # 点击后最少保护多久才允许因“已在槽里看到”而解除冷却。太短会在入槽动画
 # 造成的识别抖动窗口里重复投同色（曾连投 3 个 peach）。
 MIN_PENDING = 1.5
@@ -55,34 +55,6 @@ def key_back(serial):
           ["shell", "input", "keyevent", "4"]
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-
-def notify_phone(message, serial=None, script_path=NOTIFY_SCRIPT):
-    """和其他工具一样，用 AutoJS6 在手机状态栏发通知。"""
-    adb = ["adb"] + (["-s", serial] if serial else [])
-    js = "notice(%s, %s);\n" % (
-        json.dumps("搬砖大战", ensure_ascii=False),
-        json.dumps(message, ensure_ascii=False))
-    fd, tmp = tempfile.mkstemp(prefix="ants_notify_", suffix=".js")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(js)
-        subprocess.run(adb + ["shell", "mkdir", "-p", "/sdcard/Scripts"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(adb + ["push", tmp, script_path], stdout=subprocess.DEVNULL,
-                       stderr=subprocess.DEVNULL, check=True)
-        subprocess.run(adb + ["shell", "am", "start", "-n", RUN_INTENT_ACTIVITY,
-                              "-d", "file://" + script_path, "-t", "text/javascript"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print("提醒: 已发送通知: %s" % message, flush=True)
-        return True
-    except (OSError, subprocess.CalledProcessError) as e:
-        print("提醒: 发送失败: %s" % e, flush=True)
-        return False
-    finally:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
 
 
 def dump_ui(serial=None):
@@ -211,14 +183,7 @@ def main():
     ap.add_argument("--ad-wait", type=int, default=12, help="看广告等待秒数")
     ap.add_argument("--ad-timeout", type=int, default=30, help="广告返回超时秒数")
     ap.add_argument("--settle", type=float, default=1.0, help="解锁后稳定等待秒数")
-    ap.add_argument("--notify", dest="notify", action="store_true", default=True,
-                    help="结束时发送手机状态栏通知（默认开启）")
-    ap.add_argument("--no-notify", dest="notify", action="store_false",
-                    help="结束时不发送通知")
-    ap.add_argument("--notify-message", default="auto",
-                    help="自定义通知内容，auto=自动生成")
-    ap.add_argument("--notify-script", default=NOTIFY_SCRIPT,
-                    help="手机上 AutoJS6 通知脚本路径")
+    add_notify_args(ap, "ants", TOOL_NAME)
     args = ap.parse_args()
 
     # 连续无法决策的等待上限。任何一次点击（含关弹窗）都视为有进展，计时清零。
@@ -382,8 +347,7 @@ def main():
                   unlocked, clicks, time.time() - start)
     print("done: " + message, flush=True)
     if args.notify and not args.dry_run:
-        notify_phone(args.notify_message if args.notify_message != "auto" else message,
-                     serial, args.notify_script)
+        send_notify(message, args, TOOL_NAME, tool_slug="ants")
 
 
 if __name__ == "__main__":

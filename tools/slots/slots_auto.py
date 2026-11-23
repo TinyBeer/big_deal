@@ -20,7 +20,6 @@ import random
 import re
 import subprocess
 import sys
-import tempfile
 import time
 import xml.etree.ElementTree as ET
 
@@ -28,14 +27,15 @@ import cv2
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 import slots_vision as sv
+from common.notify import add_notify_args, send_notify
 
 RETURN_TEXTS = ("立即返回", "返回游戏")
 SECURITY_TEXTS = ("安全验证", "京东验证")
 DISMISS_TEXTS = ("不了", "关闭", "下次再说", "跳过", "我知道了")
 
-NOTIFY_SCRIPT = "/sdcard/Scripts/slots_notify.js"
-RUN_INTENT_ACTIVITY = "org.autojs.autojs6/org.autojs.autojs.external.open.RunIntentActivity"
+TOOL_NAME = "色块入槽"
 
 
 class TerminalState(Exception):
@@ -158,33 +158,6 @@ def wait_stable(serial, min_wait=0.6, max_wait=6.0, interval=0.2):
         time.sleep(interval)
     return img if img is not None else sv.grab(serial)
 
-
-def notify_phone(message, serial=None, script_path=NOTIFY_SCRIPT):
-    adb = ["adb"] + (["-s", serial] if serial else [])
-    js = "notice(%s, %s);\n" % (
-        json.dumps("色块入槽", ensure_ascii=False),
-        json.dumps(message, ensure_ascii=False))
-    fd, tmp = tempfile.mkstemp(prefix="slots_notify_", suffix=".js")
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as f:
-            f.write(js)
-        subprocess.run(adb + ["shell", "mkdir", "-p", "/sdcard/Scripts"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        subprocess.run(adb + ["push", tmp, script_path], stdout=subprocess.DEVNULL,
-                       stderr=subprocess.DEVNULL, check=True)
-        subprocess.run(adb + ["shell", "am", "start", "-n", RUN_INTENT_ACTIVITY,
-                              "-d", "file://" + script_path, "-t", "text/javascript"],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        print("提醒: 已发送通知: %s" % message, flush=True)
-        return True
-    except (OSError, subprocess.CalledProcessError) as e:
-        print("提醒: 发送失败: %s" % e, flush=True)
-        return False
-    finally:
-        try:
-            os.unlink(tmp)
-        except OSError:
-            pass
 
 
 def unlock_all(serial, args):
@@ -392,8 +365,7 @@ def auto_run(args):
               "解锁 %d 次，点击 %d 次，耗时 %.0fs" % (unlocked, clicks, time.time() - start)
     print("done: " + message, flush=True)
     if args.notify and not args.dry_run:
-        notify_phone(args.notify_message if args.notify_message != "auto" else message,
-                     serial, args.notify_script)
+        send_notify(message, args, TOOL_NAME, tool_slug="slots")
 
 
 def main():
@@ -419,10 +391,7 @@ def main():
     ap.add_argument("--security-timeout", type=int, default=300)
     ap.add_argument("--ui-check-every", type=int, default=5)
     ap.add_argument("--max-no-view", type=int, default=3)
-    ap.add_argument("--notify", dest="notify", action="store_true", default=True)
-    ap.add_argument("--no-notify", dest="notify", action="store_false")
-    ap.add_argument("--notify-message", default="auto")
-    ap.add_argument("--notify-script", default=NOTIFY_SCRIPT)
+    add_notify_args(ap, "slots", TOOL_NAME, default_message='auto')
     args = ap.parse_args()
     auto_run(args)
 
