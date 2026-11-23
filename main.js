@@ -121,6 +121,7 @@ ui.layout(
           <button id="ddep" text="天天赚京豆" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
           <button id="save" text="省钱中心" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
         </horizontal>
+        <button id="jdbrowse" text="浏览领赚豆" w="*" h="42" textSize="12sp" marginTop="8" />
       </vertical>
 
       {/* 其他 */}
@@ -171,7 +172,7 @@ function tintCheck(id) {
 
 [
   "jd", "jdbb", "jddddb", "jd121", "jdst", "jdss",
-  "jdjrm", "ddep", "save", "panda", "exit", "igrun",
+  "jdjrm", "ddep", "save", "jdbrowse", "panda", "exit", "igrun",
 ].forEach((id) => {
   rounded(id, id === "igrun" ? C.primaryDark : C.btn, 10, id === "igrun" ? null : C.btnBorder, 1);
   ui[id].setTextColor(color(C.text));
@@ -203,6 +204,9 @@ ui.ddep.click(() =>
   startTask(require("./modules/jdjr_earn_pea").run, "天天赚京豆"),
 );
 ui.save.click(() => startTask(require("./modules/jdjr_save_center").run, "省钱中心"));
+ui.jdbrowse.click(() =>
+  startTask(require("./modules/jdjr_browse_earn_pea").run, "浏览领赚豆"),
+);
 ui.jdjrm.click(() =>
   startTask(require("./modules/jdjr_manual").run, "金融手动"),
 );
