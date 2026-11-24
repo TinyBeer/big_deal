@@ -8,6 +8,7 @@
 #   tools/spool/quick.sh --image shot.png --once  # 调试本地截图
 #   tools/spool/quick.sh --targets yellow pink  # 指定目标颜色（仍默认 --auto）
 #   tools/spool/quick.sh --device <serial>      # 指定 adb 设备
+#   tools/spool/quick.sh --batch-size 4 --batch-gap 0.3  # 一次识别批量点 4 个目标色
 #
 # 输出: outputs/spool_annotated.png（传 --output 可覆盖）
 # 解释器: 见 tools/common/python_env.sh（SPOOL_PYTHON > 当前激活环境 > PATH）
@@ -20,7 +21,7 @@ OUT="$ROOT/outputs/spool_annotated.png"
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) tool_print_help 2 13 "$0"; exit 0 ;;
+    -h|--help) tool_print_help 2 14 "$0"; exit 0 ;;
   esac
 done
 

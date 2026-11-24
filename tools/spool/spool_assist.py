@@ -14,12 +14,15 @@
   置灰/锁定的大线卷无法读出颜色，会被单独列出并跳过。
   中间最长的白色线卷是暂存区，不作为目标；没有目标色可点时，自动模式会点其他
   顶层线卷把它送进暂存区。暂存区存满即失败，不会因同色自动消除；顶部刷新出
-  对应颜色的空线卷时才会从暂存区移走 3 个。没有目标色可点时，优先清掉剩余
+  对应颜色的空线卷时才会从暂存区移走 3 个。有目标色可点时一次识别批量点最多
+  --batch-size 个候选（批内间隔 --batch-gap），整批点完才重新截图；没有目标色、
+  需要点其他线卷释放挡板时只允许单次点击，等画面变化后重新决策。优先清掉剩余
   线卷最少的挡板；释放挡板后下一轮会优先恢复消除。挡板按线卷周围的半透明
-  底色分组，消除和释放都优先选所在挡板剩余线卷更少的位置。复活后会多等一会儿。
-  消除之前先看广告解锁锁定的线卷槽；失败弹窗也会自动点「获得」看广告复活。
-  两者都靠「点击立即返回」控件回游戏。遇到京东安全验证会暂停等用户手动完成，
-  --security-timeout 控制最长等待时间，--no-revive 可关闭自动复活。
+  底色分组，消除和释放都优先选所在挡板剩余线卷更少的位置。
+  检测到「复活」页面会立即停止，不做任何点击（批量点击中途也会复查）；其他暗色
+  失败/弹窗页面仍可自动点「获得」看广告复活，复活后多等一会儿，靠「点击立即
+  返回」控件回游戏。消除之前先看广告解锁锁定的线卷槽。遇到京东安全验证会暂停
+  等用户手动完成，--security-timeout 控制最长等待时间，--no-revive 可关闭这类复活。
 """
 
 import argparse
@@ -294,6 +297,25 @@ def grab(serial=None):
     return adb_grab(serial, check=True)
 
 
+REVIVE_TEMPLATE = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                               "templates", "revive_banner.png")
+
+
+def detect_revive_dialog(img, threshold=0.80):
+    """检测「复活」弹窗：紫底白字标题横幅模板匹配。命中后立即停止，不做任何点击。"""
+    tpl = cv2.imread(REVIVE_TEMPLATE)
+    if tpl is None:
+        return False
+    h, w = img.shape[:2]
+    sx, sy = w / 1080.0, h / 2400.0
+    if abs(sx - 1.0) > 0.01 or abs(sy - 1.0) > 0.01:
+        tpl = cv2.resize(tpl, None, fx=sx, fy=sy, interpolation=cv2.INTER_LINEAR)
+    if tpl.shape[0] > h or tpl.shape[1] > w:
+        return False
+    res = cv2.matchTemplate(img, tpl, cv2.TM_CCOEFF_NORMED)
+    return float(res.max()) >= threshold
+
+
 def has_modal(img, threshold=150):
     """失败/复活/游戏中心等弹窗会压暗整屏，平均亮度明显低于正常对局。"""
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
@@ -324,22 +346,31 @@ def wait_stable(serial=None, min_wait=0.35, max_wait=1.8, interval=0.15):
     return img if img is not None else grab(serial)
 
 
-def pick_next(clickable, recent, scale):
-    """优先点当前可选数量最多的颜色，避开刚点过的位置。"""
+def pick_nexts(clickable, recent, scale):
+    """按「可选数量最多的颜色优先、同色从上到下」返回候选序列，避开刚点过的位置。"""
     cands = [
         s for s in clickable
         if not any((s["x"] - x) ** 2 + (s["y"] - y) ** 2 < (28 * scale) ** 2
                    for x, y in recent)
     ]
     if not cands:
-        return None
+        return []
     counts = {}
     for s in cands:
         counts[s["color"]] = counts.get(s["color"], 0) + 1
-    best = max(counts, key=lambda c: (counts[c], c))
-    pool = [s for s in cands if s["color"] == best]
-    pool.sort(key=lambda s: (s["y"], s["x"]))
-    return pool[0]
+    colors = [c for c, _ in sorted(counts.items(),
+                                   key=lambda kv: (kv[1], kv[0]), reverse=True)]
+    ordered = []
+    for color in colors:
+        pool = [s for s in cands if s["color"] == color]
+        pool.sort(key=lambda s: (s["y"], s["x"]))
+        ordered.extend(pool)
+    return ordered
+
+
+def pick_next(clickable, recent, scale):
+    ordered = pick_nexts(clickable, recent, scale)
+    return ordered[0] if ordered else None
 
 
 def detect_top_boards(img, small=None, min_area=8000):
@@ -449,10 +480,17 @@ def group_by_board(spools, img):
     return split
 
 
-def pick_by_board(candidates, small, excluded, scale, img):
-    """在候选线卷里优先选「所在挡板剩余线卷最少」的。"""
+def pick_batch_by_board(candidates, small, excluded, scale, img, limit):
+    """一次识别挑最多 limit 个候选：先选所在挡板剩余线卷少的，再按颜色数量排序。
+
+    同一帧里的目标色线卷彼此独立，可直接按原坐标连点；本批已选位置和 excluded
+    一起参与去重，避免同一个线卷被重复点击。limit <= 0 表示不限。
+    @returns: (候选列表, 说明)
+    """
     if not candidates:
-        return None, "empty"
+        return [], "empty"
+    if limit <= 0:
+        limit = len(candidates)
     groups = group_by_board(small, img)
     ranked = []
     for members in groups.values():
@@ -460,12 +498,33 @@ def pick_by_board(candidates, small, excluded, scale, img):
         if subset:
             ranked.append((len(members), subset))
     ranked.sort(key=lambda t: t[0])
+    picked = []
+    used = list(excluded)
+    reason = "fallback"
     for count, subset in ranked:
-        cand = pick_next(subset, excluded, scale)
-        if cand is not None:
-            return cand, "board(%d spools)" % count
-    cand = pick_next(candidates, excluded, scale)
-    return cand, "fallback"
+        if len(picked) >= limit:
+            break
+        batch = pick_nexts(subset, used, scale)
+        if batch:
+            reason = "board(%d spools)" % count
+        for cand in batch:
+            if len(picked) >= limit:
+                break
+            picked.append(cand)
+            used.append((cand["x"], cand["y"]))
+    if len(picked) < limit:
+        for cand in pick_nexts(candidates, used, scale):
+            if len(picked) >= limit:
+                break
+            picked.append(cand)
+            used.append((cand["x"], cand["y"]))
+    return picked, reason
+
+
+def pick_by_board(candidates, small, excluded, scale, img):
+    """在候选线卷里优先选「所在挡板剩余线卷最少」的（单次点击）。"""
+    picked, reason = pick_batch_by_board(candidates, small, excluded, scale, img, 1)
+    return (picked[0] if picked else None), reason
 
 
 def pick_unlock(small, targets, excluded, scale, img, top_boards=None):
@@ -550,6 +609,9 @@ def auto_run(args):
 
     while clicks < args.max_clicks and time.time() - started < args.max_seconds:
         img = grab(serial)
+        if detect_revive_dialog(img, args.revive_threshold):
+            print("stop: 检测到复活页面，立即停止（保留现场）", flush=True)
+            break
         if has_security_check(serial):
             print("暂停: 检测到安全验证，请手动完成，脚本不会点击 ...", flush=True)
             ok = wait_for_user(serial, args.security_timeout)
@@ -606,9 +668,11 @@ def auto_run(args):
             print("stop: 没有可用的目标颜色（大线卷锁定或页面已变化）")
             break
 
+        # 有目标色：一次识别批量点击；没有目标色、需要点其他线卷释放挡板：只点 1 个
         mode = "target"
-        cand, reason = pick_by_board(clickable, small, excluded, scale, img)
-        if cand is None:
+        batch, reason = pick_batch_by_board(clickable, small, excluded, scale,
+                                            img, args.batch_size)
+        if not batch:
             # 没有目标色：优先清空剩余线卷最少的挡板，释放它露出下层
             if unlocks >= args.max_unlock:
                 print("stop: 已尝试 %d 次解放挡板，仍未出现目标线卷" % unlocks)
@@ -618,34 +682,56 @@ def auto_run(args):
             if cand is None:
                 print("stop: 没有可操作的线卷，也无法通过点击其他线卷解放挡板")
                 break
+            batch = [cand]
             mode = "unlock"
             unlocks += 1
+        batch = batch[:max(0, args.max_clicks - clicks)]
+        if not batch:
+            break
 
-        clicks += 1
+        limit_text = "%d" % args.batch_size if args.batch_size > 0 else "全部"
         if mode == "unlock":
-            print("[%d] unlock %s (%d, %d)  释放挡板 %d/%d [%s]" %
-                  (clicks, cand["color"], cand["x"], cand["y"],
+            print("解锁挡板（单次）%s (%d,%d)  %d/%d [%s]" %
+                  (batch[0]["color"], batch[0]["x"], batch[0]["y"],
                    unlocks, args.max_unlock, reason), flush=True)
         else:
-            print("[%d] tap %s (%d, %d)  剩余可点 %d [%s]" %
-                  (clicks, cand["color"], cand["x"], cand["y"],
-                   len(clickable), reason), flush=True)
+            print("本轮批量 %d/%s 个目标色候选 [%s]: %s" %
+                  (len(batch), limit_text, reason,
+                   " ".join("%s(%d,%d)" % (c["color"], c["x"], c["y"])
+                            for c in batch)), flush=True)
 
         if args.dry_run:
             print("dry-run: 未实际点击")
             break
 
-        tap(cand["x"], cand["y"], serial)
-        recent.append((cand["x"], cand["y"], time.time()))
+        stopped_by_revive = False
+        for i, cand in enumerate(batch):
+            if i > 0:
+                mid = grab(serial)
+                if mid is not None and detect_revive_dialog(mid, args.revive_threshold):
+                    print("stop: 批次内检测到复活页面，立即停手", flush=True)
+                    stopped_by_revive = True
+                    break
+            clicks += 1
+            print("[%d] %s %d/%d %s (%d, %d)" %
+                  (clicks, mode, i + 1, len(batch), cand["color"],
+                   cand["x"], cand["y"]), flush=True)
+            tap(cand["x"], cand["y"], serial)
+            recent.append((cand["x"], cand["y"], time.time()))
+            if i < len(batch) - 1:
+                time.sleep(args.batch_gap)
+        if stopped_by_revive:
+            break
         after = wait_stable(serial, args.wait, args.max_wait)
         big2, small2, targets2 = analyze(after)
         if args.targets:
             targets2 = args.targets
         clickable2 = [s for s in small2 if s["color"] in targets2]
-        if any((s["x"] - cand["x"]) ** 2 + (s["y"] - cand["y"]) ** 2 < (28 * scale) ** 2
-               for s in clickable2):
-            print("  ! 点击后线卷仍在，暂时跳过该位置")
-            failed.append((cand["x"], cand["y"], time.time()))
+        for cand in batch:
+            if any((s["x"] - cand["x"]) ** 2 + (s["y"] - cand["y"]) ** 2 < (28 * scale) ** 2
+                   for s in clickable2):
+                print("  ! 点击后线卷仍在，暂时跳过 (%d, %d)" % (cand["x"], cand["y"]))
+                failed.append((cand["x"], cand["y"], time.time()))
         if not targets2:
             print("页面变化：目标颜色消失，下一轮重新识别")
         time.sleep(args.gap)
@@ -674,11 +760,17 @@ def main():
     ap.add_argument("--wait", type=float, default=0.35, help="点击后最短等待秒数")
     ap.add_argument("--max-wait", type=float, default=1.8, help="点击后最长等待秒数")
     ap.add_argument("--gap", type=float, default=0.15, help="每轮之间的额外间隔秒数")
+    ap.add_argument("--batch-size", type=int, default=3,
+                    help="一次识别最多批量点击几个目标色线卷（默认 3；0=不限）")
+    ap.add_argument("--batch-gap", type=float, default=0.35,
+                    help="批内相邻两次点击的间隔秒数（默认 0.35）")
     ap.add_argument("--recent-seconds", type=float, default=4.0,
                     help="多久内不重复点击同一位置")
     ap.add_argument("--dry-run", action="store_true", help="自动模式只演示第一步，不点击")
     ap.add_argument("--modal-v", type=float, default=150,
                     help="画面平均亮度低于此值视为失败/弹窗")
+    ap.add_argument("--revive-threshold", type=float, default=0.80,
+                    help="复活页面标题横幅模板匹配阈值，命中立即停止（默认 0.80）")
     ap.add_argument("--no-revive", action="store_true", help="失败时不看广告复活，直接停止")
     ap.add_argument("--max-revive", type=int, default=3, help="自动看广告复活的最大次数")
     ap.add_argument("--max-slot-unlock", type=int, default=4,
