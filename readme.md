@@ -19,7 +19,7 @@
 仓库包含两部分能力：
 
 - **AutoJS6 任务助手**：以 `main.js` 为入口，提供京东商城、京东金融、互动游戏等日常任务的图形化控制台。
-- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「搬砖大战」「停车场接客」「环形岛接客」「色块入槽」与「沙画收集」。
+- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「搬砖大战」「停车场接客」「环形岛接客」「色块入槽」「沙画收集」与「线条解放」。
 
 ## 目录结构
 
@@ -29,6 +29,7 @@ big_deal/
 ├── scripts/              # AutoJS 测试脚本
 ├── tools/                # 游戏辅助工具
 │   ├── find-diff/        # 找不同：检测并标注差异点
+│   ├── lines/            # 线条解放：找出所有当前可点击线条并标注
 │   ├── spool/            # 线卷三消：识别并自动点击
 │   ├── dogs/             # 狗狗三消：识别并自动点击
 │   ├── ants/             # 搬砖大战：像素画前沿识别与自动投放
@@ -75,6 +76,19 @@ python -m pip install -r tools/requirements.txt
 tools/find-diff/quick.sh                   # 抓图 → 检测 → outputs/mark.png
 tools/find-diff/quick.sh -f 某张图.png      # 跳过抓图，处理本地图片
 ```
+
+**线条解放**（手机停在关卡界面：自动检测网格并还原每条折线箭头，找出当前可点击的线条；编号与识别出的方向标注在箭头外侧，不遮挡箭头；编号只是标识，不代表点击顺序；**默认自动点击**）。识别会等画面稳定后进行，首轮锁定网格避免漂移，误点时游戏闪红的线条也计入遮挡；每轮识别时检查复活页与爱心，减少立即停手：
+
+```bash
+tools/lines/quick.sh                       # 默认：每轮全量识别 → 批量点击 → 循环到无可点击线或命中停止条件
+tools/lines/quick.sh --once                # 只识别标注，不点击 → outputs/lines_annotated.png + lines_free.json
+tools/lines/quick.sh --image shot.png --dry-run  # 离线试运行：只打印要点击的坐标
+tools/lines/quick.sh --max-clicks 3 --no-notify  # 限制点击步数 / 关闭状态栏通知
+tools/lines/quick.sh --batch-size 4 --gap 0.45   # 每批最多 4 条、批内间隔 0.45s（默认）
+tools/lines/quick.sh --click-log            # 可选：每次点击写入 outputs/lines_clicks.jsonl（默认关闭）
+```
+
+停止条件：已无可点击线条、复活页、爱心减少、`--max-clicks`、`--max-seconds`。调试用参数还有 `--batch-wait`、`--dry-run`、`--once`、`--steps`（额外顺序规划，仅 `--once` 下有意义）。
 
 **线卷三消**：
 
@@ -132,6 +146,7 @@ tools/sand/quick.sh                                           # 默认：解锁 
 完整参数与算法说明见各工具目录：
 
 - `tools/find-diff/README.md` — 找不同
+- `tools/lines/quick.sh --help` — 线条解放（网格识别、箭头判定、当前可点击集合与自动点击参数）
 - `tools/spool/README.md` — 线卷三消
 - `tools/dogs/README.md` — 狗狗三消
 - `tools/parking/PLAN.md` — 停车场接客（方案、规则与实现说明）

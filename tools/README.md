@@ -6,6 +6,7 @@
 |------|------|------|
 | `find-diff/` | 找不同（找茬）差异检测与标注 | `tools/find-diff/quick.sh` |
 | `spool/` | 三消「线卷」识别、标注与自动点击：有目标色时一次识别批量点最多 3 个候选（`--batch-size`/`--batch-gap`）；解锁挡板时只点 1 个；检测到复活页面立即停止 | `tools/spool/quick.sh` |
+| `lines/` | 线条解放：自动检测网格并还原每条折线箭头，找出**当前所有可点击**线条，在外围标注编号与识别出的方向（不遮挡箭头），输出 JSON；默认每轮等画面稳定后全量识别当前所有可移除线条（首轮锁定网格 lattice，避免逐轮漂移；误点时游戏闪红的线条也计入遮挡，图判定后再用当前截图逐像素复核射线），依次点击后重新识别循环；复活页与爱心在识别时检查，减少即停手；`--batch-size`/`--gap`/`--batch-wait` 控制每批条数与节奏，`--max-clicks`/`--max-seconds` 为上限；`--click-log` 可把每次点击写入 `outputs/lines_clicks.jsonl`（默认关闭），`--steps` 可额外输出顺序规划 | `tools/lines/quick.sh`（默认自动点击，`--once` 只标注） |
 | `dogs/` | 狗狗三消识别、标注与自动点击：一次识别选最多 3 只能进大狗窝且不重复品种的出口狗依次点击（`--batch-size`/`--batch-gap`）；无大狗窝目标时随机单只送小狗窝 | `tools/dogs/quick.sh`（默认 `--auto`，`--once` 只标注） |
 | `parking/` | 停车场接客：看广告解锁接驳位 + 自动接同色乘客；倾斜关卡只解锁不自动打，剩 1 空位停手 | `tools/parking/quick.sh`（见 `PLAN.md`） |
 | `ring/` | 环形岛接客：按接驳区车色出车（全占用随机）；空位 ≤1 且无新色提前结束；复活弹窗立即停手 | `tools/ring/quick.sh` |
@@ -29,7 +30,7 @@ python -m pip install -r tools/requirements.txt
 ```
 
 - 解释器由 `tools/common/python_env.sh` 统一选择：显式覆盖变量 > 当前激活的 venv（`VIRTUAL_ENV`）/conda（`CONDA_PREFIX`）环境 > PATH 中的 `python`/`python3`。激活环境里没有可执行的 Python 时会直接提示，不会静默改用其它环境
-- 覆盖变量：`FIND_DIFF_PYTHON` / `SPOOL_PYTHON` / `DOG_PYTHON` / `PARKING_PYTHON` / `RING_PYTHON` / `SLOTS_PYTHON` / `ANTS_PYTHON` / `SAND_PYTHON`
+- 覆盖变量：`FIND_DIFF_PYTHON` / `SPOOL_PYTHON` / `DOG_PYTHON` / `PARKING_PYTHON` / `RING_PYTHON` / `SLOTS_PYTHON` / `ANTS_PYTHON` / `SAND_PYTHON` / `LINES_PYTHON`
 
 ### 限制
 
