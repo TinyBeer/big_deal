@@ -15,19 +15,17 @@
 """
 import argparse
 import datetime
-import json
 import os
-import re
-import subprocess
 import sys
 import time
-import xml.etree.ElementTree as ET
 
 import cv2
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 from ants_vision import analyze, annotate, grab, CN, detect_queue  # noqa: E402
+from common.adb import detect_device, dump_ui, find_text_node, key_back
+from common.adb import tap as adb_tap
 from common.notify import add_notify_args, send_notify
 
 ROOT = "/home/beer/workspace/big_deal"
@@ -45,42 +43,7 @@ def log(msg):
 
 
 def tap(serial, x, y):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + \
-          ["shell", "input", "tap", str(int(x)), str(int(y))]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-def key_back(serial):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + \
-          ["shell", "input", "keyevent", "4"]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-
-def dump_ui(serial=None):
-    adb = ["adb"] + (["-s", serial] if serial else [])
-    subprocess.run(adb + ["shell", "uiautomator", "dump", "/sdcard/window.xml"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    data = subprocess.run(adb + ["exec-out", "cat", "/sdcard/window.xml"],
-                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    try:
-        return ET.fromstring(data)
-    except ET.ParseError:
-        return None
-
-
-def find_text_node(root, keywords):
-    if root is None:
-        return None
-    for node in root.iter("node"):
-        text = node.get("text", "")
-        if any(k in text for k in keywords):
-            m = re.match(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.get("bounds", ""))
-            if m:
-                x1, y1, x2, y2 = [int(v) for v in m.groups()]
-                if x2 > x1 and y2 > y1:
-                    return ((x1 + x2) // 2, (y1 + y2) // 2), text
-    return None
+    return adb_tap(x, y, serial)
 
 
 def watch_ad_return(serial, args):
@@ -211,13 +174,7 @@ def main():
         time.sleep(args.interval)
         return True
 
-    serial = args.device
-    if not serial:
-        out = subprocess.run(["adb", "devices"], capture_output=True, text=True).stdout
-        for line in out.splitlines():
-            if line.strip().endswith("\tdevice"):
-                serial = line.split()[0]
-                break
+    serial = args.device or detect_device()
     if serial:
         log("使用设备 %s" % serial)
     else:

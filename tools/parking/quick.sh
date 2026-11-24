@@ -13,22 +13,22 @@
 # 解释器: 见 tools/common/python_env.sh（PARKING_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python PARKING_PYTHON)" || exit 1
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env PARKING_PYTHON "$0" || exit 1
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,13p' "$0"; exit 0 ;;
+    -h|--help) tool_print_help 2 13 "$0"; exit 0 ;;
   esac
 done
 
-mkdir -p "$ROOT/outputs"
+tool_ensure_outputs
 
 if [[ " $* " == *" --once "* ]]; then
   echo "▶ 停车场接客 · 识别一次"
-  exec "$PY" "$TOOL_DIR/parking_vision.py" --output "$ROOT/outputs/parking_annotated.png" "$@"
+  tool_strip_flag --once "$@"
+  exec "$PY" "$TOOL_DIR/parking_vision.py" --output "$ROOT/outputs/parking_annotated.png" "${STRIPPED_ARGS[@]}"
 fi
 
 echo "▶ 停车场接客 · 自动模式（默认打通单关）"

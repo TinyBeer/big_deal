@@ -35,10 +35,9 @@ done
 
 case "$NUM" in 1|2|3|4) ;; *) echo "-k 只支持 1~4" >&2; exit 2 ;; esac
 
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python FIND_DIFF_PYTHON)" || exit 1
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env FIND_DIFF_PYTHON "$0" || exit 1
 export FIND_DIFF_PYTHON="$PY"
 export TMPDIR="${TMPDIR:-/home/beer/tmp}"
 mkdir -p "$OUTDIR" "$TMPDIR"

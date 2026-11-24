@@ -9,10 +9,13 @@
 import argparse
 import json
 import os
-import subprocess
+import sys
 
 import cv2
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.screen import grab  # noqa: E402
 
 # ---------- 颜色定义 ----------
 # HSV hue 范围 (OpenCV 0~179)。停车场车常见色：红/黄/绿/青/蓝/粉/深红(brown)/灰(?)
@@ -68,13 +71,6 @@ DIR_VEC = {
 # 排序优先级：越朝上越优先（车开向顶部接驳区）
 DIR_PRIORITY = {"up": 0, "up-left": 1, "up-right": 1, "left": 2, "right": 2,
                 "down": 3, "down-left": 4, "down-right": 4}
-
-
-def grab(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["exec-out", "screencap", "-p"]
-    data = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    arr = np.frombuffer(data, np.uint8)
-    return cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
 
 def hue_name(h, s=255, v=255):

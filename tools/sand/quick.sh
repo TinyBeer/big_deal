@@ -16,26 +16,18 @@
 # 解释器: 见 tools/common/python_env.sh（SAND_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python SAND_PYTHON)" || exit 1
-export PYTHONPATH="$TOOL_DIR${PYTHONPATH:+:$PYTHONPATH}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env SAND_PYTHON "$0" || exit 1
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
+    -h|--help) tool_print_help 2 16 "$0"; exit 0 ;;
   esac
 done
 
-mkdir -p "$ROOT/outputs"
-
-if [[ " $* " != *" --device "* ]]; then
-  DEV="$(adb devices 2>/dev/null | awk '/device$/{print $1; exit}')"
-  if [ -n "$DEV" ]; then
-    set -- "$@" --device "$DEV"
-  fi
-fi
+tool_ensure_outputs
+tool_auto_device --device "$@"; set -- "${TOOL_ARGS[@]}"
 
 if [[ " $* " == *" --once "* ]]; then
   echo "▶ 沙画收集 · 识别一次"

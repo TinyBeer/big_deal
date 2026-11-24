@@ -2,15 +2,14 @@
 # 狗狗三消统一入口：默认 --auto 自动点击；--once 只标注一次。
 # 解释器: 见 tools/common/python_env.sh（DOG_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python DOG_PYTHON)" || exit 1
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env DOG_PYTHON "$0" || exit 1
 
 for a in "$@"; do
   case "$a" in
     -h|--help)
-      sed -n '2,12p' "$0"
+      tool_print_help 2 12 "$0"
       echo "  tools/dogs/quick.sh                  # 默认 --auto，自动点击"
       echo "  tools/dogs/quick.sh --once           # 只识别标注一次"
       echo "  tools/dogs/quick.sh --auto --dry-run # 只演示决策，不点击"
@@ -27,7 +26,7 @@ for a in "$@"; do
   esac
 done
 
-mkdir -p "$ROOT/outputs"
+tool_ensure_outputs
 if [ "$mode" = "once" ]; then
   has_out=0
   for a in "${args[@]}"; do [ "$a" = "--output" ] && has_out=1; done

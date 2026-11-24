@@ -12,11 +12,8 @@
 import argparse
 import json
 import os
-import re
-import subprocess
 import sys
 import time
-import xml.etree.ElementTree as ET
 
 import cv2
 import numpy as np
@@ -24,6 +21,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 import parking_vision as pv
+from common.adb import dump_ui, find_text_node, key_back, tap
 from common.notify import add_notify_args, send_notify
 
 RETURN_TEXTS = ("立即返回", "返回游戏")
@@ -53,44 +51,6 @@ def car_tap_point(car):
         off = max(10, min(bw, bh) // 5)
         return int(cx - ux*off), int(cy - uy*off)
     return cx, by + max(10, bh // 3)
-
-
-def tap(x, y, serial=None, touch=False):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["shell", "input"]
-    cmd += ["touchscreen"] if touch else []
-    cmd += ["tap", str(int(round(x))), str(int(round(y)))]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-def key_back(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["shell", "input", "keyevent", "4"]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-
-def dump_ui(serial=None):
-    adb = ["adb"] + (["-s", serial] if serial else [])
-    subprocess.run(adb + ["shell", "uiautomator", "dump", "/sdcard/window.xml"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    data = subprocess.run(adb + ["exec-out", "cat", "/sdcard/window.xml"],
-                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    try:
-        return ET.fromstring(data)
-    except ET.ParseError:
-        return None
-
-
-def find_text_node(root, keywords):
-    if root is None:
-        return None
-    for node in root.iter("node"):
-        text = node.get("text", "")
-        if any(k in text for k in keywords):
-            m = re.match(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.get("bounds", ""))
-            if m:
-                x1, y1, x2, y2 = [int(v) for v in m.groups()]
-                if x2 > x1 and y2 > y1:
-                    return ((x1+x2)//2, (y1+y2)//2), text
-    return None
 
 
 def has_security_check(serial=None):

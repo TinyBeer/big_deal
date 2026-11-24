@@ -14,27 +14,18 @@
 # 依赖: 所选环境需安装 tools/requirements.txt（pip install -r tools/requirements.txt）
 set -euo pipefail
 
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python RING_PYTHON)" || exit 1
-export PYTHONPATH="$TOOL_DIR${PYTHONPATH:+:$PYTHONPATH}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env RING_PYTHON "$0" || exit 1
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
+    -h|--help) tool_print_help 2 14 "$0"; exit 0 ;;
   esac
 done
 
-mkdir -p "$ROOT/outputs"
-
-# --device 未指定时自动探测已连接的 adb 设备
-if [[ " $* " != *" --device "* ]]; then
-  DEV="$(adb devices 2>/dev/null | awk '/device$/{print $1; exit}')"
-  if [ -n "$DEV" ]; then
-    set -- "$@" --device "$DEV"
-  fi
-fi
+tool_ensure_outputs
+tool_auto_device --device "$@"; set -- "${TOOL_ARGS[@]}"
 
 if [[ " $* " == *" --once "* ]]; then
   echo "▶ 环形岛接客 · 识别一次"

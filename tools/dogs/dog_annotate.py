@@ -12,13 +12,16 @@
 import argparse
 import json
 import os
-import subprocess
+import sys
 
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 import exit_detect
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.screen import grab as _adb_grab  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 BOARD_TEMPLATES = os.path.join(HERE, "templates", "board")
@@ -71,13 +74,7 @@ def load_templates(folder):
 
 
 def grab(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["exec-out", "screencap", "-p"]
-    data = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                          check=True).stdout
-    img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
-    if img is None:
-        raise RuntimeError("截图解码失败")
-    return img
+    return _adb_grab(serial, check=True)
 
 
 def match_all(img, templates, threshold=0.85, min_dist=60, zone=None):

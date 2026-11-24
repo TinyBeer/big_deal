@@ -19,31 +19,23 @@
 # 解释器: 见 tools/common/python_env.sh（ANTS_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python ANTS_PYTHON)" || exit 1
-export PYTHONPATH="$TOOL_DIR${PYTHONPATH:+:$PYTHONPATH}"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env ANTS_PYTHON "$0" || exit 1
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
+    -h|--help) tool_print_help 2 19 "$0"; exit 0 ;;
   esac
 done
 
-mkdir -p "$ROOT/outputs"
-
-if [[ " $* " != *" --device "* ]]; then
-  DEV="$(adb devices 2>/dev/null | awk '/device$/{print $1; exit}')"
-  if [ -n "$DEV" ]; then
-    set -- "$@" --device "$DEV"
-  fi
-fi
+tool_ensure_outputs
+tool_auto_device --device "$@"; set -- "${TOOL_ARGS[@]}"
 
 if [[ " $* " == *" --once "* ]]; then
   echo "▶ 搬砖大战 · 识别一次"
-  ARGS=()
-  for a in "$@"; do [ "$a" = "--once" ] || ARGS+=("$a"); done
+  tool_strip_flag --once "$@"
+  ARGS=("${STRIPPED_ARGS[@]}")
   exec "$PY" "$TOOL_DIR/ants_vision.py" --output "$ROOT/outputs/ants_annotated.png" "${ARGS[@]}"
 fi
 

@@ -15,10 +15,9 @@
 # 解释器: 见 tools/common/python_env.sh（FIND_DIFF_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
-TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-source "$ROOT/tools/common/python_env.sh"
-PY="$(resolve_python FIND_DIFF_PYTHON)" || exit 1
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+source "$ROOT/tools/common/shell_runtime.sh"
+tool_init_env FIND_DIFF_PYTHON "$0" || exit 1
 # /tmp 常是小容量 tmpfs，pip/matplotlib 之类会失败，统一改用大目录
 export TMPDIR="${TMPDIR_OVERRIDE:-/home/beer/tmp}"
 mkdir -p "$TMPDIR"

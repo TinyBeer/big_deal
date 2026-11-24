@@ -25,17 +25,17 @@
 import argparse
 import json
 import os
-import re
-import subprocess
 import sys
 import time
-import xml.etree.ElementTree as ET
 
 import cv2
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.adb import find_text
+from common.adb import tap as adb_tap
 from common.notify import add_notify_args, send_notify, notify_phone  # noqa: E402
+from common.screen import grab as adb_grab
 
 # HSV  hue 范围（OpenCV: 0~179）及标注用 BGR
 COLORS = {
@@ -291,16 +291,7 @@ def has_gui():
 
 
 def grab(serial=None):
-    cmd = ["adb"]
-    if serial:
-        cmd += ["-s", serial]
-    cmd += ["exec-out", "screencap", "-p"]
-    data = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                          check=True).stdout
-    img = cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
-    if img is None:
-        raise RuntimeError("截图解码失败")
-    return img
+    return adb_grab(serial, check=True)
 
 
 def has_modal(img, threshold=150):
@@ -310,11 +301,7 @@ def has_modal(img, threshold=150):
 
 
 def tap(x, y, serial=None):
-    cmd = ["adb"]
-    if serial:
-        cmd += ["-s", serial]
-    cmd += ["shell", "input", "tap", str(int(round(x))), str(int(round(y)))]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    return adb_tap(x, y, serial, check=True)
 
 
 TOOL_NAME = "线卷三消"
@@ -498,50 +485,15 @@ def pick_unlock(small, targets, excluded, scale, img, top_boards=None):
     return pick_by_board(pool, small, excluded, scale, img)
 
 
-def dump_ui(serial):
-    cmd = ["adb"]
-    if serial:
-        cmd += ["-s", serial]
-    subprocess.run(cmd + ["shell", "uiautomator", "dump", "/sdcard/window.xml"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    xml = subprocess.run(cmd + ["exec-out", "cat", "/sdcard/window.xml"],
-                         stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    if not xml:
-        return None
-    try:
-        return ET.fromstring(xml)
-    except ET.ParseError:
-        return None
-
-
 def find_return_button(serial):
     """从控件树里找「点击立即返回」，返回中心坐标。"""
-    root = dump_ui(serial)
-    if root is None:
-        return None
-    for node in root.iter("node"):
-        text = node.get("text", "")
-        if "立即返回" not in text:
-            continue
-        m = re.match(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.get("bounds", ""))
-        if not m:
-            continue
-        x1, y1, x2, y2 = [int(v) for v in m.groups()]
-        if x2 > x1 and y2 > y1:
-            return (int((x1 + x2) / 2), int((y1 + y2) / 2))
-    return None
+    found = find_text(serial, ("立即返回",))
+    return found[0] if found else None
 
 
 def has_security_check(serial):
     """京东验证等安全验证页：命中后应暂停，等用户自己操作。"""
-    root = dump_ui(serial)
-    if root is None:
-        return False
-    for node in root.iter("node"):
-        text = node.get("text", "")
-        if "安全验证" in text or "京东验证" in text:
-            return True
-    return False
+    return find_text(serial, ("安全验证", "京东验证")) is not None
 
 
 def wait_for_user(serial, timeout):

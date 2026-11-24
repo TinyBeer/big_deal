@@ -10,10 +10,13 @@
 import argparse
 import json
 import os
-import subprocess
+import sys
 
 import cv2
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.screen import grab  # noqa: E402
 
 # 颜色池：由马赛克拼图实机标定（见 palette.json / palette_calibrate.py）。
 # 14 色：白/青/深灰/中灰/浅蓝灰/浅紫(新)/黑/橙红/玫红(新)/蓝/粉/黄/紫/绿 + 橙粉。
@@ -59,12 +62,6 @@ SLOTS = (0.0, 0.671, 1.0, 0.735)
 UNLOCK_SEARCH = ((0.0, 0.594, 0.24, 0.668), (0.76, 0.594, 1.0, 0.668))
 SLOT_CENTERS = (103, 310, 517, 724, 931)  # 1080 宽基准
 FIRST_ROW_CENTERS = (145, 340, 535, 730, 925)  # 第一排 5 列中心
-
-
-def grab(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["exec-out", "screencap", "-p"]
-    data = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    return cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
 
 
 def _region_px(img, box):

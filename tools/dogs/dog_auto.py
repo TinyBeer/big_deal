@@ -12,11 +12,8 @@
 import argparse
 import json
 import os
-import re
-import subprocess
 import sys
 import time
-import xml.etree.ElementTree as ET
 
 import cv2
 import numpy as np
@@ -25,6 +22,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 import dog_annotate
 import exit_detect
+from common.adb import dump_ui, find_text_node, key_back
+from common.adb import tap as adb_tap, tap_touch as adb_tap_touch
 from common.notify import add_notify_args, send_notify, notify_phone  # noqa: E402
 
 HOUSE_CIRCLE_X = (-30, 17, 65)
@@ -35,50 +34,14 @@ DISMISS_TEXTS = ("不了", "关闭", "下次再说", "跳过", "我知道了")
 
 
 def tap(x, y, serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + \
-          ["shell", "input", "tap", str(int(round(x))), str(int(round(y)))]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    return adb_tap(x, y, serial, check=True)
 
 
 def tap_touch(x, y, serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + \
-          ["shell", "input", "touchscreen", "tap", str(int(round(x))), str(int(round(y)))]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-
-
-def key_back(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["shell", "input", "keyevent", "4"]
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+    return adb_tap_touch(x, y, serial, check=True)
 
 
 TOOL_NAME = "狗狗三消"
-
-
-
-def dump_ui(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else [])
-    subprocess.run(cmd + ["shell", "uiautomator", "dump", "/sdcard/window.xml"],
-                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    data = subprocess.run(cmd + ["exec-out", "cat", "/sdcard/window.xml"],
-                          stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    try:
-        return ET.fromstring(data)
-    except ET.ParseError:
-        return None
-
-
-def find_text_node(root, keywords):
-    if root is None:
-        return None
-    for node in root.iter("node"):
-        text = node.get("text", "")
-        if any(k in text for k in keywords):
-            m = re.match(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", node.get("bounds", ""))
-            if m:
-                x1, y1, x2, y2 = [int(v) for v in m.groups()]
-                if x2 > x1 and y2 > y1:
-                    return ((x1 + x2) // 2, (y1 + y2) // 2), text
-    return None
 
 
 def watch_ad_return(serial, wait, timeout):

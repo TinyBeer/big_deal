@@ -10,13 +10,15 @@
 import argparse
 import json
 import os
-import subprocess
+import sys
 
 import cv2
 import numpy as np
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.screen import grab  # noqa: E402
+
 # 复用色块入槽工具经过实机标定的颜色分类（14 色 + 橙粉）
-import sys
 _SLOTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "slots")
 if _SLOTS_DIR not in sys.path:
     sys.path.insert(0, _SLOTS_DIR)
@@ -63,12 +65,6 @@ PLUS_SEARCH = (0.10, 0.51, 0.28, 0.60)    # 加号搜索区（中部左侧）
 # 桶色可能是任意饱和度，必须是「非米色、非空槽深蓝」的可见色块
 BEIGE_H = (14, 32)
 EMPTY_SLOT_H = (104, 126)
-
-
-def grab(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["exec-out", "screencap", "-p"]
-    data = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    return cv2.imdecode(np.frombuffer(data, np.uint8), cv2.IMREAD_COLOR)
 
 
 def _region_px(img, box):
