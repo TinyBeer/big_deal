@@ -10,10 +10,13 @@
 import argparse
 import json
 import os
-import subprocess
+import sys
 
 import cv2
 import numpy as np
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
+from common.screen import grab  # noqa: E402
 
 # ---------- 颜色定义（与 parking_vision 一致） ----------
 COLORS = {
@@ -33,6 +36,9 @@ CAR_HUE = {"red": 3, "brown": 176, "yellow": 25, "green": 56,
 BOARD = (0.037, 0.483, 0.963, 0.888)    # 车辆棋盘 x0,y0,x1,y1 (y≈1160~2130)
 DOCK  = (0.12, 0.345, 0.98, 0.425)     # 接驳区行 (y≈830~1020, 左边界避开 X2 图标)
 GIFT_X_SEARCH = (0.70, 0.19, 0.99, 0.32)  # 助力礼包弹窗右上角 × 搜索区
+UNLOCK_ICON = os.path.join(os.path.dirname(__file__), "templates", "unlock_icon.png")
+# 播放图标中心相对整枚「解锁」按钮中心的偏移（1080x2400 基准）
+UNLOCK_ICON_TO_BUTTON = (36, -49)
 
 # 标注 BGR
 DRAW = {
@@ -59,13 +65,6 @@ DIR_VEC = {
 }
 DIR_PRIORITY = {"up": 0, "up-left": 1, "up-right": 1, "left": 2, "right": 2,
                 "down": 3, "down-left": 4, "down-right": 4}
-
-
-def grab(serial=None):
-    cmd = ["adb"] + (["-s", serial] if serial else []) + ["exec-out", "screencap", "-p"]
-    data = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL).stdout
-    arr = np.frombuffer(data, np.uint8)
-    return cv2.imdecode(arr, cv2.IMREAD_COLOR)
 
 
 def hue_name(h, s=255, v=255):
@@ -346,10 +345,14 @@ def can_exit(car, cars, img_shape, docked=None, img=None):
     return _can_exit_geom(car, cars, docked) and _can_exit_pixels(img, car)
 
 
-def detect_unlock_slots(img, template_path=None, threshold=0.65):
-    """模板匹配接驳行的「解锁」位，返回可点击中心坐标列表。"""
+def detect_unlock_slots(img, template_path=None, threshold=0.8):
+    """在接驳区匹配「看广告」播放图标，返回整枚解锁按钮的可点击中心。
+
+    旧版用两枚按钮的大模板 unlock.png，当前 UI 下峰值只有 ~0.60，阈值 0.65
+    会全部漏掉；播放图标是独立 UI 元素，峰值 0.98+，空槽位只有 ~0.16。
+    """
     if template_path is None:
-        template_path = os.path.join(os.path.dirname(__file__), "templates", "unlock.png")
+        template_path = UNLOCK_ICON
     tpl = cv2.imread(template_path)
     if tpl is None:
         return []
@@ -358,11 +361,15 @@ def detect_unlock_slots(img, template_path=None, threshold=0.65):
     if tpl.shape[0] > search.shape[0] or tpl.shape[1] > search.shape[1]:
         return []
     res = cv2.matchTemplate(search, tpl, cv2.TM_CCOEFF_NORMED)
-    locs = np.where(res >= threshold)
+    sx, sy = img.shape[1] / 1080.0, img.shape[0] / 2400.0
+    dx = int(round(UNLOCK_ICON_TO_BUTTON[0] * sx))
+    dy = int(round(UNLOCK_ICON_TO_BUTTON[1] * sy))
+    min_dist = max(30, int(round(70 * sx)))
     pts = []
-    for y, x in zip(*locs):
-        px, py = int(x + tpl.shape[1]//2 + x0), int(y + tpl.shape[0]//2 + y0)
-        if all((px-a)**2 + (py-b)**2 > 70**2 for a, b in pts):
+    for y, x in zip(*np.where(res >= threshold)):
+        px = int(x + tpl.shape[1] // 2 + x0) + dx
+        py = int(y + tpl.shape[0] // 2 + y0) + dy
+        if all((px - a) ** 2 + (py - b) ** 2 > min_dist ** 2 for a, b in pts):
             pts.append((px, py))
     return pts
 
