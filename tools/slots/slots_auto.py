@@ -3,6 +3,7 @@
 
 流程：开局看广告解锁全部「解锁」位 -> 循环 {抓图 -> 复活弹窗/胜利界面最高优先级停手
 -> 等稳定 -> 识别第一排色块与槽位颜色 -> 选一批颜色不在槽位、彼此不重复的第一排块
+   （颜色按首次出现顺序，同色多块随机选一个）
 -> 按顺序点完这一轮（原坐标，不做响应判断/坐标屏蔽/列偏移预测）
 -> 等稳定 -> 重新抓图进入下一轮决策}。
 
@@ -158,21 +159,21 @@ def unlock_all(serial, args):
 
 
 def pick_batch(result, args):
-    """一次决策选一批色块：颜色不在槽位中、彼此不重复、按第一排从左到右。
+    """一次决策选一批色块：颜色不在槽位中、彼此不重复。
 
-    只负责挑不重复的颜色，不预测补位/左移，也不记录点过哪些坐标——
-    色块捆绑导致的「点不动」暂不处理，下一轮重新抓图再决策。
+    颜色按第一排首次出现顺序排列；同一颜色有多个块时随机选一个坐标，
+    避免总点最左那块。只负责挑不重复的颜色，不预测补位/左移，也不记录
+    点过哪些坐标——色块捆绑导致的「点不动」暂不处理，下一轮重新决策。
     """
     row = result["first_row"]
     if not row:
         return [], "none"
     slot_colors = set(result["slot_colors"])
-    fresh, seen = [], set()
+    by_color = {}
     for b in row:
-        if b["color"] in slot_colors or b["color"] in seen:
-            continue
-        seen.add(b["color"])
-        fresh.append(b)
+        if b["color"] not in slot_colors:
+            by_color.setdefault(b["color"], []).append(b)
+    fresh = [random.choice(blocks) for blocks in by_color.values()]
     print("  候选: 第一排=%s 槽位=%s" % (
         "/".join(sv.CN.get(b["color"], b["color"]) for b in row),
         "/".join(sv.CN.get(c, c) for c in sorted(slot_colors)) or "空"), flush=True)
@@ -338,7 +339,7 @@ def main():
     ap.add_argument("--max-clicks", type=int, default=200)
     ap.add_argument("--max-seconds", type=int, default=600)
     ap.add_argument("--batch-size", type=int, default=3,
-                    help="单次决策点几个不同色块，按第一排从左到右（默认 3；0=全部）")
+                    help="单次决策点几个不同色块，按首次出现顺序、同色多块随机选（默认 3；0=全部）")
     ap.add_argument("--batch-gap", type=float, default=0.45,
                     help="批内两次点击间隔秒数（默认 0.45）")
     ap.add_argument("--wait", type=float, default=0.6)
