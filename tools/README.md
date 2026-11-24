@@ -12,7 +12,7 @@
 | `slots/` | 色块入槽：一批点第一排中颜色不在槽位且不重复的色块（全占用随机）；看广告解锁；复活/胜利界面立即停手 | `tools/slots/quick.sh` |
 | `ants/` | 搬砖大战：开局看广告解锁；只检查槽位和第一排候选块，一次选一批不在槽中的颜色投放（同色最多一槽）；福利弹窗点 X 关闭；复活弹窗立即停手；连续无法决策超过 `--idle-timeout`（默认 20 秒）停止；已点未入槽的颜色在 `--repeat-delay`（默认 8 秒）内不重复点；结束时发手机状态栏通知（`--no-notify` 关闭） | `tools/ants/quick.sh`（见 `PLAN.md`） |
 | `sand/` | 沙画收集：看广告解锁槽位到加号消失；批量选第一排不重复色桶依次点击（`--batch-size`/`--batch-gap`）；复活/通关弹窗立即停手 | `tools/sand/quick.sh`（见 `PLAN.md`） |
-| `common/` | 共用模块：`notify.py` 统一各工具的手机状态栏通知（参数注册、文案解析、adb 推送、临时脚本清理） | 被各 `*Auto.py` 引入，无独立入口 |
+| `common/` | 共用模块：`notify.py` 统一通知；`adb.py` 统一 tap/key_back/控件树查找/设备探测；`screen.py` 统一 adb 抓图；`palette_calibrate_core.py` 统一调色板标定的投影/FFT/相位/众数色/KMeans 骨架；`shell_runtime.sh` 统一入口脚本的环境初始化、outputs 创建、设备探测与参数剔除；`python_env.sh` 统一解释器选择 | 被各 `*Auto.py` / `quick.sh` / `palette_calibrate.py` 引入，无独立入口 |
 
 ## 约定
 
