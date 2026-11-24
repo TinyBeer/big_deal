@@ -238,9 +238,9 @@
       ],
       "count": 54,
       "ratio": 0.0286,
-      "current_class": "purple",
+      "current_class": "purple_dark",
       "name": "深紫",
-      "class": "purple",
+      "class": "purple_dark",
       "is_solid_block": true
     },
     {
@@ -257,9 +257,9 @@
       ],
       "count": 54,
       "ratio": 0.0286,
-      "current_class": "purple",
+      "current_class": "purple_bright",
       "name": "紫",
-      "class": "purple",
+      "class": "purple_bright",
       "is_solid_block": true
     },
     {
