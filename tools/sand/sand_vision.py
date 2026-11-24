@@ -40,16 +40,21 @@ def is_locked_bucket(h, s, v):
 
 
 def hue_name(h, s=255, v=255):
-    """桶色分类：在通用色表上补两个本项目专属修正。
+    """桶色分类：在通用色表上补三个本项目专属修正。
 
     1. 白桶内壁实测 (H0 S21 V216)，通用色表 S<20 V>210 差 1 落到 gray_light，
        统一归 white（另有纯白内壁 H0 S0 V255 本来就归 white）。
     2. 带问号的锁定桶底 (H109 S114 V179) 归 unknown，不参与颜色决策。
+    3. 沙画的黄色桶内壁实测 (H22 S189 V215)，通用色表把 H<=25 一律归 red；
+       沙画里这是明黄色，归 yellow（米黄背景 S≈107 不会被误判）。
     """
     if is_locked_bucket(h, s, v):
         return "unknown"
+    h, s, v = int(h) % 180, int(s), int(v)
+    if 18 <= h <= 25 and s >= 150 and 190 <= v <= 225:
+        return "yellow"
     name = _base_hue_name(h, s, v)
-    if name == "gray_light" and int(v) >= 205 and int(s) < 35:
+    if name == "gray_light" and v >= 205 and s < 35:
         return "white"
     return name
 
@@ -90,38 +95,37 @@ def _is_bucket_pixel(h, s, v):
 def detect_first_row(img):
     """自适应检测第一排桶（列数/桶尺寸随关卡变化，不能固定列坐标）。
 
-    用连通域找桶体：掩码 = 高饱和或暗色，排除米色背景与空槽底；
-    用 bbox 顶部 y 限定在第一排（避开下面几排）。桶色取桶口内部中位色。
-    已验证关卡 155（5 列小桶）与 156（4 列大桶）。
+    用桶的**黑色描边轮廓**定位桶，而非桶内颜色：背景色（米黄/草绿）与桶色
+    （浅紫/黄/蓝/黑…）千变万化，但每个桶都有一圈近黑粗描边 (V<70 S<90)，
+    用连通域可稳定找出所有桶，再取桶口内部中位色分类。
+    第一排由 y 范围 (1320~1620) 限定，避开下面几排。
+    已验证关卡 155（5 列）/156（4 列）/165（浅紫+黄）。
     """
     h, w = img.shape[:2]
     sx, sy = w / 1080.0, h / 2400.0
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    H, S, V = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
+    V, S = hsv[:, :, 2], hsv[:, :, 1]
 
-    mask = ((S > 60) | (V < 90)).astype(np.uint8)
-    beige = ((H >= BEIGE_H[0]) & (H <= BEIGE_H[1]) & (S > 80) & (V > 185))
-    empty = ((H >= EMPTY_SLOT_H[0]) & (H <= EMPTY_SLOT_H[1])
-             & (S >= 45) & (S <= 130) & (V >= 120) & (V <= 200))
-    mask[beige | empty] = 0
-    mask[:int(1320 * sy), :] = 0
-    mask[int(1600 * sy):, :] = 0
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE,
-                            cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7)))
+    # 桶描边是近黑：V<70 且 S<90（数字黑字也在内，闭运算后并入桶 bbox）
+    dark = ((V < 70) & (S < 90)).astype(np.uint8) * 255
+    dark[:int(1320 * sy), :] = 0
+    dark[int(1620 * sy):, :] = 0
+    dark = cv2.morphologyEx(dark, cv2.MORPH_CLOSE,
+                            cv2.getStructuringElement(cv2.MORPH_ELLIPSE,
+                                                      (int(11 * sx) | 1, int(11 * sy) | 1)))
 
-    n, lab, stats, cents = cv2.connectedComponentsWithStats(mask)
+    n, lab, stats, cents = cv2.connectedComponentsWithStats(dark)
     blocks = []
-    top_lo, top_hi = int(1330 * sy), int(1480 * sy)
     for i in range(1, n):
         x, y, bw, bh, area = stats[i]
-        if not (top_lo <= y <= top_hi):
-            continue
-        if (area < 4000 * sx * sy or bw < 60 * sx or bw > 220 * sx
-                or bh < 60 * sy or bh > 220 * sy):
+        # 描边连通域：面积>1500，宽 150~200、高 170~210（1080x2400 基准，随缩放）
+        if (area < 1500 * sx * sy or not (150 * sx <= bw <= 200 * sx)
+                or not (170 * sy <= bh <= 210 * sy)):
             continue
         cx = x + bw // 2
-        xa, xb = max(0, cx - int(18 * sx)), min(w, cx + int(18 * sx))
-        ya, yb = int(y + 20 * sy), int(y + 70 * sy)
+        # 桶口内部：bbox 顶部往下 40~95px，宽 ±25px（桶口内壁集中在此）
+        ya, yb = int(y + 40 * sy), int(y + 95 * sy)
+        xa, xb = max(0, cx - int(25 * sx)), min(w, cx + int(25 * sx))
         if yb <= ya or xb <= xa:
             continue
         p = hsv[ya:yb, xa:xb].reshape(-1, 3)
