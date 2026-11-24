@@ -9,21 +9,20 @@
 #   tools/ring/quick.sh --device <serial>      # 指定 adb 设备
 #
 # 输出: outputs/ring_annotated.png（--once）/ outputs/ring_dryrun.png（--dry-run）
+#
+# 解释器: 见 tools/common/python_env.sh（RING_PYTHON > 当前激活环境 > PATH）
+# 依赖: 所选环境需安装 tools/requirements.txt（pip install -r tools/requirements.txt）
 set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${RING_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
-if [ ! -x "$PY" ]; then PY="$(command -v python3 || true)"; fi
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请设置 RING_PYTHON" >&2
-  exit 1
-fi
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python RING_PYTHON)" || exit 1
 export PYTHONPATH="$TOOL_DIR${PYTHONPATH:+:$PYTHONPATH}"
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
   esac
 done
 

@@ -15,21 +15,19 @@
 #   tools/ants/palette_calibrate.py                   # 从上方像素画重新标定颜色池
 #
 # 输出: outputs/ants_annotated.png（覆盖更新）
+#
+# 解释器: 见 tools/common/python_env.sh（ANTS_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${ANTS_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
-if [ ! -x "$PY" ]; then PY="$(command -v python3 || true)"; fi
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请设置 ANTS_PYTHON" >&2
-  exit 1
-fi
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python ANTS_PYTHON)" || exit 1
 export PYTHONPATH="$TOOL_DIR${PYTHONPATH:+:$PYTHONPATH}"
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,19p' "$0"; exit 0 ;;
   esac
 done
 

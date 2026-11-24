@@ -9,20 +9,18 @@
 #   tools/parking/quick.sh --device <serial>      # 指定 adb 设备
 #
 # 输出: outputs/parking_annotated.png（--once）
+#
+# 解释器: 见 tools/common/python_env.sh（PARKING_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${PARKING_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
-if [ ! -x "$PY" ]; then PY="$(command -v python3 || true)"; fi
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请设置 PARKING_PYTHON" >&2
-  exit 1
-fi
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python PARKING_PYTHON)" || exit 1
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,11p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,13p' "$0"; exit 0 ;;
   esac
 done
 

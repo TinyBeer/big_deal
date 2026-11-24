@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 线卷三消快速执行：固定解释器与输出路径，其余参数原样透传给 spool_assist.py
+# 线卷三消快速执行：使用当前激活环境的 Python 与固定输出路径，其余参数原样透传给 spool_assist.py
 #
 # 用法:
 #   tools/spool/quick.sh                        # 默认 --auto，自动点击直到无可操作线卷
@@ -10,20 +10,18 @@
 #   tools/spool/quick.sh --device <serial>      # 指定 adb 设备
 #
 # 输出: outputs/spool_annotated.png（传 --output 可覆盖）
+# 解释器: 见 tools/common/python_env.sh（SPOOL_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${SPOOL_PYTHON:-$(command -v python || command -v python3 || true)}"
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请先激活环境（如 conda activate xxx）或设置 SPOOL_PYTHON" >&2
-  exit 1
-fi
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python SPOOL_PYTHON)" || exit 1
 OUT="$ROOT/outputs/spool_annotated.png"
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,13p' "$0"; exit 0 ;;
   esac
 done
 

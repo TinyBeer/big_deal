@@ -2,12 +2,12 @@
 # pyright: reportMissingParameterType=false, reportUnknownParameterType=false, reportUnknownArgumentType=false, reportUnknownVariableType=false, reportUnknownMemberType=false, reportUnknownLambdaType=false, reportUnusedCallResult=false
 """三消线卷辅助识别：截屏 -> 找目标大线卷 -> 圈出可点击的小线卷。
 
-用法示例：
-  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --image shot.png --once
-  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --once --output result.png
-  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --live
-  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --live --targets yellow pink --interval 0.7
-  /home/beer/.workbuddy/binaries/python/envs/default/bin/python tools/spool/spool_assist.py --auto
+用法示例（python 为当前激活环境中的解释器）：
+  python tools/spool/spool_assist.py --image shot.png --once
+  python tools/spool/spool_assist.py --once --output result.png
+  python tools/spool/spool_assist.py --live
+  python tools/spool/spool_assist.py --live --targets yellow pink --interval 0.7
+  python tools/spool/spool_assist.py --auto
 
 说明：
   --targets 可手动指定目标颜色；不传时自动从顶部彩色大线卷读取。

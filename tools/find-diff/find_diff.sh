@@ -12,10 +12,13 @@
 #   -h         显示帮助
 #
 # 依赖: python + numpy/Pillow/scipy（不需要 adb）
+# 解释器: 见 tools/common/python_env.sh（FIND_DIFF_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PY="${FIND_DIFF_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
+ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python FIND_DIFF_PYTHON)" || exit 1
 # /tmp 常是小容量 tmpfs，pip/matplotlib 之类会失败，统一改用大目录
 export TMPDIR="${TMPDIR_OVERRIDE:-/home/beer/tmp}"
 mkdir -p "$TMPDIR"
@@ -25,7 +28,7 @@ COUNT=25
 THR=14
 SRC=""
 
-usage() { sed -n '2,14p' "$0"; exit 0; }
+usage() { sed -n '2,15p' "$0"; exit 0; }
 
 # 手写解析：图片路径可以放在任意位置，和选项混排都行
 while [ $# -gt 0 ]; do

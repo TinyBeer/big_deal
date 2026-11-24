@@ -8,6 +8,7 @@
 #   quick.sh -f 已有图片.png          # 跳过抓图，直接处理本地图片
 #   quick.sh -s 192.168.2.11:42559    # 指定设备（默认取第一台在线设备）
 #   quick.sh -c 25 -t 14              # 候选上限 / 色差阈值（同 find_diff.sh）
+# 解释器: 见 tools/common/python_env.sh（FIND_DIFF_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
 OUTDIR="./outputs"
@@ -27,7 +28,7 @@ while [ $# -gt 0 ]; do
     -s|--serial) SERIAL="$2"; shift 2 ;;
     -c|--count)  COUNT="$2"; shift 2 ;;
     -t|--thr)    THR="$2"; shift 2 ;;
-    -h|--help)   sed -n '2,10p' "$0"; exit 0 ;;
+    -h|--help)   sed -n '2,11p' "$0"; exit 0 ;;
     *) echo "未知参数: $1" >&2; exit 2 ;;
   esac
 done
@@ -35,11 +36,9 @@ done
 case "$NUM" in 1|2|3|4) ;; *) echo "-k 只支持 1~4" >&2; exit 2 ;; esac
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PY="${FIND_DIFF_PYTHON:-$(command -v python || command -v python3 || true)}"
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请先激活环境（如 conda activate xxx）或设置 FIND_DIFF_PYTHON" >&2
-  exit 1
-fi
+ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python FIND_DIFF_PYTHON)" || exit 1
 export FIND_DIFF_PYTHON="$PY"
 export TMPDIR="${TMPDIR:-/home/beer/tmp}"
 mkdir -p "$OUTDIR" "$TMPDIR"

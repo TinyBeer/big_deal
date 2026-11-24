@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 # 狗狗三消统一入口：默认 --auto 自动点击；--once 只标注一次。
-# 与 tools/spool/quick.sh 一致，使用当前激活环境中的 Python。
+# 解释器: 见 tools/common/python_env.sh（DOG_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${DOG_PYTHON:-$(command -v python || command -v python3 || true)}"
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请先激活环境（如 conda activate xxx）或设置 DOG_PYTHON" >&2
-  exit 1
-fi
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python DOG_PYTHON)" || exit 1
 
 for a in "$@"; do
   case "$a" in

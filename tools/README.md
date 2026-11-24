@@ -28,7 +28,14 @@
 python -m pip install -r tools/requirements.txt
 ```
 
-- 默认使用当前激活环境中的 Python（优先 `python`，找不到时回退 `python3`），可用 `FIND_DIFF_PYTHON` / `SPOOL_PYTHON` 覆盖
+- 解释器由 `tools/common/python_env.sh` 统一选择：显式覆盖变量 > 当前激活的 venv（`VIRTUAL_ENV`）/conda（`CONDA_PREFIX`）环境 > PATH 中的 `python`/`python3`。激活环境里没有可执行的 Python 时会直接提示，不会静默改用其它环境
+- 覆盖变量：`FIND_DIFF_PYTHON` / `SPOOL_PYTHON` / `DOG_PYTHON` / `PARKING_PYTHON` / `RING_PYTHON` / `SLOTS_PYTHON` / `ANTS_PYTHON` / `SAND_PYTHON`
+
+### 限制
+
+- 工具只使用当前激活环境（或显式 `XXX_PYTHON`）中的 Python。若已激活的 venv/conda 环境里没有可执行的 `python`，脚本会直接提示并退出，不会静默回退到系统 Python 或其它环境；请修复/切换环境，或显式设置对应覆盖变量
+- 未激活任何环境时回退到 PATH 中的 `python`/`python3`；PATH 中也没有 Python 时同样提示并退出。运行前请确认所选环境已安装 `tools/requirements.txt` 依赖
+
 - 色块入槽的颜色池由马赛克拼图完整画板实机标定（14 色，含玫红/橙红、粉/玫红、浅紫/浅蓝灰/中灰/深灰等相近色细分）：`tools/slots/palette.json`；换关卡可用 `tools/slots/palette_calibrate.py` 重新标定（默认覆盖完整 20×26 网格；详见 `tools/slots/PLAN.md` 第十节）
 - 停车场接客的模板（`arrow_right.png` / `p_slot.png` / `unlock.png`）位于 `tools/parking/templates/`；环形岛接客的模板（`unlock.png` / `p_slot.png` / `gift_x.png` / `use_button.png` / `revive_banner.png` / `fail_banner.png`）位于 `tools/ring/templates/`；色块入槽的模板（`unlock.png` / `revive_banner.png` / `victory_banner.png`）位于 `tools/slots/templates/`；搬砖大战的模板（`popup_close.png` / `revive_close.png` / `unlock.png`）位于 `tools/ants/templates/`
 - 搬砖大战的颜色池由 `tools/ants/palette_calibrate.py` 从上方像素画标定，结果存 `tools/ants/palette.json`；用法与 slots 的调色板标定一致（`--image` 指定截图或实时抓图，`--k` 控制聚类数）。

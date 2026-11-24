@@ -12,21 +12,19 @@
 #   tools/sand/quick.sh --batch-gap 0.15            # 批次内点击间隔秒数
 #
 # 输出: outputs/sand_annotated.png（--once）/ outputs/sand_dryrun.png（--dry-run）
+#
+# 解释器: 见 tools/common/python_env.sh（SAND_PYTHON > 当前激活环境 > PATH）
 set -euo pipefail
 
 TOOL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$TOOL_DIR/../.." && pwd)"
-PY="${SAND_PYTHON:-/home/beer/.workbuddy/binaries/python/envs/default/bin/python}"
-if [ ! -x "$PY" ]; then PY="$(command -v python3 || true)"; fi
-if [ -z "$PY" ]; then
-  echo "✗ 未找到 Python，请设置 SAND_PYTHON" >&2
-  exit 1
-fi
+source "$ROOT/tools/common/python_env.sh"
+PY="$(resolve_python SAND_PYTHON)" || exit 1
 export PYTHONPATH="$TOOL_DIR${PYTHONPATH:+:$PYTHONPATH}"
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,16p' "$0"; exit 0 ;;
   esac
 done
 
