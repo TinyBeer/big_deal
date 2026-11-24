@@ -87,6 +87,7 @@ tools/spool/quick.sh --once         # 只识别一次
 
 ```bash
 tools/dogs/quick.sh                 # 默认自动点击（--once 只标注）
+tools/dogs/quick.sh --auto --batch-size 3 --batch-gap 0.35  # 每批最多 3 只可入大狗窝的不重复候选狗，依次点击
 ```
 
 **停车场接客**（先看广告解锁全部接驳位，再自动接客；遇倾斜/8 方向关卡只解锁不自动打，剩 1 空位也停手交还）：

@@ -6,7 +6,7 @@
 |------|------|------|
 | `find-diff/` | 找不同（找茬）差异检测与标注 | `tools/find-diff/quick.sh` |
 | `spool/` | 三消「线卷」识别、标注与自动点击 | `tools/spool/quick.sh` |
-| `dogs/` | 狗狗三消识别、标注与自动点击 | `tools/dogs/quick.sh`（默认 `--auto`，`--once` 只标注） |
+| `dogs/` | 狗狗三消识别、标注与自动点击：一次识别选最多 3 只能进大狗窝且不重复品种的出口狗依次点击（`--batch-size`/`--batch-gap`）；无大狗窝目标时随机单只送小狗窝 | `tools/dogs/quick.sh`（默认 `--auto`，`--once` 只标注） |
 | `parking/` | 停车场接客：看广告解锁接驳位 + 自动接同色乘客；倾斜关卡只解锁不自动打，剩 1 空位停手 | `tools/parking/quick.sh`（见 `PLAN.md`） |
 | `ring/` | 环形岛接客：按接驳区车色出车（全占用随机）；空位 ≤1 且无新色提前结束；复活弹窗立即停手 | `tools/ring/quick.sh` |
 | `slots/` | 色块入槽：一批点第一排中颜色不在槽位且不重复的色块（全占用随机）；看广告解锁；复活/胜利界面立即停手 | `tools/slots/quick.sh` |

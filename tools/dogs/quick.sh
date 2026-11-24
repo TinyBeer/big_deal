@@ -13,6 +13,7 @@ for a in "$@"; do
       echo "  tools/dogs/quick.sh                  # 默认 --auto，自动点击"
       echo "  tools/dogs/quick.sh --once           # 只识别标注一次"
       echo "  tools/dogs/quick.sh --auto --dry-run # 只演示决策，不点击"
+      echo "  tools/dogs/quick.sh --auto --batch-size 3 --batch-gap 0.35 # 每批最多 3 只可入大狗窝的不重复候选狗"
       exit 0 ;;
   esac
 done

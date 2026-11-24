@@ -2,16 +2,21 @@
 """狗狗三消自动点击：识别廊道出口，先把狗送进匹配的大狗窝。
 
 参考 tools/spool/spool_assist.py 的 adb 抓图 -> 决策 -> 点击 -> 等稳定循环。
+有能进大狗窝的出口狗时，一次识别选一批不重复品种的目标（默认最多 3 只），按原
+坐标依次点击后再统一等画面稳定，避免每点一只都重新识别；没有大狗窝目标时改为
+随机选一只狗送小狗窝（单只点击，不走批量逻辑）。
 开局可看广告解锁锁定的大小狗窝与廊道；长时间不操作弹出的窗口会自动关闭。
 
 用法（统一入口见 quick.sh）：
   tools/dogs/quick.sh --auto --max-clicks 80
+  tools/dogs/quick.sh --auto --batch-size 3 --batch-gap 0.35
   tools/dogs/quick.sh --auto --dry-run
 """
 
 import argparse
 import json
 import os
+import random
 import sys
 import time
 
@@ -155,24 +160,34 @@ def wait_stable(serial, min_wait=0.35, max_wait=1.6, interval=0.15):
     return img if img is not None else dog_annotate.grab(serial)
 
 
-def pick_target(exits, targets, house_fills, smalls, frequent):
-    """优先送进差一只就消除的大狗窝；否则送当前数量最多的品种。"""
-    cands = [d for d in exits if d["breed"] in targets]
-    if cands:
-        def rank(d):
-            fills = [house_fills[i] for i, b in enumerate(targets[d["breed"]])]
-            return (max(fills) if fills else 0, frequent.get(d["breed"], 0),
-                    -d["y"], -d["x"])
-        return max(cands, key=rank), "house"
-    cands = [d for d in exits if d["breed"]]
-    if not cands:
-        return None, "none"
-    in_basket = {s["label"] for s in smalls
-                 if s["label"] in dog_annotate.BREED_CN.values()}
-    def rank(d):
-        name = dog_annotate.BREED_CN[d["breed"]]
-        return (name in in_basket, frequent.get(d["breed"], 0), -d["y"], -d["x"])
-    return max(cands, key=rank), "basket"
+def pick_targets(exits, targets, house_fills, frequent, batch_size):
+    """一次识别选一批不重复的大狗窝目标狗：每个品种最多一只。
+
+    只选品种与未满大狗窝匹配的出口狗，没有大狗窝可去的狗不选（不往小狗窝送）。
+    廊道出口互相独立，点掉一只只影响所在廊道，所以同一张图上选出的多只狗可以
+    按原坐标依次点击；同品种只取一只，避免大狗窝中途集满后后续点击落空。
+    """
+    def house_rank(d):
+        fills = [house_fills[i] for i in targets[d["breed"]]]
+        return (max(fills) if fills else 0, frequent.get(d["breed"], 0),
+                -d["y"], -d["x"])
+
+    pool = sorted((d for d in exits if d["breed"] in targets),
+                  key=house_rank, reverse=True)
+    limit = batch_size if batch_size > 0 else len(pool)
+    picked, used_breeds = [], set()
+    for d in pool:
+        if len(picked) >= limit:
+            break
+        breed = d["breed"]
+        if breed in used_breeds:
+            continue
+        if any(abs(d["x"] - c["x"]) < 60 and abs(d["y"] - c["y"]) < 60
+               for c, _ in picked):
+            continue
+        used_breeds.add(breed)
+        picked.append((d, "house"))
+    return picked
 
 
 def auto_run(args):
@@ -250,33 +265,61 @@ def auto_run(args):
         frequent = {}
         for d in exits:
             frequent[d["breed"]] = frequent.get(d["breed"], 0) + 1
-        if not any(d["breed"] in targets for d in exits):
-            empty_smalls = [s for s in result["smalls"] if s["label"] == "空"]
-            if len(empty_smalls) <= 1:
-                print("stop: 小狗窝只剩 %d 个空位，且出口狗无法进入大狗窝" %
-                      len(empty_smalls), flush=True)
-                break
-        matching = [d for d in exits if d["breed"] in targets]
         available = [s for s in result["smalls"] if s["label"] != "未解锁"]
         empty_smalls = [s for s in available if s["label"] == "空"]
+        matching = [d for d in exits if d["breed"] in targets]
         print("状态: 狗窝=%s 目标=%s 小狗窝 空%d/可用%d 出口=%s 可入窝=%d" % (
             [h["label"] for h in result["houses"]],
             [dog_annotate.BREED_SHORT.get(b, b) for b in targets],
             len(empty_smalls), len(available),
             [dog_annotate.BREED_SHORT.get(d["breed"], d["label"]) for d in exits],
             len(matching)), flush=True)
-        cand, mode = pick_target(exits, targets, house_fills, result["smalls"], frequent)
-        if cand is None:
+        if matching:
+            picked = pick_targets(exits, targets, house_fills, frequent, args.batch_size)
+            limit_text = str(args.batch_size) if args.batch_size > 0 else "不限"
+            print("本轮批量选择 %d/%s 个不重复大狗窝候选: %s" % (
+                len(picked), limit_text,
+                " ".join("%s->%s" % (dog_annotate.BREED_SHORT.get(d["breed"], d["label"]),
+                                     mode) for d, mode in picked)), flush=True)
+        else:
+            # 没有大狗窝目标：随机选一只送小狗窝，单只点击，不走批量逻辑
+            if len(empty_smalls) <= 1:
+                print("stop: 小狗窝只剩 %d 个空位，且无大狗窝目标" %
+                      len(empty_smalls), flush=True)
+                break
+            if not exits:
+                print("无可点出口狗，停止", flush=True)
+                break
+            cand = random.choice(exits)
+            picked = [(cand, "basket")]
+            print("无大狗窝目标，随机选 1 只送小狗窝: %s (%d,%d)" %
+                  (cand["label"], cand["x"], cand["y"]), flush=True)
+        picked = picked[:max(0, args.max_clicks - clicks)]
+        if not picked:
             print("无可点出口狗，停止", flush=True)
             break
         if args.dry_run:
-            print("[dry] %s (%d,%d) -> %s" % (cand["label"], cand["x"], cand["y"], mode),
-                  flush=True)
+            for i, (d, mode) in enumerate(picked, 1):
+                print("[dry] %d/%d %s (%d,%d) -> %s" % (
+                    i, len(picked), d["label"], d["x"], d["y"], mode), flush=True)
             break
-        clicks += 1
-        print("[%d] %s (%d,%d) -> %s" %
-              (clicks, cand["label"], cand["x"], cand["y"], mode), flush=True)
-        tap(cand["x"], cand["y"], serial)
+        for i, (cand, mode) in enumerate(picked):
+            # 批内下一只点击前复查复活弹窗，命中立即停手
+            if i > 0:
+                mid = dog_annotate.grab(serial)
+                if mid is not None and detect_revive_dialog(mid):
+                    stop_reason = "批次内检测到复活弹窗，立即停手"
+                    print(stop_reason, flush=True)
+                    break
+            clicks += 1
+            print("[%d] 批内 %d/%d %s (%d,%d) -> %s" %
+                  (clicks, i + 1, len(picked), cand["label"], cand["x"], cand["y"], mode),
+                  flush=True)
+            tap(cand["x"], cand["y"], serial)
+            if i < len(picked) - 1:
+                time.sleep(args.batch_gap)
+        if stop_reason:
+            break
         wait_stable(serial, args.wait, args.max_wait)
         time.sleep(args.gap)
 
@@ -296,6 +339,10 @@ def main():
     ap.add_argument("--wait", type=float, default=0.35)
     ap.add_argument("--max-wait", type=float, default=1.6)
     ap.add_argument("--gap", type=float, default=0.15)
+    ap.add_argument("--batch-size", type=int, default=3,
+                    help="一次识别最多选几个能进大狗窝且不重复品种的出口狗（默认 3；0=不限）")
+    ap.add_argument("--batch-gap", type=float, default=0.35,
+                    help="批内相邻两次点击的间隔秒数（默认 0.35）")
     ap.add_argument("--unlock", dest="unlock", action="store_true", default=True,
                     help="开局看广告解锁资源（默认开启）")
     ap.add_argument("--no-unlock", dest="unlock", action="store_false")
