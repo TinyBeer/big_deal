@@ -35,19 +35,21 @@ QUEUE_YS = (1897, 2062)
 CN = {
     "yellow": "黄", "green": "绿", "light_brown": "浅棕",
     "olive": "橄榄", "dark_brown": "深棕", "dark_green": "深绿",
-    "mint": "薄荷", "pink": "粉", "red": "红", "dark_red": "暗红",
+    "mint": "薄荷", "pink": "粉", "pink_light": "浅粉", "red": "红", "dark_red": "暗红",
     "coral": "橙红", "orange": "橙", "peach": "浅橙", "cyan": "青",
-    "gray": "灰", "white": "白", "black": "黑", "unknown": "未知",
+    "gray": "深灰", "slate": "蓝灰",
+    "white": "白", "black": "黑", "unknown": "未知",
 }
 DRAW = {
     "yellow": (40, 220, 250), "green": (60, 200, 90),
     "light_brown": (150, 120, 200), "olive": (100, 130, 170),
     "dark_brown": (90, 70, 130), "dark_green": (90, 150, 40),
-    "mint": (140, 220, 160), "pink": (220, 120, 240),
+    "mint": (140, 220, 160), "pink": (220, 80, 240), "pink_light": (240, 180, 255),
     "red": (60, 60, 240), "dark_red": (120, 40, 150),
     "coral": (80, 100, 240), "orange": (30, 140, 255),
     "peach": (130, 180, 255), "cyan": (255, 220, 60),
-    "gray": (150, 150, 150), "white": (255, 255, 255),
+    "gray": (105, 100, 115), "slate": (200, 150, 110),
+    "white": (255, 255, 255),
     "black": (30, 30, 30), "unknown": (150, 150, 150),
 }
 
@@ -97,9 +99,11 @@ def classify_hsv(h, s, v):
         return "white"
     if v < 60:
         return "black"
-    # 低饱和中暗灰（标定 H104 S56 V86）
+    # 低饱和中暗灰：槽位里的深灰 H104 S54 V≈86，第一排的蓝灰块
+    # H108 S55 V≈120。旧判据把两者都归 gray，导致槽里有深灰时第一排
+    # 蓝灰块被当成同色跳过。按 V=105 拆开，实测两档间隔 >15。
     if 90 <= h <= 120 and s < 80 and v < 130:
-        return "gray"
+        return "gray" if v < 105 else "slate"
     # 标定新增色：橙 H19 S242 V255、青 H97 S228 V255
     if 16 <= h <= 24 and s > 180 and v > 200:
         return "orange"
@@ -112,7 +116,9 @@ def classify_hsv(h, s, v):
     if h >= 160 and s >= 140:
         return "dark_red" if v < 190 else "red"
     if h >= 160:
-        return "pink"
+        # 两种粉色都是 H≈163，只能靠饱和度拆：槽内浅粉 S≈68，第一排
+        # 粉块 S≈118。旧版统一归 pink，槽内浅粉会误挡第一排粉块。
+        return "pink" if s >= 100 else "pink_light"
     if h <= 8:
         return "red"
     if 8 <= h <= 18:
@@ -292,13 +298,15 @@ def detect_queue(img):
         return []
     hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
     hue, sat, val = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
-    # 四类块都要覆盖：高饱和彩色 / 深色黑块 / 粉色（S低但H高） / 中低饱和灰紫。
-    # 米色背景 H≈21 S≈60 V>130，用 H 区间排除，避免整片背景被当候选块。
+    # 五类块都要覆盖：高饱和彩色 / 深色黑块 / 粉色（S低但H高） / 中低饱和灰紫 /
+    # 白色块（S<25 V>200）。米色背景 H≈13~21 S≈57~68 V>130，S 远高于白色，
+    # 不会被白色分支吃掉；旧版漏掉白色分支，白块只剩描边暗像素被判成 red。
     mask = (((sat > 95) & (val > 90)) |
             ((val < 120) & (sat > 130)) |
             ((hue >= 150) & (sat > 45) & (val > 150)) |
             ((hue >= 100) & (hue < 150) & (sat > 40) & (val > 170)) |
-            ((val < 75) & (sat < 110) & ~((hue >= 18) & (hue <= 28)))).astype(np.uint8)
+            ((val < 75) & (sat < 110) & ~((hue >= 18) & (hue <= 28))) |
+            ((sat < 25) & (val > 200))).astype(np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE,
                             np.ones((9, 9), np.uint8))
     n, lab, stats, cents = cv2.connectedComponentsWithStats(mask)
@@ -345,10 +353,15 @@ def detect_queue(img):
         # 实测真实块白字 262~1551 像素，误检位置 0~26。
         if int(white_px.sum()) < 150 * sx * sy:
             continue
-        # 排除白字与米色空背景；剩下的即块主体
-        q = p[~(((p[:, 1] < 25) & (p[:, 2] > 200)) |
-                ((p[:, 0] >= 18) & (p[:, 0] <= 28) &
-                 (p[:, 1] < 85) & (p[:, 2] > 130)))]
+        # 白块本体就是白色（实测白像素占窗口 83%），不能再把白像素剔除，
+        # 否则只剩描边暗像素被判成 red。白色占多数时直接用白像素判色。
+        if float(white_px.mean()) > 0.5:
+            q = p[white_px]
+        else:
+            # 排除白字与米色空背景；剩下的即块主体
+            q = p[~(((p[:, 1] < 25) & (p[:, 2] > 200)) |
+                    ((p[:, 0] >= 18) & (p[:, 0] <= 28) &
+                     (p[:, 1] < 85) & (p[:, 2] > 130)))]
         if len(q) < 500 * sx * sy:
             continue
         color = classify_hsv(*main_color(q))
