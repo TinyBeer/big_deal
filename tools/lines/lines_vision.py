@@ -321,7 +321,9 @@ def ray_clear_pixels(mask, line, xs, ys, step):
     min_x, max_x = xs[0] - step, xs[-1] + step
     min_y, max_y = ys[0] - step, ys[-1] + step
     h, w = mask.shape[:2]
-    d = 4
+    # 箭头尖端像素会伸到网格节点前方约 0.2 个步长；固定 4px 的起点在大
+    # 网格（关卡缩放变大）时会把自身箭头当成遮挡，误判为不可点击。
+    d = max(4, int(round(step * 0.3)))
     while True:
         x = int(round(x0 + dk * d))
         y = int(round(y0 + dj * d))
