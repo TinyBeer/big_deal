@@ -2,12 +2,13 @@
 """环形岛接客自动点击。
 
 流程：开局看广告解锁全部接驳位 -> 循环 {抓图 -> 关助力礼包弹窗 -> 识别接驳区车色
--> 选「可开出且颜色不在接驳区」的车，若全被占则随机出车 -> 点击 -> 等稳定}。
+-> 一次选一批「可开出、颜色不在接驳区且互不重复」的车，按原坐标依次点击 -> 等稳定}。
+接驳区已有颜色也算已占用；若全被占则随机出一辆车疏通。
 规则全部来自用户确认，与停车场接客的差异：不看队首乘客、倾斜关不停手、弹窗主动关。
 
 用法（统一入口见 quick.sh）：
   tools/ring/quick.sh --dry-run
-  tools/ring/quick.sh --auto --max-clicks 120
+  tools/ring/quick.sh --auto --batch-size 3 --batch-gap 0.35
 """
 import argparse
 import json
@@ -15,6 +16,7 @@ import os
 import random
 import sys
 import time
+from collections import Counter
 
 import cv2
 import numpy as np
@@ -177,28 +179,51 @@ def unlock_all_docks(serial, args):
     return unlocked
 
 
-def pick_car(result, args):
-    """选车：可开出 + 颜色不在接驳区；全占用则随机出车。
+def batch_limit(result, args, expected):
+    """单批点击上限：用户配置 + 空接驳位安全余量双重约束。"""
+    limit = expected if args.batch_size <= 0 else max(1, args.batch_size)
+    n_empty = len(result.get("empty_slots", []))
+    reserve = max(0, args.min_empty_slots)
+    # 检测不到空位时也至少保留单次点击能力，避免完全停手。
+    return max(1, min(limit, max(1, n_empty - reserve)))
 
-    返回 (car, mode)。mode: match(颜色可用) / random(全占用随机) / none
+
+def pick_batch(result, args, is_blocked=None):
+    """一次识别选一批车：可开出、颜色不在接驳区、批内颜色互不重复。
+
+    接驳区已有色视为已占用，且同一颜色最多选一辆；按「离接驳区近、方向朝上」
+    排序。若没有可用颜色，退化为随机出一辆车疏通（与旧规则一致）。
+
+    返回 (batch, mode)。mode: batch / match / random / none。
     """
-    cars = result["cars"]
-    exitable = [c for c in cars if c["can_exit"]]
+    exitable = [c for c in result.get("cars", []) if c.get("can_exit")]
     if not exitable:
-        return None, "none"
-    dock_colors = set(result["dock"]["colors"])
-    # 只考虑棋盘上真实存在的车色（排除灰障碍，它永远不可开出）
-    usable = [c for c in exitable if c["color"] != "unknown"]
+        return [], "none"
+    blocked = is_blocked or (lambda c: False)
+    # 灰障碍永远不可开出；近期点过/点过无响应的车本轮跳过。
+    usable = [c for c in exitable if c.get("color") != "unknown" and not blocked(c)]
     if not usable:
-        return None, "none"
+        return [], "none"
+    dock_colors = set(result.get("dock", {}).get("colors", []))
     fresh = [c for c in usable if c["color"] not in dock_colors]
-    if fresh:
-        # 优先离接驳区近(y 小)、方向朝上
-        fresh.sort(key=lambda c: (c["y"], rv.DIR_PRIORITY.get(c["dir"], 5)))
-        return fresh[0], "match"
-    # 用户定稿：接驳区颜色全占用时随机出车，让局面流动
+    fresh.sort(key=lambda c: (c["y"], rv.DIR_PRIORITY.get(c.get("dir"), 5)))
+
+    picked, used_colors = [], set(dock_colors)
+    limit = batch_limit(result, args, len(fresh))
+    for c in fresh:
+        if len(picked) >= limit:
+            break
+        if c["color"] in used_colors:
+            continue
+        used_colors.add(c["color"])
+        picked.append(c)
+    if picked:
+        return picked, ("batch" if len(picked) > 1 else "match")
+
+    # 接驳区颜色全占用时随机出车，让局面流动（只出一辆，避免把接驳区占死）。
+    pool = sorted(usable, key=lambda c: (c["y"], rv.DIR_PRIORITY.get(c.get("dir"), 5)))
     print("接驳区颜色已占满 (%s)，随机出车疏通" % "/".join(sorted(dock_colors)), flush=True)
-    return random.choice(usable), "random"
+    return [random.choice(pool)], "random"
 
 
 def low_slot_stop(result, min_empty=1):
@@ -232,7 +257,6 @@ def auto_run(args):
         print("接驳位解锁完成，共 %d 个" % unlocked, flush=True)
         time.sleep(args.settle)
 
-    last_no_move = 0
     no_effect_streak = 0
     low_slot_streak = 0
     ui_check_counter = 0
@@ -318,65 +342,92 @@ def auto_run(args):
         now = time.time()
         recent_clicks = [(x, y, t) for x, y, t in recent_clicks if now - t < args.recent_seconds]
         failed_taps = [(x, y, t) for x, y, t in failed_taps if now - t < args.failed_seconds]
-        cand, mode = pick_car(result, args)
 
         def is_blocked(c):
             return any((c["x"]-x)**2 + (c["y"]-y)**2 < 45**2
                        for x, y, _ in recent_clicks + failed_taps)
 
-        if cand and is_blocked(cand):
-            exitable = [c for c in result["cars"] if c["can_exit"] and not is_blocked(c)
-                        and c["color"] != "unknown"]
-            dock_colors = set(result["dock"]["colors"])
-            fresh = [c for c in exitable if c["color"] not in dock_colors]
-            if fresh or exitable:
-                pool = fresh or exitable
-                pool.sort(key=lambda c: (c["y"], rv.DIR_PRIORITY.get(c["dir"], 5)))
-                cand, mode = pool[0], ("match" if fresh else "random")
-            else:
+        batch, mode = pick_batch(result, args, is_blocked)
+        if not batch:
+            usable_any = [c for c in result["cars"]
+                          if c.get("can_exit") and c.get("color") != "unknown"]
+            if usable_any:
                 print("所有可开车均无响应，重置失败记录重试", flush=True)
                 failed_taps.clear()
-                cand, mode = pick_car(result, args)
+                batch, mode = pick_batch(result, args)
 
         dock_colors = result["dock"]["colors"]
-        print("状态: 接驳区=%s 车=%d 可开出=%d 选=%s(%s) @(%d,%d)" % (
+        picked_colors = "/".join(CN.get(c["color"], c["color"]) for c in batch) or "无"
+        print("状态: 接驳区=%s 车=%d 可开出=%d 模式=%s 本批%d辆 [%s]" % (
             "/".join(CN.get(c, c) for c in dock_colors) or "空",
             len(result["cars"]),
             sum(1 for c in result["cars"] if c["can_exit"]),
-            CN.get(cand["color"], cand["color"]) if cand else "无",
-            mode, cand["x"] if cand else -1, cand["y"] if cand else -1), flush=True)
+            mode, len(batch), picked_colors), flush=True)
 
-        if cand is None:
-            last_no_move += 1
-            print("无可开出的车（连续 %d 次），停止" % last_no_move, flush=True)
+        if not batch:
+            print("无可开出的车，停止", flush=True)
+            break
+        batch = batch[:max(0, args.max_clicks - clicks)]
+        if not batch:
             break
         if args.dry_run:
-            print("[dry] 点 %s @(%d,%d) 方向=%s 模式=%s" % (
-                CN.get(cand["color"], cand["color"]), cand["x"], cand["y"],
-                cand["dir"], mode), flush=True)
+            for i, cand in enumerate(batch, 1):
+                print("[dry] %d/%d %s @(%d,%d) 方向=%s 模式=%s" % (
+                    i, len(batch), CN.get(cand["color"], cand["color"]),
+                    cand["x"], cand["y"], cand.get("dir", "?"), mode), flush=True)
             out = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(
                 os.path.abspath(__file__)))), "outputs", "ring_dryrun.png")
-            cv2.imwrite(out, rv.annotate(img, result, cand))
+            cv2.imwrite(out, rv.annotate(img, result, batch))
             print("[dry] 标注图: " + out, flush=True)
             break
 
-        clicks += 1
-        before_n = len(result["cars"])
-        tx, ty = car_tap_point(cand)
-        tap(tx, ty, serial)
-        recent_clicks.append((cand["x"], cand["y"], time.time()))
+        before_counts = Counter(c["color"] for c in result["cars"])
+        before_dock = set(dock_colors)
+        for i, cand in enumerate(batch):
+            tx, ty = car_tap_point(cand)
+            print("  点击 %d/%d: %s @(%d,%d) 方向=%s 模式=%s" % (
+                i + 1, len(batch), CN.get(cand["color"], cand["color"]),
+                tx, ty, cand.get("dir", "?"), mode), flush=True)
+            tap(tx, ty, serial)
+            clicks += 1
+            recent_clicks.append((cand["x"], cand["y"], time.time()))
+            if i < len(batch) - 1:
+                time.sleep(args.batch_gap)
+
         after_img = wait_stable(serial, args.wait, args.max_wait)
+        if after_img is not None and (rv.detect_revive_dialog(after_img) or
+                                      rv.detect_end_dialog(after_img)):
+            stop_reason = "批次后检测到复活/结算弹窗，已停止"
+            print(stop_reason, flush=True)
+            break
+
+        failed_batch = []
         moved = False
         if after_img is not None:
             after = rv.analyze(after_img)
-            moved = (len(after["cars"]) < before_n or
-                     after["dock"]["colors"] != result["dock"]["colors"])
+            after_counts = Counter(c["color"] for c in after["cars"])
+            after_dock = set(after["dock"]["colors"])
+            for cand in batch:
+                color = cand["color"]
+                ok = ((color in after_dock and color not in before_dock) or
+                      after_counts.get(color, 0) < before_counts.get(color, 0))
+                if ok:
+                    moved = True
+                else:
+                    failed_batch.append(cand)
+        else:
+            failed_batch = list(batch)
+
+        for cand in failed_batch:
+            failed_taps.append((cand["x"], cand["y"], time.time()))
         if moved:
             no_effect_streak = 0
+            if failed_batch:
+                print("  其中 %d 辆未生效，记入失败列表" % len(failed_batch), flush=True)
         else:
-            no_effect_streak += 1
-            failed_taps.append((cand["x"], cand["y"], time.time()))
-            print("  点击无响应，记入失败列表（连续 %d 次）" % no_effect_streak, flush=True)
+            no_effect_streak += len(batch)
+            print("  本批 %d 次点击均无响应（连续 %d 次）" % (
+                len(batch), no_effect_streak), flush=True)
             if no_effect_streak >= args.max_no_effect:
                 print("连续 %d 次点击无响应，停止" % no_effect_streak, flush=True)
                 break
@@ -398,6 +449,10 @@ def main():
     # 改为匹配「看广告」播放图标后峰值 0.98+，空槽位仅 ~0.16，0.8 足够稳
     ap.add_argument("--unlock-threshold", type=float, default=0.8)
     ap.add_argument("--max-clicks", type=int, default=200)
+    ap.add_argument("--batch-size", type=int, default=3,
+                    help="一次识别最多点几个不重色且不在接驳区的车（默认 3；0=按空位不限）")
+    ap.add_argument("--batch-gap", type=float, default=0.35,
+                    help="批内相邻两次点击的间隔秒数（默认 0.35）")
     ap.add_argument("--max-seconds", type=int, default=900)
     ap.add_argument("--wait", type=float, default=0.35)
     ap.add_argument("--max-wait", type=float, default=1.6)
@@ -411,7 +466,7 @@ def main():
     ap.add_argument("--max-no-effect", type=int, default=6)
     ap.add_argument("--failed-seconds", type=float, default=25.0)
     ap.add_argument("--min-empty-slots", type=int, default=1,
-                    help="空接驳位<=此值且无新颜色车可出时结束（默认 1）")
+                    help="保留的空接驳位数：空位<=此值且无新色车可出时结束，并限制单批点击数（默认 1）")
     ap.add_argument("--slot-confirm", type=int, default=2,
                     help="提前结束条件连续确认帧数，防抖动（默认 2）")
     add_notify_args(ap, "ring", TOOL_NAME, default_message='auto')

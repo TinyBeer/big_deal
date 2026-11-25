@@ -6,6 +6,7 @@
 #   tools/ring/quick.sh --dry-run              # 演示第一步（关弹窗/解锁/选车，不真点）
 #   tools/ring/quick.sh                        # 默认 --auto，自动打通单关
 #   tools/ring/quick.sh --no-unlock            # 跳过开局解锁接驳位
+#   tools/ring/quick.sh --batch-size 3         # 一次识别选多个不重色车依次点击（默认 3）
 #   tools/ring/quick.sh --device <serial>      # 指定 adb 设备
 #
 # 输出: outputs/ring_annotated.png（--once）/ outputs/ring_dryrun.png（--dry-run）
@@ -20,7 +21,7 @@ tool_init_env RING_PYTHON "$0" || exit 1
 
 for a in "$@"; do
   case "$a" in
-    -h|--help) tool_print_help 2 14 "$0"; exit 0 ;;
+    -h|--help) tool_print_help 2 15 "$0"; exit 0 ;;
   esac
 done
 

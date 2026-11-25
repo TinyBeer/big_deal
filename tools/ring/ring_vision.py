@@ -552,8 +552,12 @@ def annotate(img, result, pick=None):
         cv2.putText(vis, d["color"][:3].upper(), (d["x"]-22, d["y"]-28),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, col, 2)
     if pick:
-        cv2.rectangle(vis, (pick["bx"]-4, pick["by"]-4),
-                      (pick["bx"]+pick["bw"]+4, pick["by"]+pick["bh"]+4), (0, 255, 0), 4)
+        picks = pick if isinstance(pick, (list, tuple)) else [pick]
+        for i, p in enumerate(picks, 1):
+            cv2.rectangle(vis, (p["bx"]-4, p["by"]-4),
+                          (p["bx"]+p["bw"]+4, p["by"]+p["bh"]+4), (0, 255, 0), 4)
+            cv2.putText(vis, str(i), (p["bx"]-4, max(0, p["by"]-10)),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
     return vis
 
 

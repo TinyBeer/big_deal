@@ -113,11 +113,12 @@ tools/parking/quick.sh --allow-tilted                         # 显式开启：�
 tools/parking/quick.sh                                        # 默认：解锁全部 + 打通单关 + 通知
 ```
 
-**环形岛接客**（与停车场接客类似，但乘客在环形岛上旋转；只看接驳区车色出车，全占用时随机出车；空位 ≤1 且无新颜色车时提前结束）：
+**环形岛接客**（与停车场接客类似，但乘客在环形岛上旋转；一次识别选一批「颜色不在接驳区且批内不重色」的车依次点击，全占用时随机出车；空位 ≤1 且无新颜色车时提前结束）：
 
 ```bash
 tools/ring/quick.sh --once                                    # 只识别一次，输出 outputs/ring_annotated.png
-tools/ring/quick.sh --dry-run                                 # 试运行，演示解锁与选车但不真点
+tools/ring/quick.sh --dry-run                                 # 试运行，演示解锁与批量选车但不真点
+tools/ring/quick.sh --batch-size 3 --batch-gap 0.35            # 每批最多 3 辆不重色车，批内间隔 0.35s（默认）
 tools/ring/quick.sh --no-unlock --no-notify --max-clicks N     # 续跑：不解锁、不通知、限 N 步
 tools/ring/quick.sh                                           # 默认：解锁全部 + 自动接客 + 通知
 ```
