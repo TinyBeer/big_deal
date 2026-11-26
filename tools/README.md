@@ -13,6 +13,7 @@
 | `slots/` | 色块入槽：一批点第一排中颜色不在槽位且不重复的色块（全占用随机）；看广告解锁；复活/胜利界面立即停手 | `tools/slots/quick.sh` |
 | `ants/` | 搬砖大战：开局看广告解锁；只检查槽位和第一排候选块，一次选一批不在槽中的颜色投放（同色最多一槽）；福利弹窗点 X 关闭；复活弹窗立即停手；连续无法决策超过 `--idle-timeout`（默认 20 秒）停止；已点未入槽的颜色在 `--repeat-delay`（默认 8 秒）内不重复点；结束时发手机状态栏通知（`--no-notify` 关闭） | `tools/ants/quick.sh`（见 `PLAN.md`） |
 | `sand/` | 沙画收集：看广告解锁槽位到加号消失；批量选第一排不重复色桶依次点击（`--batch-size`/`--batch-gap`）；复活/通关弹窗立即停手 | `tools/sand/quick.sh`（见 `PLAN.md`） |
+| `snacks/` | 本关零食/饮料 + 右上角退出按钮识别标注：只在商品最小外接矩形内用模板匹配找商品，排除顾客气泡里的同款图；被手势遮挡的商品也能识别；标注只输出图片、不输出位置日志/JSON。另有固定顺序自动点击（冰红茶→矿泉水→冰红茶→啤酒→矿泉水→啤酒→瓜子→花生→八宝粥→退出按钮，每步重新识别商品位置，退出按钮点固定坐标、点后等 2s，点击后等 1s / 八宝粥后 2s，开局按固定顺序循环处理中断（入口页「真香摆摊日记」页签点中心等 6s → 积分商店点红叉 → 游戏主界面点开始游戏并等 4s → 助力礼包点 No thanks → 广告页直接返回），直到进入关卡后直接跑点击序列、中途不再检测界面；`--rounds N` 重复完整流程 N 轮，结束发通知） | `tools/snacks/quick.sh`（默认自动点击，`--once` 只标注，见 `PLAN.md`） |
 | `common/` | 共用模块：`notify.py` 统一通知；`adb.py` 统一 tap/key_back/控件树查找/设备探测；`screen.py` 统一 adb 抓图；`palette_calibrate_core.py` 统一调色板标定的投影/FFT/相位/众数色/KMeans 骨架；`shell_runtime.sh` 统一入口脚本的环境初始化、outputs 创建、设备探测与参数剔除；`python_env.sh` 统一解释器选择 | 被各 `*Auto.py` / `quick.sh` / `palette_calibrate.py` 引入，无独立入口 |
 
 ## 约定
@@ -30,7 +31,7 @@ python -m pip install -r tools/requirements.txt
 ```
 
 - 解释器由 `tools/common/python_env.sh` 统一选择：显式覆盖变量 > 当前激活的 venv（`VIRTUAL_ENV`）/conda（`CONDA_PREFIX`）环境 > PATH 中的 `python`/`python3`。激活环境里没有可执行的 Python 时会直接提示，不会静默改用其它环境
-- 覆盖变量：`FIND_DIFF_PYTHON` / `SPOOL_PYTHON` / `DOG_PYTHON` / `PARKING_PYTHON` / `RING_PYTHON` / `SLOTS_PYTHON` / `ANTS_PYTHON` / `SAND_PYTHON` / `LINES_PYTHON`
+- 覆盖变量：`FIND_DIFF_PYTHON` / `SPOOL_PYTHON` / `DOG_PYTHON` / `PARKING_PYTHON` / `RING_PYTHON` / `SLOTS_PYTHON` / `ANTS_PYTHON` / `SAND_PYTHON` / `LINES_PYTHON` / `SNACKS_PYTHON`
 
 ### 限制
 

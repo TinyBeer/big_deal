@@ -19,7 +19,7 @@
 仓库包含两部分能力：
 
 - **AutoJS6 任务助手**：以 `main.js` 为入口，提供京东商城、京东金融、互动游戏等日常任务的图形化控制台。
-- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「搬砖大战」「停车场接客」「环形岛接客」「色块入槽」「沙画收集」与「线条解放」。
+- **游戏辅助工具（`tools/`）**：通过 adb 截屏 + 图像识别辅助游戏操作，目前包含「找不同」「线卷三消」「狗狗三消」「搬砖大战」「停车场接客」「环形岛接客」「色块入槽」「沙画收集」「线条解放」与「零食/饮料识别」。
 
 ## 目录结构
 
@@ -37,6 +37,7 @@ big_deal/
 │   ├── ring/             # 环形岛接客：识别接驳区车色并自动接客
 │   ├── slots/            # 色块入槽：第一排选色块、看广告解锁、自动点击
 │   ├── sand/             # 沙画收集：看广告解锁槽位、批量选不重复色桶打通单关
+│   ├── snacks/           # 零食/饮料识别标注 + 固定顺序自动点击（支持多轮）
 │   ├── common/           # 共用模块：notify.py 统一各工具的手机状态栏通知
 │   └── requirements.txt  # 各工具共用的 Python 依赖
 └── outputs/              # 工具运行产物（已 gitignore）
@@ -142,6 +143,18 @@ tools/sand/quick.sh --batch-size 3 --batch-gap 0.15            # 每批最多 3 
 tools/sand/quick.sh                                           # 默认：解锁 + 批量自动点击 + 通知，打通单关即停
 ```
 
+**零食/饮料识别**（本关专用：在商品最小外接矩形内用模板匹配标注棋盘上所有零食/饮料，并标出右上角退出按钮；顾客气泡里的同款图不算，被手势遮挡的商品也能识别）：
+
+```bash
+tools/snacks/quick.sh --once                                  # 只标注 → outputs/snacks_annotated.png
+tools/snacks/quick.sh --once --image outputs/shot.png         # 处理本地截图
+tools/snacks/quick.sh --dry-run                               # 打印点击顺序与轮数，不点击
+tools/snacks/quick.sh --rounds 3                              # 完整流程重复 3 轮（默认 1 轮）
+tools/snacks/quick.sh                                         # 默认：开局状态处理 + 10 步固定顺序点击 + 通知
+```
+
+默认流程每轮先按固定顺序处理开局状态（入口页「真香摆摊日记」页签 → 积分商店红叉 → 开始游戏 → 助力礼包 No thanks → 广告页返回），进入关卡后依次点击冰红茶、矿泉水、冰红茶、啤酒、矿泉水、啤酒、瓜子、花生、八宝粥、退出按钮；每步重新抓图定位，退出按钮点固定坐标，点后等 2s 再进入下一轮。
+
 弹窗处理：助力礼包自动点 × 关闭；**复活/通关弹窗最高优先级立即结束、不做任何操作**；解锁确认框自动点「使用」看广告；结算弹窗（挑战失败/成功）立即停止。完整参数见 `tools/ring/quick.sh --help` / `tools/slots/quick.sh --help` / `tools/sand/quick.sh --help`。
 
 完整参数与算法说明见各工具目录：
@@ -154,6 +167,7 @@ tools/sand/quick.sh                                           # 默认：解锁 
 - `tools/ring/` — 环形岛接客（`ring_vision.py` 识别、`ring_auto.py` 决策，参数见 `quick.sh --help`）
 - `tools/slots/PLAN.md` — 色块入槽（方案、实机结论与识别参数）
 - `tools/sand/PLAN.md` — 沙画收集（方案、关卡差异、批量选桶规则与终止弹窗模板）
+- `tools/snacks/PLAN.md` — 零食/饮料识别标注、固定顺序自动点击与多轮参数（`--rounds`）
 - `tools/common/notify.py` — 共用的手机状态栏通知模块（各工具统一调用，支持 `--no-notify` 关闭）
 - `tools/README.md` — 工具总览与共用环境
 

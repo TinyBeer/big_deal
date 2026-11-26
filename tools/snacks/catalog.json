@@ -1,0 +1,8 @@
+[
+  {"file": "guazi.png", "name": "瓜子", "category": "零食"},
+  {"file": "huasheng.png", "name": "花生", "category": "零食"},
+  {"file": "bazhou.png", "name": "八宝粥", "category": "零食"},
+  {"file": "ice_tea.png", "name": "冰红茶", "category": "饮料"},
+  {"file": "water.png", "name": "矿泉水", "category": "饮料"},
+  {"file": "beer.png", "name": "啤酒", "category": "饮料"}
+]
