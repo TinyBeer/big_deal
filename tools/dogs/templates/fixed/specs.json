@@ -12,6 +12,8 @@
   "live1132": "outputs/dogs_live_20261126_103232/current_check_1132.png",
   "livehouse": "outputs/dogs_live_20261126_103232/current_check_house.png",
   "lockcheck": "outputs/dogs_live_20261126_103232/current_check_lock.png",
+  "missing": "outputs/dogs_live_20261126_103232/current_check_missing.png",
+  "missing2": "outputs/dogs_live_20261126_103232/current_check_missing2.png",
   "entries": [
     {
       "kind": "exit",
@@ -326,6 +328,42 @@
       "center": [
         635,
         1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "beagle_orangewhite",
+      "image": "missing",
+      "center": [
+        415,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "missing",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "missing",
+      "center": [
+        415,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "beagle_orangewhite",
+      "image": "missing2",
+      "center": [
+        415,
+        1743
       ]
     }
   ],

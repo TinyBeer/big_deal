@@ -39,6 +39,8 @@ CORRIDOR_LOCKS = [
      "template": os.path.join(os.path.dirname(os.path.abspath(__file__)),
                               "templates", "corridor", "locked_right.png")},
 ]
+CORRIDOR_ROW_Y = 1743
+CORRIDOR_ROW_X = {"左": 415, "右": 635}
 RETURN_TEXTS = ("立即返回", "返回游戏")
 DISMISS_TEXTS = ("不了", "关闭", "下次再说", "跳过", "我知道了")
 
@@ -141,6 +143,15 @@ def corridor_locked(img, spec):
     return score >= 0.85
 
 
+def corridor_has_dog(img, side):
+    """第五行出口已有狗/蛋说明该侧廊道已解锁，不必点解锁位。"""
+    patch = fixed_match.crop_at(img, (CORRIDOR_ROW_X[side], CORRIDOR_ROW_Y),
+                                fixed_match.SIZES["exit"])
+    if dog_annotate.egg_label(patch):
+        return True
+    return fixed_match.get_matcher("exit").match(patch) is not None
+
+
 def wait_stable(serial, min_wait=0.35, max_wait=1.6, interval=0.15):
     time.sleep(min_wait)
     prev, img = None, None
@@ -216,12 +227,10 @@ def auto_run(args):
 
             locked = [dict(h, kind="house") for h in result["houses"]
                       if h["label"] == "未解锁"]
-            exit_dogs = [d for d in result["dogs"] if d["breed"]]
-            last_row = max((d["row"] for d in result["dogs"]), default=0)
             for spec in CORRIDOR_LOCKS:
                 side = "左" if spec["x"] < 540 else "右"
-                # 底部该侧出口已有狗，说明这段廊道已解锁，不必再按固定点检测/点击
-                if any(d["row"] == last_row and d["side"] == side for d in exit_dogs):
+                # 检查被锁住的第五行出口；有狗/蛋才算已解锁，不能用当前最后一行判断
+                if corridor_has_dog(img, side):
                     continue
                 if corridor_locked(img, spec):
                     locked.append({"x": spec["x"], "y": spec["y"],
@@ -232,6 +241,11 @@ def auto_run(args):
             if args.unlock and unlocks < args.max_unlock and locked:
                 r = locked[0]
                 unlocks += 1
+                if args.dry_run:
+                    print("[dry] 解锁 %d/%d %s (%d,%d) 看广告 ..." %
+                          (unlocks, args.max_unlock, r["kind"], r["x"], r["y"]),
+                          flush=True)
+                    break
                 print("解锁 %d/%d %s (%d,%d) 看广告 ..." %
                       (unlocks, args.max_unlock, r["kind"], r["x"], r["y"]), flush=True)
                 tap(r["x"], r["y"], serial)

@@ -21,7 +21,7 @@ ROOT = os.path.dirname(os.path.dirname(HERE))
 FIXED_DIR = os.path.join(HERE, "templates", "fixed")
 SPECS_PATH = os.path.join(FIXED_DIR, "specs.json")
 SIZES = {"exit": 120, "house": 100}
-DEFAULT_SCORE = {"exit": 0.86, "house": 0.83}
+DEFAULT_SCORE = {"exit": 0.82, "house": 0.83}
 DEFAULT_HU = {"exit": 0.35, "house": 0.60}
 MIN_MARGIN = 0.04  # 最优与次优模板的色差分数差，太小则回退旧算法
 
@@ -193,11 +193,12 @@ class FixedMatcher:
         if second is not None and best["score"] - second["score"] < MIN_MARGIN:
             return None
         verified = [d for d in scored
-                    if d["breed"] == best["breed"] and d["hu"] <= hu_max]
+                    if d["breed"] == best["breed"] and d["hu"] <= hu_max and
+                    d["score"] >= best["score"] - 0.05]
         if not verified:
             return None
         chosen = min(verified, key=lambda d: (d["hu"], -d["score"]))
-        return {"breed": chosen["breed"], "score": round(chosen["score"], 3),
+        return {"breed": chosen["breed"], "score": round(best["score"], 3),
                 "hu": round(chosen["hu"], 3), "method": "fixed+hu",
                 "best": best}
 

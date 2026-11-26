@@ -383,5 +383,49 @@
       1139
     ],
     "size": 120
+  },
+  {
+    "file": "exit/beagle_orangewhite__missing_36.png",
+    "breed": "beagle_orangewhite",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_missing.png",
+    "center": [
+      415,
+      1139
+    ],
+    "size": 120
+  },
+  {
+    "file": "exit/pug_beige__missing_37.png",
+    "breed": "pug_beige",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_missing.png",
+    "center": [
+      635,
+      1340
+    ],
+    "size": 120
+  },
+  {
+    "file": "exit/pug_beige__missing_38.png",
+    "breed": "pug_beige",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_missing.png",
+    "center": [
+      415,
+      1542
+    ],
+    "size": 120
+  },
+  {
+    "file": "exit/beagle_orangewhite__missing2_39.png",
+    "breed": "beagle_orangewhite",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_missing2.png",
+    "center": [
+      415,
+      1743
+    ],
+    "size": 120
   }
 ]
