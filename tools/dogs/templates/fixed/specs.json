@@ -14,6 +14,8 @@
   "lockcheck": "outputs/dogs_live_20261126_103232/current_check_lock.png",
   "missing": "outputs/dogs_live_20261126_103232/current_check_missing.png",
   "missing2": "outputs/dogs_live_20261126_103232/current_check_missing2.png",
+  "terrier": "outputs/dogs_live_20261126_103232/current_check_terrier.png",
+  "poodle": "outputs/dogs_live_20261126_103232/current_check_poodle.png",
   "entries": [
     {
       "kind": "exit",
@@ -364,6 +366,33 @@
       "center": [
         415,
         1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "terrier_gray",
+      "image": "terrier",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "poodle",
+      "center": [
+        635,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "poodle_brown",
+      "image": "poodle",
+      "center": [
+        635,
+        1340
       ]
     }
   ],

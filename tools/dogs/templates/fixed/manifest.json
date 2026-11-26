@@ -427,5 +427,38 @@
       1743
     ],
     "size": 120
+  },
+  {
+    "file": "exit/terrier_gray__terrier_40.png",
+    "breed": "terrier_gray",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_terrier.png",
+    "center": [
+      635,
+      1542
+    ],
+    "size": 120
+  },
+  {
+    "file": "exit/boston_blackwhite__poodle_41.png",
+    "breed": "boston_blackwhite",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_poodle.png",
+    "center": [
+      635,
+      1139
+    ],
+    "size": 120
+  },
+  {
+    "file": "exit/poodle_brown__poodle_42.png",
+    "breed": "poodle_brown",
+    "kind": "exit",
+    "source": "outputs/dogs_live_20261126_103232/current_check_poodle.png",
+    "center": [
+      635,
+      1340
+    ],
+    "size": 120
   }
 ]
