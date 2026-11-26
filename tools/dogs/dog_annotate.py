@@ -28,6 +28,8 @@ LOCKED_TEMPLATE = os.path.join(HERE, "templates", "house", "locked.png")
 FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 
 BIG_CENTERS = [(165, 320), (420, 320), (675, 320), (930, 320)]
+# 用 Hough 圆检测确定的头像圆心，裁片恰好包裹圆形区域（半径约 50）
+HOUSE_AVATAR_CENTERS = [(185, 294), (429, 294), (673, 294), (917, 294)]
 SMALL_CENTERS = [(85, 535), (220, 535), (365, 535), (510, 535),
                  (660, 535), (790, 535), (930, 535)]
 
@@ -191,7 +193,7 @@ def analyze(img):
         if locked:
             houses.append({"idx": i, "x": x, "y": y, "label": "未解锁", "score": None})
             continue
-        avatar = fixed_match.crop_at(img, (x + 20, y - 25),
+        avatar = fixed_match.crop_at(img, HOUSE_AVATAR_CENTERS[i - 1],
                                      fixed_match.SIZES["house"])
         hit = house_matcher.match(avatar)
         breed, score = (hit["breed"], hit["score"]) if hit else (None, 0.0)

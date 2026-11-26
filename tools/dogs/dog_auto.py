@@ -26,11 +26,19 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 import dog_annotate
+import fixed_match
 from common.adb import dump_ui, find_text_node, key_back
 from common.adb import tap as adb_tap, tap_touch as adb_tap_touch
 from common.notify import add_notify_args, send_notify, notify_phone  # noqa: E402
 
-CORRIDOR_CENTERS = [(240, 1770), (840, 1770)]
+CORRIDOR_LOCKS = [
+    {"x": 240, "y": 1770, "cx": 240, "cy": 1728,
+     "template": os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "templates", "corridor", "locked.png")},
+    {"x": 840, "y": 1770, "cx": 842, "cy": 1728,
+     "template": os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                              "templates", "corridor", "locked_right.png")},
+]
 RETURN_TEXTS = ("立即返回", "返回游戏")
 DISMISS_TEXTS = ("不了", "关闭", "下次再说", "跳过", "我知道了")
 
@@ -121,11 +129,16 @@ def dismiss_popup(serial, img):
     return True
 
 
-def corridor_locked(img, x, y):
-    patch = img[max(0, y - 50):y + 50, max(0, x - 50):x + 50]
-    hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
-    h, s, v = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
-    return float(((h >= 8) & (h <= 28) & (s > 100) & (v > 100)).mean()) > 0.12
+def corridor_locked(img, spec):
+    """用实机锁头模板判断，阈值 0.85；解锁画面分数接近 0。"""
+    tpl = cv2.imread(spec["template"], cv2.IMREAD_COLOR)
+    if tpl is None:
+        return False
+    patch = fixed_match.crop_at(img, (spec["cx"], spec["cy"]), tpl.shape[0])
+    if patch.shape[:2] != tpl.shape[:2]:
+        return False
+    score = float(cv2.matchTemplate(patch, tpl, cv2.TM_CCOEFF_NORMED).max())
+    return score >= 0.85
 
 
 def wait_stable(serial, min_wait=0.35, max_wait=1.6, interval=0.15):
@@ -205,13 +218,14 @@ def auto_run(args):
                       if h["label"] == "未解锁"]
             exit_dogs = [d for d in result["dogs"] if d["breed"]]
             last_row = max((d["row"] for d in result["dogs"]), default=0)
-            for x, y in CORRIDOR_CENTERS:
-                side = "左" if x < 540 else "右"
+            for spec in CORRIDOR_LOCKS:
+                side = "左" if spec["x"] < 540 else "右"
                 # 底部该侧出口已有狗，说明这段廊道已解锁，不必再按固定点检测/点击
                 if any(d["row"] == last_row and d["side"] == side for d in exit_dogs):
                     continue
-                if corridor_locked(img, x, y):
-                    locked.append({"x": x, "y": y, "label": "廊道", "kind": "corridor"})
+                if corridor_locked(img, spec):
+                    locked.append({"x": spec["x"], "y": spec["y"],
+                                   "label": "廊道", "kind": "corridor"})
             locked = [r for r in locked if not any(
                 (r["x"] - x) ** 2 + (r["y"] - y) ** 2 < (90 ** 2)
                 for x, y, _ in tried_unlock)]

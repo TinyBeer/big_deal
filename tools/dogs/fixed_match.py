@@ -111,7 +111,7 @@ def extract_template(image_path, spec):
     patch = crop_at(img, spec["center"], size)
     mask = circle_mask(size) if kind == "house" else foreground_mask(patch)
     rgba = cv2.cvtColor(patch, cv2.COLOR_BGR2BGRA)
-    rgba[:, :, 3] = mask * 255
+    rgba[:, :, 3] = np.where(mask > 0, 255, 0).astype(np.uint8)
     return rgba
 
 
@@ -173,8 +173,6 @@ class FixedMatcher:
         scored = []
         for tpl in self.templates:
             score = _masked_color_score(patch, tpl.image, color_mask, tpl.mask)
-            # 白色狗脸与浅色窝体颜色接近，轮廓分割不可靠时不做 Hu 否决，
-            # 只靠颜色分数与品种间差距把关。
             if (candidate is None or tpl.contour is None or
                     shape_area < 2000 or tpl.shape_area < 2000):
                 hu = 0.0
