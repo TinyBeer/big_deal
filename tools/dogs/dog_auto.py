@@ -203,8 +203,15 @@ def auto_run(args):
 
             locked = [dict(h, kind="house") for h in result["houses"]
                       if h["label"] == "未解锁"]
-            locked += [{"x": x, "y": y, "label": "廊道", "kind": "corridor"}
-                       for x, y in CORRIDOR_CENTERS if corridor_locked(img, x, y)]
+            exit_dogs = [d for d in result["dogs"] if d["breed"]]
+            last_row = max((d["row"] for d in result["dogs"]), default=0)
+            for x, y in CORRIDOR_CENTERS:
+                side = "左" if x < 540 else "右"
+                # 底部该侧出口已有狗，说明这段廊道已解锁，不必再按固定点检测/点击
+                if any(d["row"] == last_row and d["side"] == side for d in exit_dogs):
+                    continue
+                if corridor_locked(img, x, y):
+                    locked.append({"x": x, "y": y, "label": "廊道", "kind": "corridor"})
             locked = [r for r in locked if not any(
                 (r["x"] - x) ** 2 + (r["y"] - y) ** 2 < (90 ** 2)
                 for x, y, _ in tried_unlock)]

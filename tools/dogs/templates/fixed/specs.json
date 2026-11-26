@@ -10,6 +10,7 @@
   "live10": "outputs/dogs_live_20261126_103232/shot_10.png",
   "live11": "outputs/dogs_live_20261126_103232/shot_11.png",
   "live1132": "outputs/dogs_live_20261126_103232/current_check_1132.png",
+  "livehouse": "outputs/dogs_live_20261126_103232/current_check_house.png",
   "entries": [
     {
       "kind": "exit",
@@ -738,6 +739,24 @@
       "center": [
         415,
         1340
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "beagle_orangewhite",
+      "image": "livehouse",
+      "center": [
+        440,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "shiba_orange",
+      "image": "livehouse",
+      "center": [
+        950,
+        295
       ]
     }
   ],

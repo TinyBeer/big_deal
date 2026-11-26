@@ -889,5 +889,27 @@
       1340
     ],
     "size": 120
+  },
+  {
+    "file": "house/beagle_orangewhite__livehouse_82.png",
+    "breed": "beagle_orangewhite",
+    "kind": "house",
+    "source": "outputs/dogs_live_20261126_103232/current_check_house.png",
+    "center": [
+      440,
+      295
+    ],
+    "size": 100
+  },
+  {
+    "file": "house/shiba_orange__livehouse_83.png",
+    "breed": "shiba_orange",
+    "kind": "house",
+    "source": "outputs/dogs_live_20261126_103232/current_check_house.png",
+    "center": [
+      950,
+      295
+    ],
+    "size": 100
   }
 ]
