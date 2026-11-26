@@ -18,21 +18,18 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-import exit_detect
+import fixed_match
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 from common.screen import grab as _adb_grab  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-BOARD_TEMPLATES = os.path.join(HERE, "templates", "board")
-HOUSE_TEMPLATES = os.path.join(HERE, "templates", "house")
-SHOP_TEMPLATES = os.path.join(HERE, "templates", "shop")
+LOCKED_TEMPLATE = os.path.join(HERE, "templates", "house", "locked.png")
 FONT_PATH = "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc"
 
 BIG_CENTERS = [(165, 320), (420, 320), (675, 320), (930, 320)]
 SMALL_CENTERS = [(85, 535), (220, 535), (365, 535), (510, 535),
                  (660, 535), (790, 535), (930, 535)]
-BOARD_BAND = (0, 850, 1080, 1660)
 
 BREED_CN = {
     "shiba_orange": "橙白柴犬",
@@ -55,68 +52,94 @@ PALETTE = [(60, 200, 120), (255, 160, 40), (80, 180, 255), (255, 100, 160),
            (230, 120, 90)]
 
 
-def canon(breed):
-    """<品种>_v2.png 等姿态变体归并回品种名。"""
-    parts = breed.rsplit("_v", 1)
-    return parts[0] if len(parts) == 2 and parts[1].isdigit() else breed
-
-
-def load_templates(folder):
-    out = {}
-    if not os.path.isdir(folder):
-        return out
-    for fn in sorted(os.listdir(folder)):
-        if fn.lower().endswith((".png", ".jpg", ".jpeg")):
-            img = cv2.imread(os.path.join(folder, fn), cv2.IMREAD_COLOR)
-            if img is not None:
-                out[os.path.splitext(fn)[0]] = img
-    return out
+ROWS = (930, 1132, 1324, 1534, 1740)
+LEFT_CENTERS = (415, 285, 170, 55)
+RIGHT_CENTERS = (635, 765, 895, 1020)
 
 
 def grab(serial=None):
     return _adb_grab(serial, check=True)
 
 
-def match_all(img, templates, threshold=0.85, min_dist=60, zone=None):
-    """模板匹配 + 非极大值抑制，返回带全屏坐标的候选。"""
-    x0, y0, x1, y1 = zone or (0, 0, img.shape[1], img.shape[0])
-    crop = img[y0:y1, x0:x1]
-    found = []
-    for breed, tpl in templates.items():
-        if tpl.shape[0] > crop.shape[0] or tpl.shape[1] > crop.shape[1]:
+def detect_rows(img):
+    """从紫蓝色廊道架子的水平投影定位所有行，包含新解锁的廊道。"""
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    h, s, v = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
+    shelf = (h >= 110) & (h <= 145) & (s > 60) & (v > 100)
+    h_img, w_img = shelf.shape
+    proj = shelf[:, 40:min(480, w_img)].mean(axis=1) + \
+           shelf[:, 600:min(1040, w_img)].mean(axis=1)
+    ys = [y for y in range(850, min(2100, h_img)) if proj[y] > 0.9]
+    groups = []
+    for y in ys:
+        if groups and y - groups[-1][-1] <= 4:
+            groups[-1].append(y)
+        else:
+            groups.append([y])
+    rows = [int((g[0] + g[-1]) / 2 - 100) for g in groups
+            if 850 <= (g[0] + g[-1]) / 2 <= 2050]
+    merged = []
+    for row in rows:
+        if merged and row - merged[-1] < 80:
             continue
-        res = cv2.matchTemplate(crop, tpl, cv2.TM_CCOEFF_NORMED)
-        while True:
-            _, score, _, loc = cv2.minMaxLoc(res)
-            if score < threshold:
-                break
-            found.append({"breed": canon(breed), "score": round(float(score), 3),
-                          "x": x0 + loc[0] + tpl.shape[1] // 2,
-                          "y": y0 + loc[1] + tpl.shape[0] // 2,
-                          "w": tpl.shape[1], "h": tpl.shape[0]})
-            cv2.rectangle(res,
-                          (max(0, loc[0] - min_dist), max(0, loc[1] - min_dist)),
-                          (min(res.shape[1] - 1, loc[0] + min_dist),
-                           min(res.shape[0] - 1, loc[1] + min_dist)), 0, -1)
-    found.sort(key=lambda d: -d["score"])
-    kept = []
-    for d in found:
-        if any(abs(d["x"] - k["x"]) < min_dist and abs(d["y"] - k["y"]) < min_dist
-               for k in kept):
-            continue
-        kept.append(d)
-    return sorted(kept, key=lambda d: (d["y"], d["x"]))
+        merged.append(row)
+    return merged if len(merged) >= 4 else list(ROWS)
 
 
-def classify_patch(patch, templates, threshold=0.65):
-    best, score = None, 0.0
-    for breed, tpl in templates.items():
-        if tpl.shape[0] > patch.shape[0] or tpl.shape[1] > patch.shape[1]:
-            continue
-        s = float(cv2.matchTemplate(patch, tpl, cv2.TM_CCOEFF_NORMED).max())
-        if s > score:
-            best, score = canon(breed), s
-    return (best, round(score, 3)) if score >= threshold else (None, round(score, 3))
+def color_fractions(patch):
+    hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
+    h, s, v = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
+    white = (v > 200) & (s < 45)
+    black = v < 75
+    orange = (h >= 5) & (h <= 25) & (s > 100) & (v > 120)
+    brown = (h >= 8) & (h <= 28) & (s > 70) & (v > 60) & (v < 170)
+    gray = (s < 45) & (v >= 80) & (v <= 200)
+    blue = (h >= 85) & (h <= 115) & (s > 70) & (v > 100)
+    return {"white": float(white.mean()), "black": float(black.mean()),
+            "orange": float(orange.mean()), "brown": float(brown.mean()),
+            "gray": float(gray.mean()), "blue": float(blue.mean())}
+
+
+def egg_label(patch):
+    hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
+    sat, val, hue = hsv[:, :, 1], hsv[:, :, 2], hsv[:, :, 0]
+    sel = (sat > 55) & (val > 90)
+    if sel.sum() < patch.shape[0] * patch.shape[1] * 0.12:
+        return None
+    med = float(np.median(hue[sel]))
+    if 125 <= med <= 175:
+        return "紫蛋"
+    ice = (hue >= 85) & (hue <= 115) & (sat >= 25) & (sat <= 120) & (val > 150)
+    if ice.mean() > 0.18:
+        return "冰蛋"
+    return None
+
+
+def occupied(patch):
+    if egg_label(patch):
+        return True
+    f = color_fractions(patch)
+    return (f["white"] + f["black"] + f["orange"] + f["brown"] + f["gray"]) > 0.28
+
+
+def find_exit_slots(img):
+    """从中间往外扫描候选槽位，第一个有狗/蛋的槽位就是廊道出口。"""
+    h, w = img.shape[:2]
+    slots = []
+    for row, cy in enumerate(detect_rows(img)):
+        for side, centers in (("左", LEFT_CENTERS), ("右", RIGHT_CENTERS)):
+            chosen = None
+            for cx in centers:
+                x0, x1 = max(0, cx - 55), min(w, cx + 55)
+                y0, y1 = max(0, cy - 55), min(h, cy + 55)
+                if occupied(img[y0:y1, x0:x1]):
+                    chosen = {"x": cx, "y": cy, "w": 110, "h": 110}
+                    break
+            if chosen is None:
+                chosen = {"x": centers[0], "y": cy, "w": 110, "h": 110}
+            chosen.update({"row": row + 1, "side": side})
+            slots.append(chosen)
+    return slots
 
 
 def is_locked(patch, purple=False):
@@ -130,63 +153,32 @@ def is_locked(patch, purple=False):
     return bool(float(gray.mean()) > 0.45)
 
 
-def detect_eggs(img):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    x0, y0, x1, y1 = BOARD_BAND
-    sub = hsv[y0:y1, x0:x1]
-    masks = [((sub[:, :, 0] >= 125) & (sub[:, :, 0] <= 170) &
-              (sub[:, :, 1] > 70) & (sub[:, :, 2] > 90), "紫蛋"),
-             ((sub[:, :, 0] >= 85) & (sub[:, :, 0] <= 110) &
-              (sub[:, :, 1] > 35) & (sub[:, :, 1] < 120) &
-              (sub[:, :, 2] > 150), "冰蛋")]
-    out = []
-    for mask, label in masks:
-        m = cv2.morphologyEx(mask.astype(np.uint8) * 255, cv2.MORPH_CLOSE,
-                             np.ones((9, 9), np.uint8))
-        contours, _ = cv2.findContours(m, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        for c in contours:
-            x, y, w, h = cv2.boundingRect(c)
-            if 55 <= w <= 150 and 55 <= h <= 150 and 4000 <= cv2.contourArea(c) <= 18000:
-                out.append({"label": label, "x": x0 + x + w // 2,
-                            "y": y0 + y + h // 2, "w": w, "h": h})
-    return out
+def classify_exit(slot, img, matcher):
+    """固定模板 + Hu 校验；未命中就标未知，不再使用旧的颜色规则。"""
+    size = fixed_match.SIZES["exit"]
+    patch = fixed_match.crop_at(img, (slot["x"], slot["y"]), size)
+    egg = egg_label(patch)
+    if egg:
+        return {"breed": None, "label": egg, "score": 0.0, "method": "egg"}
+    hit = matcher.match(patch)
+    if hit:
+        return {"breed": hit["breed"], "label": hit["breed"],
+                "score": hit["score"], "method": hit["method"]}
+    return {"breed": None, "label": "未知", "score": 0.0, "method": "unknown"}
 
 
-def mark_exits(dogs):
-    """出口在画面中部：左侧廊道取最右的狗，右侧廊道取最左的狗。"""
-    for d in dogs:
-        d["exit"] = False
-    rows = {}
-    for d in dogs:
-        row = min(range(4), key=lambda i: abs(d["y"] - (930, 1132, 1324, 1534)[i]))
-        rows.setdefault(row, []).append(d)
-    for row in rows.values():
-        left = [d for d in row if d["x"] < 540]
-        right = [d for d in row if d["x"] >= 540]
-        if left:
-            max(left, key=lambda d: d["x"])["exit"] = True
-        if right:
-            min(right, key=lambda d: d["x"])["exit"] = True
-    return dogs
-
-
-def analyze(img, threshold=0.85):
-    board_tpl = exit_detect.load_templates(BOARD_TEMPLATES)
-    house_tpl = load_templates(HOUSE_TEMPLATES)
-    locked_tpl = house_tpl.pop("locked", None)
-    shop_tpl = {k: [v] for k, v in load_templates(SHOP_TEMPLATES).items()}
+def analyze(img):
+    locked_tpl = cv2.imread(LOCKED_TEMPLATE, cv2.IMREAD_COLOR)
+    exit_matcher = fixed_match.get_matcher("exit")
+    house_matcher = fixed_match.get_matcher("house")
 
     dogs = []
-    for slot in exit_detect.find_exit_slots(img):
-        result = exit_detect.classify_exit(slot, img, board_tpl, shop_tpl)
+    for slot in find_exit_slots(img):
+        result = classify_exit(slot, img, exit_matcher)
         dogs.append({"breed": result["breed"], "label": result["label"],
                      "score": result["score"], "method": result["method"],
                      "x": slot["x"], "y": slot["y"], "w": slot["w"], "h": slot["h"],
                      "row": slot["row"], "side": slot["side"], "exit": True})
-    tpl_feats = []
-    for name, imgs in {**board_tpl, **shop_tpl}.items():
-        for t in imgs:
-            tpl_feats.append((name, exit_detect.featurize(t)))
 
     houses = []
     for i, (x, y) in enumerate(BIG_CENTERS, 1):
@@ -199,48 +191,26 @@ def analyze(img, threshold=0.85):
         if locked:
             houses.append({"idx": i, "x": x, "y": y, "label": "未解锁", "score": None})
             continue
-        breed, score = classify_patch(patch, house_tpl, 0.72)
-        if breed is None:
-            flat = {k: imgs[0] for k, imgs in board_tpl.items()}
-            breed, score = classify_patch(patch, flat, 0.55)
-        inner = patch[40:150, 40:150]
-        for dx, dy in ((0, 0), (-30, 0), (30, 0), (0, 25), (0, -25),
-                           (-30, 25), (30, 25)):
-                crop = patch[40 + dy:150 + dy, 40 + dx:150 + dx]
-                if crop.shape[0] < 60 or crop.shape[1] < 60:
-                    continue
-                breed = exit_detect.rule_classify(crop)
-                if breed:
-                    score = 0.75
-                    break
-        if breed is None and tpl_feats:
-            hf = exit_detect.featurize(inner)
-            nearest = min(tpl_feats,
-                          key=lambda t: float(np.linalg.norm(hf - t[1])))
-            dist = float(np.linalg.norm(hf - nearest[1]))
-            if dist < 2.8:
-                breed, score = nearest[0], round(1.0 / (1.0 + dist), 3)
+        avatar = fixed_match.crop_at(img, (x + 20, y - 25),
+                                     fixed_match.SIZES["house"])
+        hit = house_matcher.match(avatar)
+        breed, score = (hit["breed"], hit["score"]) if hit else (None, 0.0)
         houses.append({"idx": i, "x": x, "y": y,
                        "label": BREED_CN.get(breed, breed or "未知"), "score": score})
+
     smalls = []
     for i, (x, y) in enumerate(SMALL_CENTERS, 1):
         patch = img[y - 48:y + 48, max(0, x - 48):x + 48]
         if is_locked(patch, purple=True):
             smalls.append({"idx": i, "x": x, "y": y, "label": "未解锁", "score": None})
             continue
-        flat = {k: imgs[0] for k, imgs in board_tpl.items()}
+        # 小狗窝只判状态，不识别品种：白/黑/灰是狗，橙色筐本身不算有狗
         inner = img[y - 30:y + 30, max(0, x - 30):x + 30]
-        frac = exit_detect.color_fractions(inner)
-        if frac["white"] > 0.42 or frac["black"] > 0.12 or frac["gray"] > 0.25:
-            breed = exit_detect.rule_classify(inner)
-            score = 0.75
-        else:
-            breed, score = None, 0.0
-        if breed is None:
-            breed, score = classify_patch(
-                patch, {**flat, **{k: v[0] for k, v in shop_tpl.items()}}, 0.62)
+        frac = color_fractions(inner)
+        filled = (frac["white"] > 0.42 or frac["black"] > 0.12 or
+                  frac["gray"] > 0.25)
         smalls.append({"idx": i, "x": x, "y": y,
-                       "label": BREED_CN.get(breed, breed or "空"), "score": score})
+                       "label": "有狗" if filled else "空", "score": None})
     return {"houses": houses, "smalls": smalls, "dogs": dogs}
 
 
@@ -266,7 +236,7 @@ def annotate(img, result):
         color = (150, 150, 150) if s["label"] == "未解锁" else (255, 200, 40)
         draw.rectangle((s["x"] - 48, s["y"] - 48, s["x"] + 48, s["y"] + 48),
                        outline=color, width=3)
-        slabel = s["label"] if s["label"] in ("未解锁", "空") else BREED_SHORT.get(
+        slabel = s["label"] if s["label"] in ("未解锁", "空", "有狗") else BREED_SHORT.get(
             next((k for k, v in BREED_CN.items() if v == s["label"]), ""), s["label"])
         text(s["x"] - 30, s["y"] - 82, slabel, color, small_font)
     for i, d in enumerate(result["dogs"], 1):
@@ -287,14 +257,13 @@ def main():
     ap.add_argument("--image", help="本地截图路径；不传则 adb 抓图")
     ap.add_argument("--device", help="adb 设备序列号")
     ap.add_argument("--output", default="outputs/dog_annotated.png")
-    ap.add_argument("--threshold", type=float, default=0.88, help="模板匹配置信度")
     args = ap.parse_args()
     img = cv2.imread(args.image) if args.image else grab(args.device)
     if img is None:
         raise SystemExit("图片读取失败: " + args.image)
     if float(img.mean()) < 12:
         raise SystemExit("画面几乎全黑（可能锁屏或广告），请先回到游戏界面")
-    result = analyze(img, args.threshold)
+    result = analyze(img)
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
     cv2.imwrite(args.output, annotate(img, result))
     summary = {

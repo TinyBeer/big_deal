@@ -2,14 +2,14 @@
 """狗狗三消自动点击：识别廊道出口，先把狗送进匹配的大狗窝。
 
 参考 tools/spool/spool_assist.py 的 adb 抓图 -> 决策 -> 点击 -> 等稳定循环。
-有能进大狗窝的出口狗时，一次识别选一批不重复品种的目标（默认最多 3 只），按原
-坐标依次点击后再统一等画面稳定，避免每点一只都重新识别；没有大狗窝目标时改为
-随机选一只狗送小狗窝（单只点击，不走批量逻辑）。
+有能进大狗窝的出口狗时，按已解锁大狗窝品种选出所有不重复的目标狗，不判断狗窝
+已填数量、也不限制选择数量；按原坐标依次点击后统一等画面稳定。没有大狗窝目标时
+改为随机选一只狗送小狗窝（单只点击）。
 开局可看广告解锁锁定的大小狗窝与廊道；长时间不操作弹出的窗口会自动关闭。
 
 用法（统一入口见 quick.sh）：
   tools/dogs/quick.sh --auto --max-clicks 80
-  tools/dogs/quick.sh --auto --batch-size 3 --batch-gap 0.35
+  tools/dogs/quick.sh --auto --batch-gap 0.2
   tools/dogs/quick.sh --auto --dry-run
 """
 
@@ -26,13 +26,10 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 import dog_annotate
-import exit_detect
 from common.adb import dump_ui, find_text_node, key_back
 from common.adb import tap as adb_tap, tap_touch as adb_tap_touch
 from common.notify import add_notify_args, send_notify, notify_phone  # noqa: E402
 
-HOUSE_CIRCLE_X = (-30, 17, 65)
-HOUSE_CIRCLE_DY = 45
 CORRIDOR_CENTERS = [(240, 1770), (840, 1770)]
 RETURN_TEXTS = ("立即返回", "返回游戏")
 DISMISS_TEXTS = ("不了", "关闭", "下次再说", "跳过", "我知道了")
@@ -124,21 +121,6 @@ def dismiss_popup(serial, img):
     return True
 
 
-def house_fill(img, house):
-    """每个大狗窝下方三个圆点：深色为空，橙/彩色为已放入一只狗。"""
-    x, y = house["x"], house["y"]
-    filled = 0
-    for dx in HOUSE_CIRCLE_X:
-        cx, cy = x + dx, y + HOUSE_CIRCLE_DY
-        patch = img[max(0, cy - 5):cy + 5, max(0, cx - 5):cx + 5]
-        hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
-        sat, val, hue = hsv[:, :, 1], hsv[:, :, 2], hsv[:, :, 0]
-        if (float(np.median(val)) > 150 and float((sat > 70).mean()) > 0.5 and
-                5 <= float(np.median(hue)) <= 35):
-            filled += 1
-    return filled
-
-
 def corridor_locked(img, x, y):
     patch = img[max(0, y - 50):y + 50, max(0, x - 50):x + 50]
     hsv = cv2.cvtColor(patch, cv2.COLOR_BGR2HSV)
@@ -160,25 +142,16 @@ def wait_stable(serial, min_wait=0.35, max_wait=1.6, interval=0.15):
     return img if img is not None else dog_annotate.grab(serial)
 
 
-def pick_targets(exits, targets, house_fills, frequent, batch_size):
-    """一次识别选一批不重复的大狗窝目标狗：每个品种最多一只。
+def pick_targets(exits, targets):
+    """按已解锁大狗窝品种，从出口选出不重复的狗，不做数量限制。
 
-    只选品种与未满大狗窝匹配的出口狗，没有大狗窝可去的狗不选（不往小狗窝送）。
-    廊道出口互相独立，点掉一只只影响所在廊道，所以同一张图上选出的多只狗可以
-    按原坐标依次点击；同品种只取一只，避免大狗窝中途集满后后续点击落空。
+    廊道出口互相独立，同一张图上选出的多只狗可按原坐标依次点击；同一品种只取
+    一只，避免重复送同一品种。大狗窝已填几只不影响选择。
     """
-    def house_rank(d):
-        fills = [house_fills[i] for i in targets[d["breed"]]]
-        return (max(fills) if fills else 0, frequent.get(d["breed"], 0),
-                -d["y"], -d["x"])
-
     pool = sorted((d for d in exits if d["breed"] in targets),
-                  key=house_rank, reverse=True)
-    limit = batch_size if batch_size > 0 else len(pool)
+                  key=lambda d: (-d["y"], -d["x"]))
     picked, used_breeds = [], set()
     for d in pool:
-        if len(picked) >= limit:
-            break
         breed = d["breed"]
         if breed in used_breeds:
             continue
@@ -194,6 +167,7 @@ def auto_run(args):
     serial = args.device
     clicks = unlocks = 0
     tried_unlock = []
+    started_clicking = False
     stop_reason = ""
     start = time.time()
 
@@ -223,62 +197,56 @@ def auto_run(args):
             time.sleep(1)
             continue
 
-        now = time.time()
-        tried_unlock = [(x, y, t) for x, y, t in tried_unlock if now - t < 90]
+        if not started_clicking:
+            now = time.time()
+            tried_unlock = [(x, y, t) for x, y, t in tried_unlock if now - t < 90]
 
-        locked = [dict(h, kind="house") for h in result["houses"]
-                  if h["label"] == "未解锁"]
-        locked += [{"x": x, "y": y, "label": "廊道", "kind": "corridor"}
-                   for x, y in CORRIDOR_CENTERS if corridor_locked(img, x, y)]
-        locked = [r for r in locked if not any(
-            (r["x"] - x) ** 2 + (r["y"] - y) ** 2 < (90 ** 2)
-            for x, y, _ in tried_unlock)]
-        if args.unlock and unlocks < args.max_unlock and locked:
-            r = locked[0]
-            unlocks += 1
-            print("解锁 %d/%d %s (%d,%d) 看广告 ..." %
-                  (unlocks, args.max_unlock, r["kind"], r["x"], r["y"]), flush=True)
-            tap(r["x"], r["y"], serial)
-            tried_unlock.append((r["x"], r["y"], now))
-            if r["kind"] == "corridor":
-                time.sleep(1.0)
-                claim = find_template(dog_annotate.grab(serial), CLAIM_TEMPLATE)
-                if claim:
-                    tap_touch(claim[0], claim[1], serial)
-                else:
-                    print("  ! 未找到领取按钮，尝试固定位置", flush=True)
-                    tap_touch(540, 1500, serial)
-            ok = watch_ad_return(serial, args.ad_wait, args.ad_timeout)
-            print("解锁: " + ("成功" if ok else "未回到对局，继续尝试"), flush=True)
-            time.sleep(args.settle)
-            continue
+            locked = [dict(h, kind="house") for h in result["houses"]
+                      if h["label"] == "未解锁"]
+            locked += [{"x": x, "y": y, "label": "廊道", "kind": "corridor"}
+                       for x, y in CORRIDOR_CENTERS if corridor_locked(img, x, y)]
+            locked = [r for r in locked if not any(
+                (r["x"] - x) ** 2 + (r["y"] - y) ** 2 < (90 ** 2)
+                for x, y, _ in tried_unlock)]
+            if args.unlock and unlocks < args.max_unlock and locked:
+                r = locked[0]
+                unlocks += 1
+                print("解锁 %d/%d %s (%d,%d) 看广告 ..." %
+                      (unlocks, args.max_unlock, r["kind"], r["x"], r["y"]), flush=True)
+                tap(r["x"], r["y"], serial)
+                tried_unlock.append((r["x"], r["y"], now))
+                if r["kind"] == "corridor":
+                    time.sleep(1.0)
+                    claim = find_template(dog_annotate.grab(serial), CLAIM_TEMPLATE)
+                    if claim:
+                        tap_touch(claim[0], claim[1], serial)
+                    else:
+                        print("  ! 未找到领取按钮，尝试固定位置", flush=True)
+                        tap_touch(540, 1500, serial)
+                ok = watch_ad_return(serial, args.ad_wait, args.ad_timeout)
+                print("解锁: " + ("成功" if ok else "未回到对局，继续尝试"), flush=True)
+                time.sleep(args.settle)
+                continue
 
         exits = [d for d in result["dogs"] if d["breed"]]
-        targets = {}
-        house_fills = []
-        for i, h in enumerate(result["houses"]):
-            fill = house_fill(img, h)
-            house_fills.append(fill)
-            if h["label"] in dog_annotate.BREED_CN.values() and fill < 3:
-                breed = next(k for k, v in dog_annotate.BREED_CN.items() if v == h["label"])
-                targets.setdefault(breed, []).append(i)
-        frequent = {}
-        for d in exits:
-            frequent[d["breed"]] = frequent.get(d["breed"], 0) + 1
+        targets = set()
+        for h in result["houses"]:
+            if h["label"] in dog_annotate.BREED_CN.values():
+                targets.add(next(k for k, v in dog_annotate.BREED_CN.items()
+                                 if v == h["label"]))
         available = [s for s in result["smalls"] if s["label"] != "未解锁"]
         empty_smalls = [s for s in available if s["label"] == "空"]
         matching = [d for d in exits if d["breed"] in targets]
         print("状态: 狗窝=%s 目标=%s 小狗窝 空%d/可用%d 出口=%s 可入窝=%d" % (
             [h["label"] for h in result["houses"]],
-            [dog_annotate.BREED_SHORT.get(b, b) for b in targets],
+            [dog_annotate.BREED_SHORT.get(b, b) for b in sorted(targets)],
             len(empty_smalls), len(available),
             [dog_annotate.BREED_SHORT.get(d["breed"], d["label"]) for d in exits],
             len(matching)), flush=True)
         if matching:
-            picked = pick_targets(exits, targets, house_fills, frequent, args.batch_size)
-            limit_text = str(args.batch_size) if args.batch_size > 0 else "不限"
-            print("本轮批量选择 %d/%s 个不重复大狗窝候选: %s" % (
-                len(picked), limit_text,
+            picked = pick_targets(exits, targets)
+            print("本轮选择 %d 个不重复大狗窝候选: %s" % (
+                len(picked),
                 " ".join("%s->%s" % (dog_annotate.BREED_SHORT.get(d["breed"], d["label"]),
                                      mode) for d, mode in picked)), flush=True)
         else:
@@ -316,6 +284,7 @@ def auto_run(args):
                   (clicks, i + 1, len(picked), cand["label"], cand["x"], cand["y"], mode),
                   flush=True)
             tap(cand["x"], cand["y"], serial)
+            started_clicking = True
             if i < len(picked) - 1:
                 time.sleep(args.batch_gap)
         if stop_reason:
@@ -339,10 +308,10 @@ def main():
     ap.add_argument("--wait", type=float, default=0.35)
     ap.add_argument("--max-wait", type=float, default=1.6)
     ap.add_argument("--gap", type=float, default=0.15)
-    ap.add_argument("--batch-size", type=int, default=3,
-                    help="一次识别最多选几个能进大狗窝且不重复品种的出口狗（默认 3；0=不限）")
-    ap.add_argument("--batch-gap", type=float, default=0.35,
-                    help="批内相邻两次点击的间隔秒数（默认 0.35）")
+    ap.add_argument("--batch-size", type=int, default=0,
+                    help="已废弃：现在按已解锁大狗窝品种全选不重复狗，保留参数仅为兼容")
+    ap.add_argument("--batch-gap", type=float, default=0.2,
+                    help="相邻两次点击的间隔秒数（默认 0.2）")
     ap.add_argument("--unlock", dest="unlock", action="store_true", default=True,
                     help="开局看广告解锁资源（默认开启）")
     ap.add_argument("--no-unlock", dest="unlock", action="store_false")

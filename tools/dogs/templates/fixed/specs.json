@@ -1,0 +1,753 @@
+{
+  "description": "固定位置模板截取规格。image 相对仓库根目录；center 为原图坐标；size 为裁切边长。",
+  "s1": "outputs/dogs_samples_20261125_114609/shot_114609_1.png",
+  "s1b": "outputs/dogs_samples_20261125_114609/shot_114658_4.png",
+  "s2": "outputs/dogs_samples2_20261125_125549/shot_current_131146.png",
+  "live5": "outputs/dogs_live_20261126_103232/shot_05.png",
+  "live7": "outputs/dogs_live_20261126_103232/shot_07.png",
+  "live8": "outputs/dogs_live_20261126_103232/shot_08.png",
+  "live9": "outputs/dogs_live_20261126_103232/shot_09.png",
+  "live10": "outputs/dogs_live_20261126_103232/shot_10.png",
+  "live11": "outputs/dogs_live_20261126_103232/shot_11.png",
+  "live1132": "outputs/dogs_live_20261126_103232/current_check_1132.png",
+  "entries": [
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "s1",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "s1",
+      "center": [
+        415,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "s1",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "s1",
+      "center": [
+        415,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "s1",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "s2",
+      "center": [
+        415,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "husky_black",
+      "image": "s1",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "husky_black",
+      "image": "s1",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "s1",
+      "center": [
+        895,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "s1",
+      "center": [
+        765,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "samoyed_white",
+      "image": "s2",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "samoyed_white",
+      "image": "s2",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "samoyed_white",
+      "image": "s2",
+      "center": [
+        635,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "samoyed_white",
+      "image": "s2",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "beagle_orangewhite",
+      "image": "s2",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "beagle_orangewhite",
+      "image": "s2",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "beagle_orangewhite",
+      "image": "s2",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "poodle_brown",
+      "image": "s2",
+      "center": [
+        415,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "terrier_gray",
+      "image": "s2",
+      "center": [
+        415,
+        1542
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "boston_blackwhite",
+      "image": "s1",
+      "center": [
+        185,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "boston_blackwhite",
+      "image": "s2",
+      "center": [
+        440,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "s1",
+      "center": [
+        440,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "s2",
+      "center": [
+        185,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "s2",
+      "center": [
+        695,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "shiba_orange",
+      "image": "s1",
+      "center": [
+        695,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "samoyed_white",
+      "image": "s1",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "husky_black",
+      "image": "s1b",
+      "center": [
+        440,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "terrier_gray",
+      "image": "s2",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "boston_blackwhite",
+      "image": "live5",
+      "center": [
+        185,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "husky_black",
+      "image": "live9",
+      "center": [
+        185,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "live7",
+      "center": [
+        415,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "live8",
+      "center": [
+        415,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "live9",
+      "center": [
+        415,
+        1340
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "beagle_orangewhite",
+      "image": "live5",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "poodle_brown",
+      "image": "live10",
+      "center": [
+        695,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "collie_blackwhite",
+      "image": "live10",
+      "center": [
+        635,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "live10",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "collie_blackwhite",
+      "image": "live11",
+      "center": [
+        440,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114609_1",
+      "center": [
+        415,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114609_1",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114625_2",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114625_2",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114625_2",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114625_2",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "husky_black",
+      "image": "114625_2",
+      "center": [
+        695,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114641_3",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114641_3",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114641_3",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114641_3",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114658_4",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114658_4",
+      "center": [
+        635,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114658_4",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114658_4",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114658_4",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "114730_6",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114730_6",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114730_6",
+      "center": [
+        635,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114730_6",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114730_6",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "114730_6",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "114803_8",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114803_8",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114803_8",
+      "center": [
+        635,
+        1139
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114803_8",
+      "center": [
+        415,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "samoyed_white",
+      "image": "114803_8",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "samoyed_white",
+      "image": "114803_8",
+      "center": [
+        635,
+        1542
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114803_8",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114803_8",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "114803_8",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "114819_9",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114819_9",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "114819_9",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114819_9",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114819_9",
+      "center": [
+        635,
+        1743
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "114819_9",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "114835_10",
+      "center": [
+        415,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "boston_blackwhite",
+      "image": "114835_10",
+      "center": [
+        635,
+        937
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "pug_beige",
+      "image": "114835_10",
+      "center": [
+        635,
+        1340
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "shiba_orange",
+      "image": "114835_10",
+      "center": [
+        415,
+        1743
+      ]
+    },
+    {
+      "kind": "house",
+      "breed": "pug_beige",
+      "image": "114835_10",
+      "center": [
+        950,
+        295
+      ]
+    },
+    {
+      "kind": "exit",
+      "breed": "beagle_orangewhite",
+      "image": "live1132",
+      "center": [
+        415,
+        1340
+      ]
+    }
+  ],
+  "114609_1": "outputs/dogs_samples_20261125_114609/shot_114609_1.png",
+  "114625_2": "outputs/dogs_samples_20261125_114609/shot_114625_2.png",
+  "114641_3": "outputs/dogs_samples_20261125_114609/shot_114641_3.png",
+  "114658_4": "outputs/dogs_samples_20261125_114609/shot_114658_4.png",
+  "114730_6": "outputs/dogs_samples_20261125_114609/shot_114730_6.png",
+  "114803_8": "outputs/dogs_samples_20261125_114609/shot_114803_8.png",
+  "114819_9": "outputs/dogs_samples_20261125_114609/shot_114819_9.png",
+  "114835_10": "outputs/dogs_samples_20261125_114609/shot_114835_10.png",
+  "current_131146": "outputs/dogs_samples2_20261125_125549/shot_current_131146.png"
+}
