@@ -18,10 +18,12 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))  # tools/
 from common.screen import grab  # noqa: E402
 
-# 颜色池：由马赛克拼图实机标定（见 palette.json / palette_calibrate.py）。
-# 14 色：白/青/深灰/中灰/浅蓝灰/浅紫(新)/黑/橙红/玫红(新)/蓝/粉/黄/紫/绿 + 橙粉。
-# HSV(H) 基准：红~8 玫红~176 黄~29 绿~53 青~88 蓝~108 紫~134 粉~166。
+# 颜色池：马赛克拼图实机标定 + 关卡106 新增蓝（见 palette.json / palette_calibrate.py）。
+# 14 色 + 橙粉 + 浅蓝/宝蓝：白/青/深灰/中灰/浅蓝灰/浅紫/黑/橙红/玫红/蓝/粉/黄/紫/绿 + 橙粉 + 浅蓝/宝蓝。
+# HSV(H) 基准：红~8 玫红~176 黄~29 绿~53 青~88 浅蓝~102 蓝~108 宝蓝~118 紫~134 粉~166。
 # 相近色分辨要点：
+#   - 浅蓝(#30A8F0 H102) vs 标准蓝(#3286FF H108) vs 宝蓝(#2430F0 H118)：
+#     色相仅差 6~16，按 H<=105 / 106~112 / >=113 分三档；
 #   - 玫红(H176 S210) vs 橙红(H8 S196)：色相跨 0 边界，用 H>=170 独立；
 #   - 粉(H166 S126) vs 玫红(H176 S210)：靠饱和度 + 色相细分区分；
 #   - 浅紫(H130 S59) vs 浅蓝灰(H106 S43) vs 中灰(H107 S24)：低饱和区按色相 + 亮度分档；
@@ -46,7 +48,8 @@ DRAW = {
     "red": (60, 60, 235), "crimson": (60, 30, 235), "brown": (70, 75, 140),
     "yellow": (40, 215, 245), "green": (60, 215, 75), "cyan": (225, 215, 70),
     "green_dark": (30, 140, 50), "green_cyan": (120, 220, 180),
-    "blue": (235, 100, 45), "purple": (185, 70, 235),
+    "blue": (235, 100, 45), "blue_light": (240, 168, 48),
+    "blue_royal": (242, 48, 36), "purple": (185, 70, 235),
     "purple_dark": (95, 40, 150), "purple_bright": (200, 90, 235),
     "lavender": (190, 160, 220), "pink": (170, 70, 235),
     "black": (90, 90, 90), "white": (235, 235, 235),
@@ -56,7 +59,8 @@ DRAW = {
 }
 CN = {"red": "红", "crimson": "玫红", "brown": "深红", "yellow": "黄",
       "green": "绿", "green_dark": "深绿", "green_cyan": "青绿",
-      "cyan": "青", "blue": "蓝", "purple": "紫",
+      "cyan": "青", "blue": "蓝", "blue_light": "浅蓝", "blue_royal": "宝蓝",
+      "purple": "紫",
       "purple_dark": "深紫", "purple_bright": "艳紫",
       "lavender": "浅紫", "pink": "粉", "black": "黑", "white": "白",
       "gray_light": "浅灰", "gray": "灰", "gray_dark": "深灰",
@@ -77,7 +81,7 @@ def _region_px(img, box):
 
 
 def hue_name(h, s=255, v=255):
-    """把像素 HSV 归入游戏调色板（14 色 + 橙粉，见 palette.json）。
+    """把像素 HSV 归入游戏调色板（14 色 + 橙粉 + 浅蓝/宝蓝，见 palette.json）。
 
     顺序很关键，先按明度/饱和分黑白灰阶，再按色相分彩色。相近色分辨：
     - 近黑 V<70：无论 S 多大（近黑实测 S 可达 180+）都归 black；
@@ -91,7 +95,10 @@ def hue_name(h, s=255, v=255):
     - 绿三档(H39~78)：V<180 为深绿(H61 V142)；H>=70 为青绿(H75 V221)；
       其余为标准绿(H54 V229)。三者色相/亮度都接近，必须分开否则决策误判同色；
     - 紫三档(H123~149)：V<210 为深紫(H136 V172)；S>=180 为艳紫(H136 S205 V239)；
-      其余为标准紫(H133 S147 V243)。深紫/艳紫与槽内的标准紫同为 H133，不细分会被一起避开。
+      其余为标准紫(H133 S147 V243)。深紫/艳紫与槽内的标准紫同为 H133，不细分会被一起避开；
+    - 蓝三档(H100~122)：浅蓝(#30A8F0 H102) / 标准蓝(#3286FF H108) / 宝蓝(#2430F0 H118)，
+      H 仅差 6~16，按 H<=105 / 106~112 / >=113 分；宝蓝另要求 S>=170，
+      避免被遮挡的灰蓝块(H113 S136)误入。
     """
     h, s, v = int(h) % 180, int(s), int(v)
     if v < 70:
@@ -125,7 +132,11 @@ def hue_name(h, s=255, v=255):
     if 79 <= h <= 99:
         return "cyan"
     if 100 <= h <= 122:
-        return "blue"
+        if h <= 105:
+            return "blue_light"        # 浅蓝 #30A8F0 H102 S204 V240
+        if h >= 113 and s >= 170:
+            return "blue_royal"        # 宝蓝 #2430F0 H118 S217 V240
+        return "blue"                  # 标准蓝 #3286FF H108 / 深蓝 #195095 V149
     if 123 <= h <= 149:
         if v < 210:
             return "purple_dark"       # 深紫 H136 V172

@@ -37,7 +37,7 @@ python -m pip install -r tools/requirements.txt
 - 工具只使用当前激活环境（或显式 `XXX_PYTHON`）中的 Python。若已激活的 venv/conda 环境里没有可执行的 `python`，脚本会直接提示并退出，不会静默回退到系统 Python 或其它环境；请修复/切换环境，或显式设置对应覆盖变量
 - 未激活任何环境时回退到 PATH 中的 `python`/`python3`；PATH 中也没有 Python 时同样提示并退出。运行前请确认所选环境已安装 `tools/requirements.txt` 依赖
 
-- 色块入槽的颜色池由马赛克拼图完整画板实机标定（14 色，含玫红/橙红、粉/玫红、浅紫/浅蓝灰/中灰/深灰等相近色细分）：`tools/slots/palette.json`；换关卡可用 `tools/slots/palette_calibrate.py` 重新标定（默认覆盖完整 20×26 网格；详见 `tools/slots/PLAN.md` 第十节）
+- 色块入槽的颜色池由马赛克拼图完整画板实机标定（16 类，含玫红/橙红、粉/玫红、浅紫/浅蓝灰/中灰/深灰、浅蓝/蓝/宝蓝等相近色细分）：`tools/slots/palette.json`；换关卡可用 `tools/slots/palette_calibrate.py` 重新标定（默认覆盖完整 38×51 网格；新增关卡的独特色可手动补入色池，详见 `tools/slots/PLAN.md` 第十节及十·八补）
 - 停车场接客的模板（`arrow_right.png` / `p_slot.png` / `unlock.png`）位于 `tools/parking/templates/`；环形岛接客的模板（`unlock.png` / `p_slot.png` / `gift_x.png` / `use_button.png` / `revive_banner.png` / `fail_banner.png`）位于 `tools/ring/templates/`；色块入槽的模板（`unlock.png` / `revive_banner.png` / `victory_banner.png`）位于 `tools/slots/templates/`；搬砖大战的模板（`popup_close.png` / `revive_close.png` / `unlock.png`）位于 `tools/ants/templates/`
 - 搬砖大战的颜色池由 `tools/ants/palette_calibrate.py` 从上方像素画标定，结果存 `tools/ants/palette.json`；用法与 slots 的调色板标定一致（`--image` 指定截图或实时抓图，`--k` 控制聚类数）。
 - 手机抓图/点击依赖 adb 无线连接（停车场工具用 `--device <serial>` 指定设备；未指定时按 adb 默认设备连接）
