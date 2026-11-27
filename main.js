@@ -38,7 +38,6 @@ const C = {
   surface: "#1E2430",
   border: "#2B3342",
   primary: "#E1251B",
-  primaryLight: "#F04335",
   primaryDark: "#C21810",
   text: "#F1F3F7",
   textDim: "#98A2B3",
@@ -72,13 +71,8 @@ ui.layout(
         </horizontal>
         <horizontal marginTop="10" w="*">
           <button id="jd" text="京东" w="0" h="42" layout_weight="1" textSize="12sp" />
-          <button id="jdbb" text="抽盲盒" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
           <button id="jddddb" text="国补" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
-        </horizontal>
-        <horizontal marginTop="8" w="*">
-          <button id="jd121" text="121京豆" w="0" h="42" layout_weight="1" textSize="12sp" />
-          <button id="jdst" text="刮卡任务" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
-          <button id="jdss" text="超级明星" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+          <button id="jd121" text="121京豆" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
         </horizontal>
         <button id="jdmedical" text="看病买药任务" w="*" h="42" textSize="12sp" marginTop="8" />
       </vertical>
@@ -89,16 +83,6 @@ ui.layout(
           <view w="3" h="14" background={C.primary} marginRight="8" />
           <text text="互动游戏" textSize="14sp" textColor={C.text} textStyle="bold" />
         </horizontal>
-        <button
-          id="jdig"
-          text="启动京东互动游戏"
-          w="*"
-          h="48"
-          textSize="15sp"
-          textStyle="bold"
-          marginTop="10"
-        />
-
         {/* 京东金融互动游戏控制 */}
         <text text="金融互动游戏 · 执行分区" textSize="12sp" textColor={C.textDim} marginTop="14" marginBottom="6" />
         <horizontal gravity="center_vertical" wrap="wrap">
@@ -142,8 +126,7 @@ ui.layout(
 
       {/* 其他 */}
       <horizontal marginTop="14" w="*">
-        <button id="panda" text="熊猫乐园" w="0" h="42" layout_weight="1" textSize="12sp" />
-        <button id="exit" text="退出" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+        <button id="exit" text="退出" w="*" h="42" textSize="12sp" />
       </horizontal>
 
   </vertical>,
@@ -187,15 +170,12 @@ function tintCheck(id) {
 ["cardShop", "cardGame", "cardJr"].forEach((id) => rounded(id, C.surface, 14, C.border, 1));
 
 [
-  "jd", "jdbb", "jddddb", "jd121", "jdst", "jdss", "jdmedical",
-  "jdjrm", "ddep", "save", "jdbrowse", "panda", "exit", "igrun",
+  "jd", "jddddb", "jd121", "jdmedical",
+  "jdjrm", "ddep", "save", "jdbrowse", "exit", "igrun",
 ].forEach((id) => {
   rounded(id, id === "igrun" ? C.primaryDark : C.btn, 10, id === "igrun" ? null : C.btnBorder, 1);
   ui[id].setTextColor(color(C.text));
 });
-
-gradient("jdig", C.primaryLight, C.primaryDark, 12);
-ui.jdig.setTextColor(color("#FFFFFF"));
 
 [
   "igHot", "igDaily", "igRecommend", "igGuess", "igDiscover", "igNew", "igtest", "igtimer",
@@ -221,22 +201,12 @@ ui.post(() => {
 });
 
 ui.jd.click(() => startTask(require("./modules/jd").run, "京东"));
-ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run, "抽盲盒"));
 ui.jddddb.click(() =>
   startTask(require("./modules/jd_day_day_benefit").run, "国补"),
 );
 ui.jd121.click(() => startTask(require("./modules/jd_121pea").run, "121京豆"));
-ui.jdst.click(() =>
-  startTask(require("./modules/jd_scratch_task").run, "刮卡任务"),
-);
-ui.jdss.click(() =>
-  startTask(require("./modules/jd_super_star").run, "超级明星"),
-);
 ui.jdmedical.click(() =>
   startTask(require("./modules/jd_h5_browse_beans").run, "看病买药"),
-);
-ui.jdig.click(() =>
-  startTask(require("./modules/jd_interactive_games").run, "互动游戏"),
 );
 ui.ddep.click(() =>
   startTask(require("./modules/jdjr_earn_pea").run, "天天赚京豆"),
@@ -248,10 +218,6 @@ ui.jdbrowse.click(() =>
 ui.jdjrm.click(() =>
   startTask(require("./modules/jdjr_manual").run, "金融手动"),
 );
-ui.panda.click(() =>
-  startTask(require("./modules/china_mobile").run, "熊猫乐园"),
-);
-
 ui.igrun.click(() => {
   startTask(() => {
     const ut = require("./modules/utils");

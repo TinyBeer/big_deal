@@ -5,7 +5,6 @@ const {
   backN,
   shortWait,
   longWait,
-  mediumWait,
   isPointInBounds,
   doubleBackN,
   miniWait,
@@ -25,7 +24,6 @@ function run() {
 
   /* run task */
   flashSale();
-  interactiveGame();
   dailyClaimPea();
   globalShopping();
 
@@ -192,37 +190,6 @@ function flashSale() {
 
   back();
   shortWait();
-}
-
-function interactiveGame() {
-  console.log("互动游戏...");
-  let backCnt = 0;
-  let enter = text("我的").findOne(1000);
-  if (!enter) {
-    return false;
-  }
-  click(enter.center());
-  shortWait();
-  backCnt++;
-
-  let gameEnter = text("互动游戏").findOne(1000);
-  if (!gameEnter) {
-    backN(backCnt);
-    return false;
-  }
-  click(gameEnter.center());
-  longWait();
-  backCnt++;
-
-  // 签到
-  let sign = text("签到").findOne(1000);
-  if (sign) {
-    click(sign.center());
-    mediumWait();
-  } else {
-    console.log("missing sign button, skip...");
-  }
-  backN(backCnt);
 }
 
 //  导出函数（供其他脚本调用）
