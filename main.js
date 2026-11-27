@@ -3,7 +3,16 @@
 // 声明使用UI
 auto();
 
-const { runTask } = require("./modules/utils");
+const { runTask, storeConfig, loadConfig } = require("./modules/utils");
+const logger = require("./modules/lib/logger");
+
+const LOG_LEVEL_KEYS = ["debug", "info", "warn", "error"];
+const LOG_LEVEL_LABELS = { debug: "调试", info: "信息", warn: "警告", error: "错误" };
+const LOG_LEVEL_KEY = "logLevel";
+
+let initialLevelIdx = LOG_LEVEL_KEYS.indexOf(loadConfig(LOG_LEVEL_KEY));
+if (initialLevelIdx < 0) initialLevelIdx = 0;
+logger.setLevel(LOG_LEVEL_KEYS[initialLevelIdx]);
 
 function startTask(taskFn, label) {
   threads.start(() => {
@@ -124,6 +133,12 @@ ui.layout(
         <button id="jdbrowse" text="浏览领赚豆" w="*" h="42" textSize="12sp" marginTop="8" />
       </vertical>
 
+      {/* 日志等级 */}
+      <horizontal marginTop="14" w="*" gravity="center_vertical">
+        <text text="日志等级" textSize="13sp" textColor={C.textDim} layout_weight="1" />
+        <spinner id="logLevel" entries="调试|信息|警告|错误" w="150" />
+      </horizontal>
+
       {/* 其他 */}
       <horizontal marginTop="14" w="*">
         <button id="panda" text="熊猫乐园" w="0" h="42" layout_weight="1" textSize="12sp" />
@@ -184,6 +199,25 @@ ui.jdig.setTextColor(color("#FFFFFF"));
 [
   "igHot", "igDaily", "igRecommend", "igGuess", "igDiscover", "igNew", "igtest", "igtimer",
 ].forEach(tintCheck);
+
+/* ---- 日志等级选择 ---- */
+let logLevelSyncing = true;
+ui.logLevel.setOnItemSelectedListener(
+  new android.widget.AdapterView.OnItemSelectedListener({
+    onItemSelected: function (parent, view, position, id) {
+      if (logLevelSyncing) return;
+      let level = LOG_LEVEL_KEYS[position];
+      logger.setLevel(level);
+      storeConfig(LOG_LEVEL_KEY, level);
+      toast("日志等级：" + LOG_LEVEL_LABELS[level]);
+    },
+    onNothingSelected: function () {},
+  }),
+);
+ui.logLevel.setSelection(initialLevelIdx);
+ui.post(() => {
+  logLevelSyncing = false;
+});
 
 ui.jd.click(() => startTask(require("./modules/jd").run, "京东"));
 ui.jdbb.click(() => startTask(require("./modules/jd_bline_box").run, "抽盲盒"));

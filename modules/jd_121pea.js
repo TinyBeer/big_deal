@@ -1,5 +1,6 @@
 const { backHomePage, homePageGetEnter } = require("./jd_utils");
 const { longWait, shortWait, doubleBackN } = require("./utils");
+const pealog = require("./lib/logger");
 
 function run() {
   /* launch app */
@@ -28,12 +29,12 @@ function _121pean() {
       .textContains("领京豆")
       .findOne(500);
     if (claimBtn) {
-      console.log("claim pean ...", claimBtn.center());
+      pealog.debug("领取京豆 ...");
       click(400, claimBtn.center().y);
       shortWait();
       return true;
     }
-    console.log("missing claim button, skip");
+    pealog.debug("未找到领京豆入口，跳过");
 
     return false;
   };
@@ -55,9 +56,9 @@ function _121pean() {
           let name = arr[5];
           let desc = arr[7];
           let act = arr[9];
-          console.log(name, desc, act);
+          pealog.debug("任务: " + name + " " + desc + " " + act);
           if (act === "去完成") {
-            console.log("goto ");
+            pealog.debug("前往任务 ...");
             click(880, 1380);
             sleep(7000);
             back();
@@ -66,14 +67,14 @@ function _121pean() {
             click(880, 1380);
             sleep(5000);
           } else {
-            console.log("mission complete, back");
+            pealog.debug("任务完成，返回");
             break;
           }
         }
         task = task = textContains("浏览5s").findOne(100);
       }
     }
-    console.log("mission complete, back");
+    pealog.debug("任务流程结束");
   };
   claim121();
 

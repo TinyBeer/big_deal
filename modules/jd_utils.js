@@ -1,6 +1,12 @@
 /* import */
 
+/*
+ * 整个模块体包在 IIFE 里：AutoJs6 的 jvm-npm 会把模块顶层 const / function 泄漏到
+ * 调用方作用域，多个模块同名声明（如 warn）会直接报「变量重复声明」。
+ */
+(function () {
 const { backN, shortWait, isPointInBounds, drag } = require("./utils");
+const { debug, warn } = require("./lib/logger");
 
 function getTag(name) {
   return className("android.widget.TextView")
@@ -56,16 +62,16 @@ function getEntryBar() {
     }
   }
   if (!entryBar) {
-    console.log("missing entry bar");
+    warn("missing entry bar");
     return null;
   }
-  console.log("entry bar bounds", entryBar.bounds());
+  debug("entry bar bounds " + entryBar.bounds());
 
   return entryBar;
 }
 
 function homePageGetEnter(name) {
-  console.log("enter", name);
+  debug("enter " + name);
   // swipe left
   let eb = getEntryBar()
   if (!eb) {
@@ -133,3 +139,4 @@ module.exports = {
   search,
   switchTag,
 };
+})();
