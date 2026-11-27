@@ -24,9 +24,11 @@ from common.screen import grab  # noqa: E402
 SEQUENCE = ["冰红茶", "矿泉水", "冰红茶", "啤酒", "矿泉水", "啤酒",
             "瓜子", "花生", "八宝粥", "退出按钮"]
 EXIT_FIXED = (999, 172)      # 右上角退出按钮，基准分辨率下的固定中心点
-GIFT_CLOSE_WAIT = 3.0        # 点 No thanks 后给足转场时间，太短会还没切到主界面就去检测
+GIFT_CLOSE_WAIT = 2.0        # 点 No thanks 后给足转场时间，太短会还没切到主界面就去检测
 SHOP_CLOSE_WAIT = 1.0        # 关积分商店红叉后等 1s
-START_GAME_WAIT = 4.0        # 点开始游戏后等 4s（原 5s，用户要求减少 1s）
+START_GAME_WAIT = 2.5        # 点开始游戏后等 2.5s
+START_GAME_SAMPLES = 6       # 按钮有缩放动画，连抓多帧取最高分，避免采到低分帧漏检
+START_GAME_SAMPLE_GAP = 0.15  # 采样间隔（秒），6 帧约覆盖 0.9s 一个动画周期
 ENTRY_TAB_WAIT = 6.0         # 点入口页「真香摆摊日记」页签后等 6s
 EXIT_WAIT = 2.0              # 点退出按钮后等 2s，给下一轮转场留足时间
 TOOL_NAME = "零食顺序点击"
@@ -53,18 +55,29 @@ def find_target(img, name, threshold, last_clicked=None):
     return cands[0]
 
 
-def click_entry_if_needed(serial, img=None):
-    """游戏入口页出现「真香摆摊日记」页签时，点页签中心并等 6 秒。"""
+def find_entry(serial, img=None):
+    """两个入口模板（入口页页签 / 任务页卡片）任一命中即返回点击位置。"""
     if img is None:
         img = grab(serial, check=True)
     h, w = img.shape[:2]
-    hit = sv.detect_entry_tab(img, w / sv.BASE_W, h / sv.BASE_H)
+    return sv.detect_entry_tab(img, w / sv.BASE_W, h / sv.BASE_H)
+
+
+def click_entry(hit, serial):
+    """点击命中的入口并等 6 秒，让游戏加载到积分商店。"""
+    tap(hit["center"][0], hit["center"][1], serial=serial, touch=True)
+    print("检测到入口「真香摆摊日记」（模板 %s，匹配 %.4f），已点中心，等待 %.1fs" %
+          (hit.get("template", "-"), hit.get("score", 0.0), ENTRY_TAB_WAIT),
+          flush=True)
+    time.sleep(ENTRY_TAB_WAIT)
+
+
+def click_entry_if_needed(serial, img=None):
+    """开局状态机里用到：有入口就点，没有就交给其它状态处理。"""
+    hit = find_entry(serial, img)
     if hit is None:
         return False
-    tap(hit["center"][0], hit["center"][1], serial=serial, touch=True)
-    print("检测到入口页「真香摆摊日记」，已点页签中心，等待 %.1fs" %
-          ENTRY_TAB_WAIT, flush=True)
-    time.sleep(ENTRY_TAB_WAIT)
+    click_entry(hit, serial)
     return True
 
 
@@ -128,11 +141,16 @@ def close_shop_if_needed(serial, img=None):
 
 
 def start_game_if_needed(serial, img=None):
-    """游戏主界面出现时，点「开始游戏」并等待 4 秒；没有则不做任何操作。"""
-    if img is None:
-        img = grab(serial, check=True)
-    h, w = img.shape[:2]
-    hit = sv.detect_start_game(img, w / sv.BASE_W, h / sv.BASE_H)
+    """游戏主界面出现时，多帧检测「开始游戏」，命中就点并等 2.5 秒。"""
+    if img is not None:
+        frames = [img]
+    else:
+        frames = []
+        for _ in range(START_GAME_SAMPLES):
+            frames.append(grab(serial, check=True))
+            time.sleep(START_GAME_SAMPLE_GAP)
+    h, w = frames[0].shape[:2]
+    hit = sv.detect_start_game(frames, w / sv.BASE_W, h / sv.BASE_H)
     if hit is None:
         return False
     tap(hit["center"][0], hit["center"][1], serial=serial, touch=True)
@@ -185,6 +203,14 @@ def main():
     if not serial:
         print("未找到 adb 设备", file=sys.stderr)
         return 1
+
+    # 开局必须有入口（两个模板任一命中）；没匹配到就直接退出，不继续后续流程
+    entry = find_entry(serial)
+    if entry is None:
+        print("当前页面没有游戏入口（入口页页签 / 任务页卡片都没匹配到），退出",
+              file=sys.stderr, flush=True)
+        return 1
+    click_entry(entry, serial)
 
     current = 0
     try:

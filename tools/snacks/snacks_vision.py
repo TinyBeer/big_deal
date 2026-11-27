@@ -42,7 +42,10 @@ SHOP_CLOSE_TEMPLATE = "shop_close.png"  # 积分兑换商店右上角的红色�
 SHOP_CLOSE_ROI = (850, 0, 1080, 800)    # 叉号搜索区（基准坐标）
 START_GAME_TEMPLATE = "start_game.png"  # 游戏主界面的「开始游戏」按钮
 GIFT_NO_THANKS_TEMPLATE = "gift_no_thanks.png"  # 助力礼包弹窗的「No thanks」
-ENTRY_TAB_TEMPLATE = "entry_tab.png"            # 游戏入口页「真香摆摊日记」页签
+ENTRY_TAB_TEMPLATES = [
+    "entry_tab.png",       # 游戏入口页「真香摆摊日记」页签
+    "entry_tab_task.png",  # 「玩游戏领京豆」任务页「真香摆摊日记」卡片
+]
 
 
 def default_output(name):
@@ -109,7 +112,18 @@ def detect_shop_close(img, sx, sy, threshold=0.85):
 
 
 def detect_start_game(img, sx, sy, threshold=0.6):
-    """游戏主界面的橙色「开始游戏」按钮，返回 bbox/center 或 None。"""
+    """游戏主界面的橙色「开始游戏」按钮，返回 bbox/center 或 None。
+
+    img 可以是单帧，也可以是多帧列表：按钮有缩放动画，匹配分在 0.37~0.95
+    之间跳，逐帧匹配后取最高分那帧，避免恰好采样到低分帧而漏检。
+    """
+    if isinstance(img, (list, tuple)):
+        best = None
+        for frame in img:
+            hit = detect_start_game(frame, sx, sy, threshold)
+            if hit is not None and (best is None or hit["score"] > best["score"]):
+                best = hit
+        return best
     tpl = cv2.imread(os.path.join(DIR, "templates", START_GAME_TEMPLATE))
     if tpl is None:
         return None
@@ -129,23 +143,27 @@ def detect_start_game(img, sx, sy, threshold=0.6):
 
 
 def detect_entry_tab(img, sx, sy, threshold=0.85):
-    """游戏入口页「真香摆摊日记」页签，返回 bbox/center 或 None。"""
-    tpl = cv2.imread(os.path.join(DIR, "templates", ENTRY_TAB_TEMPLATE))
-    if tpl is None:
-        return None
-    tw = max(10, int(round(tpl.shape[1] * sx)))
-    th = max(10, int(round(tpl.shape[0] * sy)))
-    tpl = cv2.resize(tpl, (tw, th), interpolation=cv2.INTER_AREA) \
-        if (tw, th) != (tpl.shape[1], tpl.shape[0]) else tpl
-    if img.shape[0] < th or img.shape[1] < tw:
-        return None
-    _, score, _, loc = cv2.minMaxLoc(cv2.matchTemplate(img, tpl, cv2.TM_CCOEFF_NORMED))
-    if score < threshold:
-        return None
-    bx, by = loc
-    return {"bx": bx, "by": by, "bw": tw, "bh": th,
-            "center": [bx + tw // 2, by + th // 2],
-            "score": round(float(score), 4)}
+    """两个入口模板（入口页页签 / 任务页卡片）任一命中即返回 bbox/center，否则 None。"""
+    best = None
+    for name in ENTRY_TAB_TEMPLATES:
+        tpl = cv2.imread(os.path.join(DIR, "templates", name))
+        if tpl is None:
+            continue
+        tw = max(10, int(round(tpl.shape[1] * sx)))
+        th = max(10, int(round(tpl.shape[0] * sy)))
+        tpl = cv2.resize(tpl, (tw, th), interpolation=cv2.INTER_AREA) \
+            if (tw, th) != (tpl.shape[1], tpl.shape[0]) else tpl
+        if img.shape[0] < th or img.shape[1] < tw:
+            continue
+        _, score, _, loc = cv2.minMaxLoc(cv2.matchTemplate(img, tpl, cv2.TM_CCOEFF_NORMED))
+        if score < threshold:
+            continue
+        if best is None or score > best[0]:
+            bx, by = loc
+            best = (score, {"bx": bx, "by": by, "bw": tw, "bh": th,
+                            "center": [bx + tw // 2, by + th // 2],
+                            "score": round(float(score), 4), "template": name})
+    return best[1] if best else None
 
 
 def detect_gift_no_thanks(img, sx, sy, threshold=0.85):
