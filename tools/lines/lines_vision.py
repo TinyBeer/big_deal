@@ -97,26 +97,35 @@ def _centers(score, frac=0.35, gap=3):
     return out
 
 
-def _mod_origin(values, step):
-    """用全部线条像素的坐标模步长，求网格的亚像素相位。"""
-    mod = np.asarray(values, dtype=float) % step
-    bins = np.arange(0, step, 0.5)
-    hist, _ = np.histogram(mod, bins)
-    ref = ((bins[:-1] + bins[1:]) / 2)[hist.argmax()]
-    delta = ((mod - ref + step / 2) % step) - step / 2
-    keep = np.abs(delta) < step * 0.25
-    return (ref + float(delta[keep].mean())) % step
-
-
 def _axis_fit(centers):
-    """中位数定等距索引，拟合步长/原点，并还原缺失行列后的完整数量。"""
+    """由投影峰的相邻间距拟合步长，定位原点并还原缺失行列后的完整数量。
+
+    相邻峰间距通常是 23/24 这样只差一个像素的整数，median 会取整到 23、
+    让 index 出现假跳变（峰间距 24 被误当成缺了一格），polyfit 随之把步长
+    拉偏。这里用均值步长迭代重算 index：只保留接近步长的间距（剔除真正
+    缺失峰留下的大间距），收敛后的均值能精确还原真实步长。
+    """
     values = np.asarray(centers, dtype=float)
     diffs = np.diff(values)
     diffs = diffs[diffs > 3]
+    if len(diffs) == 0:
+        raise RuntimeError("投影峰间距异常，无法拟合网格")
     guess = float(np.median(diffs))
     index = np.rint((values - values[0]) / guess).astype(int)
+    for _ in range(3):
+        # 按当前步长重算 index；相邻间距若接近步长就是正常格，明显更大
+        # 才是真缺失峰，排除它后取均值，避免缺失峰把步长拉大
+        gaps = np.diff(values)
+        normal = gaps[gaps < guess * 1.6]
+        step = float(normal.mean()) if len(normal) else guess
+        new_index = np.rint((values - values[0]) / step).astype(int)
+        if np.array_equal(new_index, index):
+            index = new_index
+            break
+        index, guess = new_index, step
     slope, origin = np.polyfit(index, values, 1)
-    return float(slope), float(origin), int(index[-1]) + 1
+    # 步长由正常相邻间距的均值决定；polyfit 斜率只作 sanity 参考
+    return step, float(origin), int(index[-1]) + 1
 
 
 def detect_grid(mask):
@@ -141,11 +150,11 @@ def detect_grid(mask):
     dark_y, dark_x = np.where(roi)
     dark_x = dark_x.astype(float) + x0
     dark_y = dark_y.astype(float) + y0
-    phase_x = _mod_origin(dark_x, step)
-    phase_y = _mod_origin(dark_y, step)
-    # 用投影到的中心锚定相位，再按线条像素范围向两侧补出稀疏/空的行列
-    origin_x = phase_x + round((cols[0] - phase_x) / step) * step
-    origin_y = phase_y + round((rows[0] - phase_y) / step) * step
+    # 投影峰就是真实的网格线中心，直接拿首峰锚定原点。
+    # 不能再对所有深色像素取模估计相位：箭头三角形等像素并不在线上，
+    # 会把相位拉偏近半格，导致采样点落到相邻竖线的箭头上、方向判定出错。
+    origin_x = float(cols[0])
+    origin_y = float(rows[0])
     kx0 = int(np.floor((dark_x.min() - origin_x) / step)) - 1
     kx1 = int(np.floor((dark_x.max() - origin_x) / step)) + 1
     ky0 = int(np.floor((dark_y.min() - origin_y) / step)) - 1
