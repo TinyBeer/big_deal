@@ -80,6 +80,7 @@ ui.layout(
           <button id="jdst" text="刮卡任务" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
           <button id="jdss" text="超级明星" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
         </horizontal>
+        <button id="jdmedical" text="看病买药任务" w="*" h="42" textSize="12sp" marginTop="8" />
       </vertical>
 
       {/* 互动游戏 */}
@@ -186,7 +187,7 @@ function tintCheck(id) {
 ["cardShop", "cardGame", "cardJr"].forEach((id) => rounded(id, C.surface, 14, C.border, 1));
 
 [
-  "jd", "jdbb", "jddddb", "jd121", "jdst", "jdss",
+  "jd", "jdbb", "jddddb", "jd121", "jdst", "jdss", "jdmedical",
   "jdjrm", "ddep", "save", "jdbrowse", "panda", "exit", "igrun",
 ].forEach((id) => {
   rounded(id, id === "igrun" ? C.primaryDark : C.btn, 10, id === "igrun" ? null : C.btnBorder, 1);
@@ -230,6 +231,9 @@ ui.jdst.click(() =>
 );
 ui.jdss.click(() =>
   startTask(require("./modules/jd_super_star").run, "超级明星"),
+);
+ui.jdmedical.click(() =>
+  startTask(require("./modules/jd_h5_browse_beans").run, "看病买药"),
 );
 ui.jdig.click(() =>
   startTask(require("./modules/jd_interactive_games").run, "互动游戏"),
