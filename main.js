@@ -38,6 +38,7 @@ const C = {
   surface: "#1E2430",
   border: "#2B3342",
   primary: "#E1251B",
+  primaryLight: "#F04335",
   primaryDark: "#C21810",
   text: "#F1F3F7",
   textDim: "#98A2B3",
@@ -84,6 +85,16 @@ ui.layout(
           <view w="3" h="14" background={C.primary} marginRight="8" />
           <text text="互动游戏" textSize="14sp" textColor={C.text} textStyle="bold" />
         </horizontal>
+        <button
+          id="jdig"
+          text="启动京东互动游戏"
+          w="*"
+          h="48"
+          textSize="15sp"
+          textStyle="bold"
+          marginTop="10"
+        />
+
         {/* 京东金融互动游戏控制 */}
         <text text="金融互动游戏 · 执行分区" textSize="12sp" textColor={C.textDim} marginTop="14" marginBottom="6" />
         <horizontal gravity="center_vertical" wrap="wrap">
@@ -116,7 +127,6 @@ ui.layout(
           <button id="ddep" text="天天赚京豆" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
           <button id="save" text="省钱中心" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
         </horizontal>
-        <button id="jdbrowse" text="浏览领赚豆" w="*" h="42" textSize="12sp" marginTop="8" />
       </vertical>
 
       {/* 日志等级 */}
@@ -171,12 +181,15 @@ function tintCheck(id) {
 ["cardShop", "cardGame", "cardJr"].forEach((id) => rounded(id, C.surface, 14, C.border, 1));
 
 [
-  "jd", "jddddb", "jd121", "jdmedical",
-  "jdjrm", "ddep", "save", "jdbrowse", "exit", "igrun",
+  "jd", "jddddb", "jd121", "wujincheng", "jdmedical",
+  "jdjrm", "ddep", "save", "exit", "igrun",
 ].forEach((id) => {
   rounded(id, id === "igrun" ? C.primaryDark : C.btn, 10, id === "igrun" ? null : C.btnBorder, 1);
   ui[id].setTextColor(color(C.text));
 });
+
+gradient("jdig", C.primaryLight, C.primaryDark, 12);
+ui.jdig.setTextColor(color("#FFFFFF"));
 
 [
   "igHot", "igDaily", "igRecommend", "igGuess", "igDiscover", "igNew", "igtest", "igtimer",
@@ -212,13 +225,13 @@ ui.wujincheng.click(() =>
 ui.jdmedical.click(() =>
   startTask(require("./modules/jd_h5_browse_beans").run, "看病买药"),
 );
+ui.jdig.click(() =>
+  startTask(require("./modules/jd_interactive_games").run, "互动游戏"),
+);
 ui.ddep.click(() =>
   startTask(require("./modules/jdjr_earn_pea").run, "天天赚京豆"),
 );
 ui.save.click(() => startTask(require("./modules/jdjr_save_center").run, "省钱中心"));
-ui.jdbrowse.click(() =>
-  startTask(require("./modules/jdjr_browse_earn_pea").run, "浏览领赚豆"),
-);
 ui.jdjrm.click(() =>
   startTask(require("./modules/jdjr_manual").run, "金融手动"),
 );
