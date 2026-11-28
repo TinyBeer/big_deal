@@ -73,6 +73,7 @@ ui.layout(
           <button id="jd" text="京东" w="0" h="42" layout_weight="1" textSize="12sp" />
           <button id="jddddb" text="国补" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
           <button id="jd121" text="121京豆" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
+          <button id="wujincheng" text="五金城" w="0" h="42" layout_weight="1" textSize="12sp" marginLeft="8" />
         </horizontal>
         <button id="jdmedical" text="看病买药任务" w="*" h="42" textSize="12sp" marginTop="8" />
       </vertical>
@@ -205,6 +206,9 @@ ui.jddddb.click(() =>
   startTask(require("./modules/jd_day_day_benefit").run, "国补"),
 );
 ui.jd121.click(() => startTask(require("./modules/jd_121pea").run, "121京豆"));
+ui.wujincheng.click(() =>
+  startTask(require("./modules/jd_daily_browse_tasks").run, "五金城"),
+);
 ui.jdmedical.click(() =>
   startTask(require("./modules/jd_h5_browse_beans").run, "看病买药"),
 );
